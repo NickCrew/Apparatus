@@ -13,12 +13,12 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const baseStyles = [
-  'inline-flex items-center justify-center font-mono font-medium tracking-wide',
-  'transition-all duration-200 ease-out',
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950',
-  'disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none',
-  'rounded-sm', // Tech/Industrial look
-  'uppercase text-xs letter-spacing-1',
+  'inline-flex items-center justify-center font-display font-semibold tracking-wide',
+  'transition-all duration-150 ease-out',
+  'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary-500/40 focus-visible:ring-offset-1 focus-visible:ring-offset-neutral-950',
+  'disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none',
+  'rounded-[3px]',
+  'uppercase text-xs',
 ].join(' ');
 
 const variants: Record<ButtonVariant, string> = {

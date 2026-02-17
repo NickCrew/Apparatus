@@ -5,6 +5,8 @@ import { MainContent } from './components/layout/MainContent';
 import { ThemeProvider } from './theme/ThemeProvider';
 import { ApparatusProvider } from './providers/ApparatusProvider';
 import { Overview } from './components/dashboard/Overview';
+import { ChaosConsole } from './components/dashboard/ChaosConsole';
+import { DefenseConsole } from './components/dashboard/DefenseConsole';
 
 // Placeholder Components with basic styling
 const Placeholder = ({ title }: { title: string }) => (
@@ -14,9 +16,7 @@ const Placeholder = ({ title }: { title: string }) => (
 );
 
 const Traffic = () => <Placeholder title="Traffic" />;
-const Defense = () => <Placeholder title="Defense" />;
 const Deception = () => <Placeholder title="Deception" />;
-const Chaos = () => <Placeholder title="Chaos" />;
 const Cluster = () => <Placeholder title="Cluster" />;
 const Webhooks = () => <Placeholder title="Webhooks" />;
 const MTD = () => <Placeholder title="MTD" />;
@@ -40,16 +40,16 @@ function Layout() {
 
 export default function App() {
   return (
-    <BrowserRouter basename="/dashboard">
+    <BrowserRouter>
       <ThemeProvider>
         <ApparatusProvider>
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Overview />} />
               <Route path="traffic" element={<Traffic />} />
-              <Route path="defense" element={<Defense />} />
+              <Route path="defense" element={<DefenseConsole />} />
               <Route path="deception" element={<Deception />} />
-              <Route path="chaos" element={<Chaos />} />
+              <Route path="chaos" element={<ChaosConsole />} />
               <Route path="cluster" element={<Cluster />} />
               <Route path="webhooks" element={<Webhooks />} />
               <Route path="mtd" element={<MTD />} />

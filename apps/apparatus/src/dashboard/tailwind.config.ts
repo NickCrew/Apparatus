@@ -19,22 +19,48 @@ const config = {
         surface: colors.surface,
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Rajdhani', 'system-ui', 'sans-serif'],
+        sans: ['Outfit', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'Menlo', 'monospace'],
+      },
+      fontSize: {
+        'display-lg': ['2.25rem', { lineHeight: '1.1', letterSpacing: '-0.01em', fontWeight: '600' }],
+        'display-md': ['1.5rem', { lineHeight: '1.15', letterSpacing: '0.02em', fontWeight: '600' }],
+        'display-sm': ['1.125rem', { lineHeight: '1.2', letterSpacing: '0.02em', fontWeight: '600' }],
+        'label': ['0.6875rem', { lineHeight: '1', letterSpacing: '0.08em', fontWeight: '500' }],
       },
       boxShadow: {
         'glow-primary': '0 0 20px -5px rgba(0, 240, 255, 0.5)',
         'glow-success': '0 0 20px -5px rgba(0, 255, 148, 0.5)',
         'glow-danger': '0 0 20px -5px rgba(255, 0, 85, 0.5)',
+        'glow-sm': '0 0 10px -3px rgba(0, 240, 255, 0.3)',
         'panel': '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.15)',
+        'inner-glow': 'inset 0 1px 0 0 rgba(255, 255, 255, 0.03)',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'grid-pattern': "linear-gradient(to right, #1f2633 1px, transparent 1px), linear-gradient(to bottom, #1f2633 1px, transparent 1px)",
+        'grid-pattern': "linear-gradient(to right, rgba(31,38,51,0.5) 1px, transparent 1px), linear-gradient(to bottom, rgba(31,38,51,0.5) 1px, transparent 1px)",
       },
       animation: {
         'spin-slow': 'spin 3s linear infinite',
         'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'terminal-in': 'terminal-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'fade-in': 'fade-in 0.4s ease-out forwards',
+        'glow-pulse': 'glow-pulse 3s ease-in-out infinite',
+      },
+      keyframes: {
+        'terminal-in': {
+          from: { opacity: '0', transform: 'translateY(10px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        'fade-in': {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
+        'glow-pulse': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.6' },
+        },
       },
     },
   },

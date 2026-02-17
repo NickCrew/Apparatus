@@ -8,133 +8,154 @@ export function TrafficVisualizer() {
   const { events, isConnected } = useTrafficStream(100);
 
   return (
-    <Card variant="panel" className="h-96 flex flex-col">
-      <CardHeader className="flex-none border-b border-neutral-800 pb-2 mb-0 bg-neutral-900/50">
+    <Card variant="panel" className="h-80 flex flex-col">
+      <CardHeader className="flex-none border-b border-neutral-800/30 pb-2 mb-0 bg-neutral-900/30">
         <div className="flex justify-between items-center">
-          <CardTitle className="flex items-center gap-2">
-            <Activity className="h-4 w-4 text-primary-500" />
+          <CardTitle className="flex items-center gap-2 text-sm">
+            <Activity className="h-3.5 w-3.5 text-primary-500/70" />
             Live Traffic Feed
           </CardTitle>
-          <div className="flex items-center gap-2">
-            <Badge variant={isConnected ? 'success' : 'neutral'} dot>
-              {isConnected ? 'LIVE STREAM' : 'OFFLINE'}
+          <div className="flex items-center gap-3">
+            <Badge variant={isConnected ? 'success' : 'neutral'} size="sm" dot>
+              {isConnected ? 'LIVE' : 'OFFLINE'}
             </Badge>
-            <div className="text-xs font-mono text-neutral-500">
-               {events.length} EPS
-            </div>
+            <span className="text-[10px] font-mono text-neutral-700">
+              {events.length} events
+            </span>
           </div>
         </div>
       </CardHeader>
-      
-      <div className="flex-1 relative overflow-hidden bg-neutral-950 font-mono text-[10px]">
-         {/* Canvas Layer for Sparklines/Visuals */}
-         <CanvasWaterfall events={events} />
+
+      <div className="flex-1 relative overflow-hidden bg-neutral-950">
+        <CanvasWaterfall events={events} />
       </div>
     </Card>
   );
 }
 
 function CanvasWaterfall({ events }: { events: TrafficEvent[] }) {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const eventsRef = useRef(events); // Keep track of latest events without triggering re-renders of the loop
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const eventsRef = useRef(events);
 
-    useEffect(() => {
-        eventsRef.current = events;
-    }, [events]);
+  useEffect(() => {
+    eventsRef.current = events;
+  }, [events]);
 
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-        let animationFrame: number;
+    let animationFrame: number;
 
-        const render = () => {
-            if (document.hidden) {
-                animationFrame = requestAnimationFrame(render);
-                return;
-            }
+    const render = () => {
+      if (document.hidden) {
+        animationFrame = requestAnimationFrame(render);
+        return;
+      }
 
-            const width = canvas.width;
-            const height = canvas.height;
-            
-            // Clear
-            ctx.clearRect(0, 0, width, height);
-            
-            // Draw grid
-            ctx.strokeStyle = '#1F2633';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            for (let i = 0; i < width; i += 40) {
-                ctx.moveTo(i, 0);
-                ctx.lineTo(i, height);
-            }
-            ctx.stroke();
+      const width = canvas.width;
+      const height = canvas.height;
 
-            const now = Date.now();
-            const timeWindow = 10000; // 10 seconds view
-            
-            eventsRef.current.forEach(ev => {
-                const eventTime = new Date(ev.timestamp).getTime();
-                const age = now - eventTime;
-                
-                if (age > timeWindow) return; // Too old
-                
-                const x = width - ((age / timeWindow) * width);
-                
-                // Y position determined by latency
-                // Cap latency at 1000ms for height
-                const y = height - Math.min((ev.latencyMs / 500) * height, height - 10);
-                
-                // Color by status
-                let color = '#00FF94';
-                if (ev.status >= 500) color = '#FF0055';
-                else if (ev.status >= 400) color = '#FFB800';
-                else if (ev.status >= 300) color = '#00A3FF';
+      ctx.clearRect(0, 0, width, height);
 
-                // Draw "Packet"
-                ctx.fillStyle = color;
-                ctx.shadowColor = color;
-                ctx.shadowBlur = 10;
-                ctx.beginPath();
-                ctx.arc(x, y, 3, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.shadowBlur = 0;
+      // Vertical grid
+      ctx.strokeStyle = 'rgba(31, 38, 51, 0.4)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let i = 0; i < width; i += 48) {
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, height);
+      }
+      ctx.stroke();
 
-                // Draw Path Label if it's "fresh" (last 1 sec)
-                if (age < 2000) {
-                    ctx.fillStyle = '#708099';
-                    ctx.font = '10px JetBrains Mono';
-                    ctx.fillText(`${ev.method} ${ev.path}`, x + 5, y);
-                }
-            });
+      // Horizontal grid + latency labels
+      ctx.beginPath();
+      const latencySteps = [100, 200, 300, 400];
+      for (const ms of latencySteps) {
+        const y = height - Math.min((ms / 500) * height, height - 10);
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+      }
+      ctx.stroke();
 
-            animationFrame = requestAnimationFrame(render);
-        };
-        
-        // Handle Resize
-        const resize = () => {
-            if (canvas.parentElement) {
-                canvas.width = canvas.parentElement.clientWidth;
-                canvas.height = canvas.parentElement.clientHeight;
-            }
-        };
-        window.addEventListener('resize', resize);
-        resize();
+      // Latency axis labels
+      ctx.fillStyle = 'rgba(112, 128, 153, 0.3)';
+      ctx.font = '9px JetBrains Mono';
+      for (const ms of latencySteps) {
+        const y = height - Math.min((ms / 500) * height, height - 10);
+        ctx.fillText(`${ms}ms`, 4, y - 3);
+      }
 
-        render();
+      const now = Date.now();
+      const timeWindow = 10000;
 
-        return () => {
-            window.removeEventListener('resize', resize);
-            cancelAnimationFrame(animationFrame);
-        };
-    }, []);
+      eventsRef.current.forEach(ev => {
+        const eventTime = new Date(ev.timestamp).getTime();
+        const age = now - eventTime;
 
-    return <canvas 
-        ref={canvasRef} 
-        className="w-full h-full block" 
-        role="img" 
-        aria-label={`Live traffic visualization showing ${events.length} recent events`}
-    />;
+        if (age > timeWindow) return;
+
+        const x = width - ((age / timeWindow) * width);
+        const y = height - Math.min((ev.latencyMs / 500) * height, height - 10);
+
+        // Color by status code
+        let color = '#00FF94';
+        if (ev.status >= 500) color = '#FF0055';
+        else if (ev.status >= 400) color = '#FFB800';
+        else if (ev.status >= 300) color = '#00A3FF';
+
+        // Fade based on age
+        const alpha = Math.max(0.2, 1 - (age / timeWindow) * 0.7);
+
+        // Glow
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 8;
+        ctx.globalAlpha = alpha;
+
+        // Draw packet dot
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1;
+
+        // Fresh event label
+        if (age < 1500) {
+          ctx.fillStyle = `rgba(112, 128, 153, ${0.5 * (1 - age / 1500)})`;
+          ctx.font = '9px JetBrains Mono';
+          ctx.fillText(`${ev.method} ${ev.path}`, x + 6, y + 1);
+        }
+      });
+
+      animationFrame = requestAnimationFrame(render);
+    };
+
+    const resize = () => {
+      if (canvas.parentElement) {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+      }
+    };
+    window.addEventListener('resize', resize);
+    resize();
+    render();
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(animationFrame);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="w-full h-full block"
+      role="img"
+      aria-label={`Live traffic visualization showing ${events.length} recent events`}
+    />
+  );
 }

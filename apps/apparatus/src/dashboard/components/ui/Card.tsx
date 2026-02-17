@@ -7,10 +7,10 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const variants = {
-  default: 'bg-neutral-900 border border-neutral-800',
-  panel: 'bg-surface-panel border border-surface-border shadow-panel',
-  outline: 'bg-transparent border border-neutral-800',
-  glass: 'bg-neutral-900/60 backdrop-blur-md border border-white/5',
+  default: 'bg-neutral-900/70 border border-neutral-800/60 shadow-inner-glow',
+  panel: 'bg-neutral-950/80 border border-neutral-800/50 shadow-panel',
+  outline: 'bg-transparent border border-neutral-800/50',
+  glass: 'bg-neutral-900/40 backdrop-blur-md border border-white/[0.04] shadow-inner-glow',
 };
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(
@@ -19,23 +19,13 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
       <div
         ref={ref}
         className={cn(
-          'rounded-sm overflow-hidden relative group', // Tech look: rounded-sm
+          'rounded-[3px] overflow-hidden relative group',
           variants[variant],
           className
         )}
         {...props}
       >
-        {/* Tech Corner Accent (Top Left) */}
-        {variant === 'panel' && (
-          <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-primary-500/50 opacity-0 group-hover:opacity-100 transition-opacity" />
-        )}
-        
-        {/* Tech Corner Accent (Bottom Right) */}
-        {variant === 'panel' && (
-          <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-primary-500/50 opacity-0 group-hover:opacity-100 transition-opacity" />
-        )}
-
-        <div className={cn('relative', !noPadding && 'p-5')}>
+        <div className={cn('relative', !noPadding && 'p-4')}>
           {children}
         </div>
       </div>
@@ -48,7 +38,7 @@ export const CardHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEleme
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('flex flex-col space-y-1.5 mb-4', className)}
+      className={cn('flex flex-col space-y-1 mb-3', className)}
       {...props}
     />
   )
@@ -59,7 +49,7 @@ export const CardTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadi
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
-      className={cn('text-base font-semibold font-mono tracking-tight text-neutral-100 uppercase', className)}
+      className={cn('text-display-sm font-display tracking-wide text-neutral-200 uppercase', className)}
       {...props}
     />
   )
@@ -70,7 +60,7 @@ export const CardDescription = forwardRef<HTMLParagraphElement, HTMLAttributes<H
   ({ className, ...props }, ref) => (
     <p
       ref={ref}
-      className={cn('text-xs text-neutral-400 font-sans', className)}
+      className={cn('text-xs text-neutral-500 font-sans', className)}
       {...props}
     />
   )
@@ -88,7 +78,7 @@ export const CardFooter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivEleme
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('flex items-center mt-4 pt-4 border-t border-neutral-800/50', className)}
+      className={cn('flex items-center mt-3 pt-3 border-t border-neutral-800/40', className)}
       {...props}
     />
   )
