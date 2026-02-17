@@ -51,6 +51,11 @@ function CanvasWaterfall({ events }: { events: TrafficEvent[] }) {
         let animationFrame: number;
 
         const render = () => {
+            if (document.hidden) {
+                animationFrame = requestAnimationFrame(render);
+                return;
+            }
+
             const width = canvas.width;
             const height = canvas.height;
             
@@ -126,5 +131,10 @@ function CanvasWaterfall({ events }: { events: TrafficEvent[] }) {
         };
     }, []);
 
-    return <canvas ref={canvasRef} className="w-full h-full block" />;
+    return <canvas 
+        ref={canvasRef} 
+        className="w-full h-full block" 
+        role="img" 
+        aria-label={`Live traffic visualization showing ${events.length} recent events`}
+    />;
 }

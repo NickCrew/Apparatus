@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-type SSEStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
+export type SSEStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
 
 interface UseSSEOptions {
   enabled?: boolean;
@@ -20,12 +20,6 @@ interface UseSSEReturn {
 const BASE_DELAY = 1000;
 const MAX_DELAY = 30000;
 
-/**
- * Hook for managing SSE (Server-Sent Events) connections with:
- * - Automatic reconnection with exponential backoff
- * - Proper cleanup on URL change or unmount
- * - Type-safe event subscriptions
- */
 export function useSSE(url: string, options: UseSSEOptions = {}): UseSSEReturn {
   const {
     enabled = true,
@@ -38,11 +32,21 @@ export function useSSE(url: string, options: UseSSEOptions = {}): UseSSEReturn {
   const [status, setStatus] = useState<SSEStatus>('disconnected');
   const [retryCount, setRetryCount] = useState(0);
 
+  // Refs for callbacks to avoid dependency cycles
+  const onOpenRef = useRef(onOpen);
+  const onErrorRef = useRef(onError);
+  const onMaxRetriesExceededRef = useRef(onMaxRetriesExceeded);
+
+  useEffect(() => {
+    onOpenRef.current = onOpen;
+    onErrorRef.current = onError;
+    onMaxRetriesExceededRef.current = onMaxRetriesExceeded;
+  }, [onOpen, onError, onMaxRetriesExceeded]);
+
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const listenersRef = useRef<Map<string, Set<(data: unknown) => void>>>(new Map());
+  const listenersRef = useRef<Map<string, Set<(data: any) => void>>>(new Map());
 
-  // Clear any pending reconnect timeout
   const clearReconnectTimeout = useCallback(() => {
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
@@ -50,119 +54,115 @@ export function useSSE(url: string, options: UseSSEOptions = {}): UseSSEReturn {
     }
   }, []);
 
-  // Close current connection
   const closeConnection = useCallback(() => {
     clearReconnectTimeout();
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
       eventSourceRef.current = null;
     }
+    setStatus('disconnected');
   }, [clearReconnectTimeout]);
 
-  // Subscribe to an event type
   const subscribe = useCallback(<T,>(eventType: string, callback: (data: T) => void) => {
-    if (!listenersRef.current.has(eventType)) {
-      listenersRef.current.set(eventType, new Set());
-
-      // Add listener to EventSource if connected
-      if (eventSourceRef.current) {
-        eventSourceRef.current.addEventListener(eventType, (event: MessageEvent) => {
-          const listeners = listenersRef.current.get(eventType);
-          if (listeners) {
-            try {
-              const data = JSON.parse(event.data);
-              listeners.forEach((cb) => cb(data));
-            } catch (e) {
-              console.error(`Failed to parse SSE event "${eventType}":`, e);
-            }
-          }
-        });
+    const listeners = listenersRef.current;
+    if (!listeners.has(eventType)) {
+      listeners.set(eventType, new Set());
+      
+      // If already connected, add the native listener
+      if (eventSourceRef.current && eventSourceRef.current.readyState === EventSource.OPEN) {
+          const handler = (event: MessageEvent) => {
+             try {
+                 const data = JSON.parse(event.data);
+                 listeners.get(eventType)?.forEach(cb => cb(data));
+             } catch (e) {
+                 console.error(`Failed to parse SSE event "${eventType}"`, e);
+             }
+          };
+          // Store handler reference if we needed to remove it later, 
+          // but here we just rely on the map lookup in a single handler per type
+          eventSourceRef.current.addEventListener(eventType, handler);
       }
     }
 
-    const typedCallback = callback as (data: unknown) => void;
-    listenersRef.current.get(eventType)!.add(typedCallback);
+    listeners.get(eventType)!.add(callback as (data: any) => void);
 
-    // Return unsubscribe function
     return () => {
-      const listeners = listenersRef.current.get(eventType);
-      if (listeners) {
-        listeners.delete(typedCallback);
-        if (listeners.size === 0) {
-          listenersRef.current.delete(eventType);
+      const set = listeners.get(eventType);
+      if (set) {
+        set.delete(callback as (data: any) => void);
+        if (set.size === 0) {
+          listeners.delete(eventType);
+          // We don't remove the native listener here to simplify logic,
+          // it will be cleaned up on reconnection/unmount
         }
       }
     };
   }, []);
 
-  // Main connection effect
   useEffect(() => {
     if (!url || !enabled) {
       closeConnection();
-      setStatus('disconnected');
-      setRetryCount(0);
       return;
     }
 
-    // Close any existing connection before opening new one
-    closeConnection();
-    setStatus('connecting');
+    // Don't reconnect if we are just incrementing retry count but maxed out?
+    // Actually, retryCount changes trigger this effect.
+    if (retryCount > maxRetries) {
+        setStatus('error');
+        onMaxRetriesExceededRef.current?.();
+        return;
+    }
 
-    const eventSource = new EventSource(url);
-    eventSourceRef.current = eventSource;
+    // Wait for backoff if this is a retry
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    
+    const connect = () => {
+        closeConnection(); // Ensure clean slate
+        setStatus('connecting');
+        
+        const es = new EventSource(url);
+        eventSourceRef.current = es;
 
-    eventSource.onopen = () => {
-      setStatus('connected');
-      setRetryCount(0);
-      onOpen?.();
+        es.onopen = () => {
+            setStatus('connected');
+            setRetryCount(0);
+            onOpenRef.current?.();
+            
+            // Re-attach listeners
+            listenersRef.current.forEach((set, type) => {
+                es.addEventListener(type, (event: MessageEvent) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        set.forEach(cb => cb(data));
+                    } catch (e) {
+                        console.error('SSE Parse Error', e);
+                    }
+                });
+            });
+        };
+
+        es.onerror = (event) => {
+            setStatus('error');
+            onErrorRef.current?.(event);
+            es.close();
+            
+            // Trigger retry logic
+            setRetryCount(prev => prev + 1); 
+        };
     };
 
-    eventSource.onerror = (event) => {
-      setStatus('error');
-      onError?.(event);
-      eventSource.close();
-      eventSourceRef.current = null;
+    if (retryCount > 0) {
+        const delay = Math.min(BASE_DELAY * Math.pow(2, retryCount - 1), MAX_DELAY);
+        timeoutId = setTimeout(connect, delay);
+    } else {
+        connect();
+    }
 
-      // Attempt reconnection with exponential backoff
-      setRetryCount((currentRetry) => {
-        if (currentRetry >= maxRetries) {
-          onMaxRetriesExceeded?.();
-          return currentRetry;
-        }
-
-        const delay = Math.min(BASE_DELAY * Math.pow(2, currentRetry), MAX_DELAY);
-        reconnectTimeoutRef.current = setTimeout(() => {
-          setRetryCount((r) => r + 1);
-        }, delay);
-
-        return currentRetry;
-      });
-    };
-
-    // Re-attach all existing event listeners
-    listenersRef.current.forEach((listeners, eventType) => {
-      eventSource.addEventListener(eventType, (event: MessageEvent) => {
-        try {
-          const data = JSON.parse(event.data);
-          listeners.forEach((cb) => cb(data));
-        } catch (e) {
-          console.error(`Failed to parse SSE event "${eventType}":`, e);
-        }
-      });
-    });
-
-    // Cleanup on URL change or unmount
     return () => {
-      clearReconnectTimeout();
-      eventSource.close();
-      eventSourceRef.current = null;
+        if (timeoutId) clearTimeout(timeoutId);
+        closeConnection();
     };
-  }, [url, enabled, retryCount, maxRetries, onOpen, onError, onMaxRetriesExceeded, closeConnection, clearReconnectTimeout]);
+  }, [url, enabled, retryCount, maxRetries, closeConnection]);
 
-  return {
-    status,
-    retryCount,
-    subscribe,
-    close: closeConnection,
-  };
+  return { status, retryCount, subscribe, close: closeConnection };
 }

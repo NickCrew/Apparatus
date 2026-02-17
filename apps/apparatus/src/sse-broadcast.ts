@@ -27,7 +27,7 @@ interface ClientInfo {
 }
 
 // Global event emitter for SSE
-class SSEBroadcaster extends EventEmitter {
+export class SSEBroadcaster extends EventEmitter {
     private clients: Map<string, ClientInfo> = new Map();
 
     /**
