@@ -130,6 +130,40 @@ export function createApp(): Express {
     // 1.5 Active Shield (Virtual Patching) - Moved here to access parsed body
     app.use(activeShieldMiddleware);
 
+    // CORS Configuration - Restrict to localhost/safe origins in production
+    app.use((req, res, next) => {
+        const origin = req.headers.origin;
+        const safeOrigins = [
+            "http://localhost:8080", 
+            "http://localhost:8090", 
+            "http://127.0.0.1:8080", 
+            "http://127.0.0.1:8090"
+        ];
+        
+        if (cfg.demoMode || (origin && safeOrigins.includes(origin)) || !origin) {
+             res.setHeader("Access-Control-Allow-Origin", origin || "*");
+             res.setHeader("Access-Control-Allow-Headers", "*");
+             res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+        }
+        
+        if (req.method === "OPTIONS") return res.sendStatus(204);
+        next();
+    });
+
+    // Security Gate for Dangerous Endpoints
+    const securityGate = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        const isLocal = req.ip === "127.0.0.1" || req.ip === "::1";
+        if (!cfg.demoMode && !isLocal) {
+            return res.status(403).json({ error: "Access denied. Enable demo mode or use localhost." });
+        }
+        next();
+    };
+
+    // Protect dangerous endpoints
+    app.use("/api/simulator", securityGate);
+    app.use("/_sensor", securityGate);
+    app.use("/proxy", securityGate);
+
     // Prometheus Metrics Endpoint
     app.get("/metrics", async (_req, res) => {
         try {

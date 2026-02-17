@@ -1,0 +1,2899 @@
+commit dd40156 (HEAD -> main)
+Author: Nick Ferguson <nferguson@a10networks.com>
+Date:   Mon, 2026-02-16 19:48 (-0500)
+
+    feat: initial apparatus setup with dashboard and broadcast middleware
+
+diff --git a/apps/apparatus/src/app.ts b/apps/apparatus/src/app.ts
+new file mode 100644
+index 0000000..91adf0f
+--- /dev/null
++++ b/apps/apparatus/src/app.ts
+@@ -0,0 +1,324 @@
++import express, { Express } from "express";
++import pinoHttp from "pino-http";
++import swaggerUi from "swagger-ui-express";
++import compression from "compression";
++import multer from "multer";
++import path from "path";
++import { fileURLToPath } from "url";
++import { cfg } from "./config.js";
++import { logger } from "./logger.js";
++import { echoHandler, sseHandler } from "./echoHandler.js";
++import { sseBroadcaster, broadcastRequest } from "./sse-broadcast.js";
++import { register, httpRequestDurationMicroseconds, httpRequestsTotal } from "./metrics.js";
++import { swaggerDocument } from "./swagger.js";
++import { getHistory, clearHistory } from "./history.js";
++import { proxyHandler } from "./proxy.js";
++import { jwtDebugHandler } from "./jwt-debug.js";
++import { rateLimitHandler } from "./ratelimit.js";
++import { graphqlHandler } from "./graphql.js";
++import { jwksHandler, tokenMintHandler, oidcDiscoveryHandler } from "./oidc.js";
++import { sinkHandler } from "./sink.js";
++import { dlpHandler } from "./dlp.js";
++import { generatorHandler } from "./generator.js";
++import { sysInfoHandler } from "./sysinfo.js";
++import { dnsHandler, pingHandler } from "./infra-debug.js";
++import { webhookReceiveHandler, webhookListHandler } from "./webhook.js";
++import { eicarHandler, crashHandler, cpuSpikeHandler, memorySpikeHandler } from "./chaos.js";
++import { kvHandler } from "./kv.js";
++import { scriptHandler } from "./scripting.js";
++import { pcapHandler, harReplayHandler } from "./forensics.js";
++import { clusterAttackHandler, getClusterMembers } from "./cluster.js";
++import { tarpitMiddleware, tarpitListHandler, tarpitReleaseHandler } from "./tarpit.js";
++import { selfHealingMiddleware, getHealthStatus } from "./self-healing.js";
++import { deceptionHandler, deceptionHistoryHandler, deceptionClearHandler } from "./deception.js";
++import { redTeamValidateHandler } from "./redteam.js";
++import { activeShieldMiddleware, sentinelHandler } from "./sentinel.js";
++import { ghostHandler } from "./ghosting.js";
++import { polymorphicRouteMiddleware, mtdHandler } from "./mtd.js";
++import { victimRouter } from "./victim/index.js";
++import { chat } from "./ai/client.js";
++import { runEscapeScan } from "./escape/index.js";
++import { triggerSupplyChainAttack } from "./simulator/supply-chain.js";
++import { request } from "undici";
++
++const __filename = fileURLToPath(import.meta.url);
++const __dirname = path.dirname(__filename);
++
++const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } }); // 50MB limit
++
++export function createApp(): Express {
++    const app = express();
++
++    // 0. Always enable CORS first for local dev
++    app.use((req, res, next) => {
++        res.setHeader("Access-Control-Allow-Origin", "*");
++        res.setHeader("Access-Control-Allow-Headers", "*");
++        res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
++        if (req.method === "OPTIONS") return res.sendStatus(204);
++        next();
++    });
++
++    // 1. Moving Target Defense (Hide everything if active)
++    app.use(polymorphicRouteMiddleware);
++
++    // 2. Self-Healing & QoS
++    app.use(selfHealingMiddleware);
++
++    // 2. Deception Engine (Misinformation wins)
++    app.use(async (req, res, next) => {
++        try {
++            const trapped = await deceptionHandler(req, res);
++            if (trapped || res.headersSent) return;
++            next();
++        } catch (error) {
++            next(error); // Pass to Express error handler
++        }
++    });
++
++    // 3. Tarpit Defense (Honeypot)
++    app.use(tarpitMiddleware);
++
++    app.use((req, res, next) => {
++        (req as any)._startAt = Date.now();
++        
++        // Metrics: end timer on response finish
++        const end = httpRequestDurationMicroseconds.startTimer();
++        res.on("finish", () => {
++            const route = req.route ? req.route.path : req.path;
++            const status = res.statusCode;
++            
++            httpRequestsTotal.inc({
++                method: req.method,
++                route: route,
++                status_code: status,
++            });
++            
++            end({
++                method: req.method,
++                route: route,
++                status_code: status,
++            });
++
++            // Global Traffic Broadcast for Dashboard
++            // We only broadcast if it's NOT the SSE stream itself to avoid loops
++            if (route !== "/sse") {
++                broadcastRequest({
++                    method: req.method,
++                    path: req.path,
++                    status: res.statusCode,
++                    ip: req.ip,
++                    timestamp: new Date().toISOString(),
++                    latencyMs: Date.now() - ((req as any)._startAt || Date.now())
++                });
++            }
++        });
++
++        next();
++    });
++
++    if (cfg.enableCompression) {
++        app.use(compression() as unknown as express.RequestHandler);
++    }
++
++    app.use(pinoHttp({ logger }));
++
++    app.use(express.json({ limit: cfg.bodyLimit, strict: false }));
++    app.use(express.urlencoded({ extended: true, limit: cfg.bodyLimit }));
++    app.use(express.raw({ type: "application/octet-stream", limit: cfg.bodyLimit }));
++    app.use(express.text({ type: "*/*", limit: cfg.bodyLimit }));
++
++    // 1.5 Active Shield (Virtual Patching) - Moved here to access parsed body
++    app.use(activeShieldMiddleware);
++
++    // Prometheus Metrics Endpoint
++    app.get("/metrics", async (_req, res) => {
++        try {
++            res.set("Content-Type", register.contentType);
++            res.end(await register.metrics());
++        } catch (ex) {
++            res.status(500).send(ex);
++        }
++    });
++
++    // Swagger Documentation
++    app.use("/docs", swaggerUi.serve as unknown as express.RequestHandler[], swaggerUi.setup(swaggerDocument) as unknown as express.RequestHandler);
++
++    app.get("/healthz", (_req, res) => res.status(200).json({ status: "ok" }));
++    app.get("/health/pro", (_req, res) => res.json(getHealthStatus()));
++    app.get("/sse", sseHandler);
++
++    // Demo Mode & Integrations Control (Dashboard parity)
++    app.get("/_sensor/demo", (_req, res) => {
++        res.json({ success: true, demo_mode: cfg.demoMode });
++    });
++
++    app.all("/_sensor/demo/toggle", (_req, res) => {
++        cfg.demoMode = !cfg.demoMode;
++        logger.info(`Apparatus Demo mode toggled to: ${cfg.demoMode}`);
++        res.json({ success: true, demo_mode: cfg.demoMode });
++    });
++
++    app.get("/_sensor/config/integrations", (_req, res) => {
++        res.json({
++            success: true,
++            data: {
++                tunnel_url: cfg.tunnelUrl,
++                tunnel_api_key: cfg.tunnelApiKey,
++                apparatus_url: `http://localhost:${cfg.portHttp1}`
++            }
++        });
++    });
++
++    app.put("/_sensor/config/integrations", (req, res) => {
++        const { tunnel_url, tunnel_api_key } = req.body;
++        if (tunnel_url !== undefined) cfg.tunnelUrl = tunnel_url;
++        if (tunnel_api_key !== undefined) cfg.tunnelApiKey = tunnel_api_key;
++
++        logger.info("Apparatus Integrations configuration updated from dashboard");
++        res.json({ success: true, message: "Integrations configuration updated" });
++    });
++
++    // Request History
++    app.get("/history", (_req, res) => res.json(getHistory()));
++    app.delete("/history", (_req, res) => {
++        clearHistory();
++        res.sendStatus(204);
++    });
++
++    // Visual Dashboard - React App
++    const dashboardPath = path.join(__dirname, "dist-dashboard");
++    app.use("/dashboard", express.static(dashboardPath));
++    
++    // SPA Fallback for Dashboard
++    app.get("/dashboard/*", (_req, res) => {
++        res.sendFile(path.join(dashboardPath, "index.html"));
++    });
++    
++    // Serve Static Assets
++    app.use("/assets", express.static(path.join(process.cwd(), "assets")));
++
++    // Debugging Tools
++    app.get("/debug/jwt", jwtDebugHandler);
++    app.get("/ratelimit", rateLimitHandler);
++    app.get("/sysinfo", sysInfoHandler);
++    app.get("/dns", dnsHandler);
++    app.get("/ping", pingHandler);
++    app.all("/hooks/:id", webhookReceiveHandler);
++    app.get("/hooks/:id/inspect", webhookListHandler);
++
++    // Modern API Features (GraphQL & OIDC)
++    app.all("/graphql", graphqlHandler as unknown as express.RequestHandler);
++    app.get("/.well-known/jwks.json", jwksHandler);
++    app.get("/.well-known/openid-configuration", oidcDiscoveryHandler);
++    app.all("/auth/token", tokenMintHandler);
++
++    // Bandwidth Tests
++    app.post("/sink", sinkHandler);
++    app.get("/generate", generatorHandler);
++    app.get("/dlp", dlpHandler);
++    
++    // Security & Chaos
++    app.get("/malicious", eicarHandler);
++    app.post("/chaos/crash", crashHandler);
++    app.get("/chaos/cpu", cpuSpikeHandler);
++    app.get("/chaos/memory", memorySpikeHandler);
++
++    // Advanced Logic
++    app.all("/kv/:key", kvHandler);
++    app.post("/script", scriptHandler);
++
++    // Network Forensics
++    app.get("/capture.pcap", pcapHandler);
++    app.post("/replay", harReplayHandler);
++
++    // Distributed Cluster
++    app.post("/cluster/attack", clusterAttackHandler);
++    app.get("/cluster/members", (_req, res) => res.json(getClusterMembers()));
++
++    // Advanced Defense & Offense
++    app.get("/redteam/validate", redTeamValidateHandler);
++    app.all("/sentinel/rules", sentinelHandler);
++    app.get("/ghosts", ghostHandler);
++    app.all("/mtd", mtdHandler);
++
++    // Tarpit Monitor API
++    app.get("/tarpit", tarpitListHandler);
++    app.post("/tarpit/release", tarpitReleaseHandler);
++
++    // Deception History API
++    app.get("/deception/history", deceptionHistoryHandler);
++    app.delete("/deception/history", deceptionClearHandler);
++
++    // The Victim (Vulnerable App)
++    app.use("/victim", victimRouter);
++
++    // Proxy / SSRF Test
++    app.all("/proxy", proxyHandler);
++
++    // AI Chat API
++    app.post("/api/ai/chat", async (req, res) => {
++        try {
++            const { sessionId, system, message } = req.body;
++            const response = await chat(sessionId || "default", system || "You are a helpful assistant.", message);
++            res.json({ response });
++        } catch (err: any) {
++            logger.error({ error: err.message }, "AI Chat Error");
++            res.status(500).json({ error: err.message });
++        }
++    });
++
++    // Infrastructure Status Proxies
++    app.get("/api/infra/imposter", async (_req, res) => {
++        try {
++            const { statusCode, body } = await request("http://127.0.0.1:16925/health");
++            if (statusCode === 200) {
++                const data = await body.json();
++                res.json(data);
++            } else {
++                res.status(502).json({ status: "error", code: statusCode });
++            }
++        } catch (e: any) {
++            res.status(502).json({ status: "down", error: e.message });
++        }
++    });
++
++    app.get("/api/infra/sidecar", async (_req, res) => {
++        try {
++            // Check sidecar by hitting its healthz which proxies to us
++            const { statusCode } = await request("http://127.0.0.1:8081/healthz");
++            if (statusCode === 200) {
++                res.json({ status: "ok", role: "Toxic Sidecar" });
++            } else {
++                res.status(502).json({ status: "error", code: statusCode });
++            }
++        } catch (e: any) {
++            res.status(502).json({ status: "down", error: e.message });
++        }
++    });
++
++    // Supply Chain Simulator
++    app.post("/api/simulator/supply-chain", async (req, res) => {
++        try {
++            const logs = await triggerSupplyChainAttack(req.body.target);
++            res.json({ logs });
++        } catch (e: any) {
++            res.status(500).json({ error: e.message });
++        }
++    });
++
++    // Escape Artist API
++    app.post("/api/escape/scan", async (req, res) => {
++        try {
++            const results = await runEscapeScan(req.body);
++            res.json(results);
++        } catch (err: any) {
++            logger.error({ error: err.message }, "Escape Scan Error");
++            res.status(500).json({ error: err.message });
++        }
++    });
++    
++    // Handle multipart uploads on any route
++    app.all("*", upload.any() as unknown as express.RequestHandler, echoHandler);
++
++    return app;
++}
+diff --git a/apps/apparatus/src/dashboard/.eslintrc.cjs b/apps/apparatus/src/dashboard/.eslintrc.cjs
+new file mode 100644
+index 0000000..a3b2216
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/.eslintrc.cjs
+@@ -0,0 +1,13 @@
++module.exports = {
++  root: true,
++  ignorePatterns: ['dist/**', 'node_modules/**'],
++  parser: '@typescript-eslint/parser',
++  parserOptions: {
++    ecmaVersion: 2022,
++    sourceType: 'module',
++    ecmaFeatures: { jsx: true },
++  },
++  plugins: ['@typescript-eslint'],
++  rules: {},
++};
++
+diff --git a/apps/apparatus/src/dashboard/App.tsx b/apps/apparatus/src/dashboard/App.tsx
+new file mode 100644
+index 0000000..060a9b8
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/App.tsx
+@@ -0,0 +1,65 @@
++import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
++import { Sidebar } from './components/layout/Sidebar';
++import { Header } from './components/layout/Header';
++import { MainContent } from './components/layout/MainContent';
++import { ThemeProvider } from './theme/ThemeProvider';
++import { ApparatusProvider } from './providers/ApparatusProvider';
++import { Overview } from './components/dashboard/Overview';
++
++// Placeholder Components with basic styling
++const Placeholder = ({ title }: { title: string }) => (
++  <div className="flex items-center justify-center h-full text-neutral-500 font-mono text-sm border-2 border-dashed border-neutral-800 rounded-lg bg-neutral-900/20">
++    [{title.toUpperCase()}_MODULE_NOT_LOADED]
++  </div>
++);
++
++const Traffic = () => <Placeholder title="Traffic" />;
++const Defense = () => <Placeholder title="Defense" />;
++const Deception = () => <Placeholder title="Deception" />;
++const Chaos = () => <Placeholder title="Chaos" />;
++const Cluster = () => <Placeholder title="Cluster" />;
++const Webhooks = () => <Placeholder title="Webhooks" />;
++const MTD = () => <Placeholder title="MTD" />;
++const Testing = () => <Placeholder title="Testing" />;
++const Network = () => <Placeholder title="Network" />;
++const Settings = () => <Placeholder title="Settings" />;
++
++function Layout() {
++  return (
++    <div className="flex h-screen bg-neutral-950 text-neutral-100 font-sans antialiased selection:bg-primary-500/30 overflow-hidden">
++      <Sidebar />
++      <div className="flex flex-col flex-1 min-w-0 relative">
++        <Header />
++        <MainContent>
++          <Outlet />
++        </MainContent>
++      </div>
++    </div>
++  );
++}
++
++export default function App() {
++  return (
++    <BrowserRouter>
++      <ThemeProvider>
++        <ApparatusProvider>
++          <Routes>
++            <Route path="/" element={<Layout />}>
++              <Route index element={<Overview />} />
++              <Route path="traffic" element={<Traffic />} />
++              <Route path="defense" element={<Defense />} />
++              <Route path="deception" element={<Deception />} />
++              <Route path="chaos" element={<Chaos />} />
++              <Route path="cluster" element={<Cluster />} />
++              <Route path="webhooks" element={<Webhooks />} />
++              <Route path="mtd" element={<MTD />} />
++              <Route path="testing" element={<Testing />} />
++              <Route path="network" element={<Network />} />
++              <Route path="settings" element={<Settings />} />
++            </Route>
++          </Routes>
++        </ApparatusProvider>
++      </ThemeProvider>
++    </BrowserRouter>
++  );
++}
+\ No newline at end of file
+diff --git a/apps/apparatus/src/dashboard/components/ErrorBoundary.tsx b/apps/apparatus/src/dashboard/components/ErrorBoundary.tsx
+new file mode 100644
+index 0000000..2d6e5a7
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/components/ErrorBoundary.tsx
+@@ -0,0 +1,86 @@
++import { Component, type ErrorInfo, type ReactNode } from 'react';
++import { Button } from './ui/Button';
++
++interface ErrorBoundaryProps {
++  children: ReactNode;
++  fallback?: ReactNode;
++}
++
++interface ErrorBoundaryState {
++  hasError: boolean;
++  error: Error | null;
++}
++
++export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
++  constructor(props: ErrorBoundaryProps) {
++    super(props);
++    this.state = { hasError: false, error: null };
++  }
++
++  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
++    return { hasError: true, error };
++  }
++
++  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
++    console.error('React Error Boundary caught:', error, errorInfo);
++    // TODO: Send to error tracking service
++  }
++
++  handleReset = (): void => {
++    this.setState({ hasError: false, error: null });
++  };
++
++  handleReload = (): void => {
++    window.location.reload();
++  };
++
++  render(): ReactNode {
++    if (this.state.hasError) {
++      if (this.props.fallback) {
++        return this.props.fallback;
++      }
++
++      return (
++        <div className="flex h-screen items-center justify-center bg-neutral-950 text-white p-6">
++          <div className="text-center max-w-md">
++            <div className="mb-6">
++              <svg
++                className="w-16 h-16 mx-auto text-danger-500"
++                fill="none"
++                viewBox="0 0 24 24"
++                stroke="currentColor"
++                aria-hidden="true"
++              >
++                <path
++                  strokeLinecap="round"
++                  strokeLinejoin="round"
++                  strokeWidth={1.5}
++                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
++                />
++              </svg>
++            </div>
++            <h1 className="text-2xl font-bold mb-2">Something went wrong</h1>
++            <p className="text-neutral-400 mb-6">
++              {this.state.error?.message || 'An unexpected error occurred'}
++            </p>
++            <div className="flex gap-3 justify-center">
++              <Button variant="secondary" onClick={this.handleReset}>
++                Try Again
++              </Button>
++              <Button variant="primary" onClick={this.handleReload}>
++                Reload Page
++              </Button>
++            </div>
++            {process.env.NODE_ENV === 'development' && this.state.error && (
++              <pre className="mt-6 text-left text-xs text-neutral-500 bg-neutral-900 p-4 rounded-lg overflow-auto max-h-48">
++                {this.state.error.stack}
++              </pre>
++            )}
++          </div>
++        </div>
++      );
++    }
++
++    return this.props.children;
++  }
++}
+diff --git a/apps/apparatus/src/dashboard/components/dashboard/Overview.tsx b/apps/apparatus/src/dashboard/components/dashboard/Overview.tsx
+new file mode 100644
+index 0000000..2e163cd
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/components/dashboard/Overview.tsx
+@@ -0,0 +1,150 @@
++import { Activity, Shield, Zap, Globe, Cpu } from 'lucide-react';
++import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
++import { StatCard } from '../ui/StatCard';
++import { Button } from '../ui/Button';
++import { Badge } from '../ui/Badge';
++import { TrafficVisualizer } from './TrafficVisualizer';
++
++// Mock Data
++const MOCK_LOGS = [
++  { id: 1, time: '10:42:05', level: 'WARN', module: 'WAF', message: 'Rate limit exceeded for IP 192.168.1.42' },
++  { id: 2, time: '10:41:58', level: 'INFO', module: 'AUTH', message: 'New session established: user-admin' },
++  { id: 3, time: '10:41:12', level: 'ERR', module: 'CHAOS', message: 'Latency injection failed on service: payment-gateway' },
++  { id: 4, time: '10:40:30', level: 'INFO', module: 'NET', message: 'Inbound traffic spike detected on port 443' },
++];
++
++export function Overview() {
++  return (
++    <div className="space-y-6 animate-in fade-in duration-500">
++      <div className="flex items-center justify-between">
++        <div>
++          <h1 className="text-2xl font-bold text-neutral-100 tracking-tight font-mono uppercase">System Overview</h1>
++          <p className="text-neutral-400 text-sm mt-1">Real-time telemetry and control status.</p>
++        </div>
++        <div className="flex gap-3">
++          <Button variant="outline" size="sm">Export Report</Button>
++          <Button variant="neon" size="sm" leftIcon={<Zap className="h-3 w-3" />}>
++            Engage Defense
++          </Button>
++        </div>
++      </div>
++
++      {/* Stats Grid */}
++      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
++        <StatCard 
++          label="Total Traffic" 
++          value="2.4 GB/s" 
++          trend={{ value: 12, direction: 'up' }}
++          icon={Activity}
++        />
++        <StatCard 
++          label="Active Threats" 
++          value="42" 
++          trend={{ value: 5, direction: 'down' }} // Good down?
++          icon={Shield}
++          className="border-danger-900/30"
++        />
++        <StatCard 
++          label="System Load" 
++          value="78%" 
++          trend={{ value: 2, direction: 'up' }}
++          icon={Cpu}
++        />
++        <StatCard 
++          label="Uptime" 
++          value="99.99%" 
++          trend={{ value: 0, direction: 'neutral' }}
++          icon={Globe}
++        />
++      </div>
++
++      {/* Main Dashboard Area */}
++      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
++        
++        {/* Left Column (2/3) */}
++        <div className="lg:col-span-2 space-y-6">
++          {/* Traffic Visualizer */}
++          <TrafficVisualizer />
++
++          {/* Active Modules */}
++          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
++             <Card variant="glass">
++                <CardHeader>
++                   <CardTitle className="flex items-center gap-2">
++                      <Shield className="h-4 w-4 text-primary-500" />
++                      Active Defenses
++                   </CardTitle>
++                </CardHeader>
++                <CardContent className="space-y-3">
++                   <div className="flex justify-between items-center p-2 bg-neutral-800/30 rounded-sm border border-neutral-800">
++                      <span className="text-xs font-mono text-neutral-300">WAF Ruleset</span>
++                      <Badge variant="success" size="sm">Active</Badge>
++                   </div>
++                   <div className="flex justify-between items-center p-2 bg-neutral-800/30 rounded-sm border border-neutral-800">
++                      <span className="text-xs font-mono text-neutral-300">IP Reputation</span>
++                      <Badge variant="warning" size="sm">Learning</Badge>
++                   </div>
++                </CardContent>
++             </Card>
++
++             <Card variant="glass">
++                <CardHeader>
++                   <CardTitle className="flex items-center gap-2">
++                      <Zap className="h-4 w-4 text-warning-500" />
++                      Chaos Experiments
++                   </CardTitle>
++                </CardHeader>
++                <CardContent className="space-y-3">
++                   <div className="flex justify-between items-center p-2 bg-neutral-800/30 rounded-sm border border-neutral-800">
++                      <span className="text-xs font-mono text-neutral-300">Latency Injection</span>
++                      <Badge variant="neutral" size="sm">Idle</Badge>
++                   </div>
++                   <div className="flex justify-between items-center p-2 bg-neutral-800/30 rounded-sm border border-neutral-800">
++                      <span className="text-xs font-mono text-neutral-300">Pod Kill</span>
++                      <Badge variant="danger" size="sm" dot>Running</Badge>
++                   </div>
++                </CardContent>
++             </Card>
++          </div>
++        </div>
++
++        {/* Right Column (1/3) */}
++        <div className="space-y-6">
++          {/* Live Logs */}
++          <Card variant="default" className="bg-black border-neutral-800 h-full">
++            <CardHeader>
++              <CardTitle>System Logs</CardTitle>
++            </CardHeader>
++            <CardContent>
++              <div className="space-y-2 font-mono text-[10px] leading-tight">
++                {MOCK_LOGS.map((log) => (
++                  <div key={log.id} className="flex gap-2 border-b border-neutral-900 pb-2 last:border-0 last:pb-0">
++                    <span className="text-neutral-500">{log.time}</span>
++                    <span className={
++                      log.level === 'ERR' ? 'text-danger-500 font-bold' :
++                      log.level === 'WARN' ? 'text-warning-500' :
++                      'text-info-500'
++                    }>{log.level}</span>
++                    <span className="text-neutral-300 truncate">{log.message}</span>
++                  </div>
++                ))}
++              </div>
++            </CardContent>
++          </Card>
++          
++          {/* Quick Actions */}
++          <Card variant="outline">
++             <CardHeader>
++                <CardTitle>Quick Actions</CardTitle>
++             </CardHeader>
++             <CardContent className="grid grid-cols-2 gap-2">
++                <Button variant="secondary" size="sm" className="w-full">Flush Cache</Button>
++                <Button variant="secondary" size="sm" className="w-full">Rotate Keys</Button>
++                <Button variant="danger" size="sm" className="w-full col-span-2">Emergency Shutdown</Button>
++             </CardContent>
++          </Card>
++        </div>
++      </div>
++    </div>
++  );
++}
+\ No newline at end of file
+diff --git a/apps/apparatus/src/dashboard/components/dashboard/TrafficVisualizer.tsx b/apps/apparatus/src/dashboard/components/dashboard/TrafficVisualizer.tsx
+new file mode 100644
+index 0000000..92c9a16
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/components/dashboard/TrafficVisualizer.tsx
+@@ -0,0 +1,130 @@
++import { useEffect, useRef } from 'react';
++import { useTrafficStream, TrafficEvent } from '../../hooks/useTrafficStream';
++import { Card, CardHeader, CardTitle } from '../ui/Card';
++import { Badge } from '../ui/Badge';
++import { Activity } from 'lucide-react';
++
++export function TrafficVisualizer() {
++  const { events, isConnected } = useTrafficStream(100);
++
++  return (
++    <Card variant="panel" className="h-96 flex flex-col">
++      <CardHeader className="flex-none border-b border-neutral-800 pb-2 mb-0 bg-neutral-900/50">
++        <div className="flex justify-between items-center">
++          <CardTitle className="flex items-center gap-2">
++            <Activity className="h-4 w-4 text-primary-500" />
++            Live Traffic Feed
++          </CardTitle>
++          <div className="flex items-center gap-2">
++            <Badge variant={isConnected ? 'success' : 'neutral'} dot>
++              {isConnected ? 'LIVE STREAM' : 'OFFLINE'}
++            </Badge>
++            <div className="text-xs font-mono text-neutral-500">
++               {events.length} EPS
++            </div>
++          </div>
++        </div>
++      </CardHeader>
++      
++      <div className="flex-1 relative overflow-hidden bg-neutral-950 font-mono text-[10px]">
++         {/* Canvas Layer for Sparklines/Visuals */}
++         <CanvasWaterfall events={events} />
++      </div>
++    </Card>
++  );
++}
++
++function CanvasWaterfall({ events }: { events: TrafficEvent[] }) {
++    const canvasRef = useRef<HTMLCanvasElement>(null);
++    const eventsRef = useRef(events); // Keep track of latest events without triggering re-renders of the loop
++
++    useEffect(() => {
++        eventsRef.current = events;
++    }, [events]);
++
++    useEffect(() => {
++        const canvas = canvasRef.current;
++        if (!canvas) return;
++        const ctx = canvas.getContext('2d');
++        if (!ctx) return;
++
++        let animationFrame: number;
++
++        const render = () => {
++            const width = canvas.width;
++            const height = canvas.height;
++            
++            // Clear
++            ctx.clearRect(0, 0, width, height);
++            
++            // Draw grid
++            ctx.strokeStyle = '#1F2633';
++            ctx.lineWidth = 1;
++            ctx.beginPath();
++            for (let i = 0; i < width; i += 40) {
++                ctx.moveTo(i, 0);
++                ctx.lineTo(i, height);
++            }
++            ctx.stroke();
++
++            const now = Date.now();
++            const timeWindow = 10000; // 10 seconds view
++            
++            eventsRef.current.forEach(ev => {
++                const eventTime = new Date(ev.timestamp).getTime();
++                const age = now - eventTime;
++                
++                if (age > timeWindow) return; // Too old
++                
++                const x = width - ((age / timeWindow) * width);
++                
++                // Y position determined by latency
++                // Cap latency at 1000ms for height
++                const y = height - Math.min((ev.latencyMs / 500) * height, height - 10);
++                
++                // Color by status
++                let color = '#00FF94';
++                if (ev.status >= 500) color = '#FF0055';
++                else if (ev.status >= 400) color = '#FFB800';
++                else if (ev.status >= 300) color = '#00A3FF';
++
++                // Draw "Packet"
++                ctx.fillStyle = color;
++                ctx.shadowColor = color;
++                ctx.shadowBlur = 10;
++                ctx.beginPath();
++                ctx.arc(x, y, 3, 0, Math.PI * 2);
++                ctx.fill();
++                ctx.shadowBlur = 0;
++
++                // Draw Path Label if it's "fresh" (last 1 sec)
++                if (age < 2000) {
++                    ctx.fillStyle = '#708099';
++                    ctx.font = '10px JetBrains Mono';
++                    ctx.fillText(`${ev.method} ${ev.path}`, x + 5, y);
++                }
++            });
++
++            animationFrame = requestAnimationFrame(render);
++        };
++        
++        // Handle Resize
++        const resize = () => {
++            if (canvas.parentElement) {
++                canvas.width = canvas.parentElement.clientWidth;
++                canvas.height = canvas.parentElement.clientHeight;
++            }
++        };
++        window.addEventListener('resize', resize);
++        resize();
++
++        render();
++
++        return () => {
++            window.removeEventListener('resize', resize);
++            cancelAnimationFrame(animationFrame);
++        };
++    }, []);
++
++    return <canvas ref={canvasRef} className="w-full h-full block" />;
++}
+\ No newline at end of file
+diff --git a/apps/apparatus/src/dashboard/components/layout/Header.tsx b/apps/apparatus/src/dashboard/components/layout/Header.tsx
+new file mode 100644
+index 0000000..ef4130a
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/components/layout/Header.tsx
+@@ -0,0 +1,71 @@
++import { useApparatus } from '../../providers/ApparatusProvider';
++import { Bell, Search, Terminal } from 'lucide-react';
++import { Button } from '../ui/Button';
++
++interface HeaderProps {
++  title?: string;
++}
++
++export function Header({}: HeaderProps) {
++  const { health } = useApparatus();
++
++  // Map health status to visual state
++  const statusColor = health.status === 'healthy' 
++    ? 'text-success-400' 
++    : health.status === 'checking' 
++      ? 'text-warning-400' 
++      : 'text-danger-400';
++
++  return (
++    <header className="h-16 bg-neutral-950/80 backdrop-blur-md border-b border-neutral-800 flex items-center justify-between px-6 z-10 sticky top-0">
++      {/* Left: Breadcrumbs / Title */}
++      <div className="flex items-center gap-4">
++        <div className="hidden md:flex items-center text-sm font-mono text-neutral-500">
++          <span className="text-neutral-300">app</span>
++          <span className="mx-2">/</span>
++          <span className="text-primary-400">dashboard</span>
++        </div>
++      </div>
++
++      {/* Right: Actions */}
++      <div className="flex items-center gap-4">
++        {/* Search Bar */}
++        <div className="relative hidden md:block group">
++          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-500 group-focus-within:text-primary-400 transition-colors" />
++          <input 
++            type="text" 
++            placeholder="SEARCH COMMANDS..." 
++            className="h-9 w-64 bg-neutral-900 border border-neutral-800 rounded-sm pl-9 pr-4 text-xs font-mono text-neutral-200 placeholder:text-neutral-600 focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/20 transition-all"
++          />
++          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
++             <kbd className="hidden sm:inline-flex h-5 items-center gap-1 rounded border border-neutral-700 bg-neutral-800 px-1.5 font-mono text-[10px] font-medium text-neutral-400 opacity-100">
++              <span className="text-xs">⌘</span>K
++            </kbd>
++          </div>
++        </div>
++
++        <div className="h-6 w-px bg-neutral-800 mx-2" />
++
++        {/* Status */}
++        <div className="flex items-center gap-3">
++          <div className={`flex items-center gap-2 text-xs font-mono ${statusColor}`}>
++             <div className={`w-2 h-2 rounded-full ${statusColor === 'text-success-400' ? 'bg-success-500 shadow-[0_0_8px_rgba(0,255,148,0.6)]' : 'bg-current'}`} />
++             <span className="uppercase">{health.status}</span>
++          </div>
++        </div>
++
++        {/* Actions */}
++        <Button variant="ghost" size="icon" className="text-neutral-400 hover:text-white">
++          <Bell className="h-4 w-4" />
++        </Button>
++        
++        <Button variant="ghost" size="icon" className="text-neutral-400 hover:text-white">
++          <Terminal className="h-4 w-4" />
++        </Button>
++
++      </div>
++    </header>
++  );
++}
++
++Header.displayName = 'Header';
+\ No newline at end of file
+diff --git a/apps/apparatus/src/dashboard/components/layout/MainContent.tsx b/apps/apparatus/src/dashboard/components/layout/MainContent.tsx
+new file mode 100644
+index 0000000..ab70abc
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/components/layout/MainContent.tsx
+@@ -0,0 +1,29 @@
++import { type ReactNode } from 'react';
++import { cn } from '../ui/cn';
++
++interface MainContentProps {
++  children: ReactNode;
++  className?: string;
++}
++
++export function MainContent({ children, className }: MainContentProps) {
++  return (
++    <main
++      className={cn(
++        'flex-1 overflow-y-auto overflow-x-hidden p-6 relative',
++        'bg-neutral-950 bg-grid-pattern bg-[length:40px_40px]', // Grid background
++        className
++      )}
++      role="main"
++    >
++      {/* Ambient Glow */}
++      <div className="absolute top-0 left-0 w-full h-96 bg-primary-900/5 rounded-full blur-3xl pointer-events-none -translate-y-1/2" />
++      
++      <div className="relative z-10 max-w-7xl mx-auto">
++        {children}
++      </div>
++    </main>
++  );
++}
++
++MainContent.displayName = 'MainContent';
+\ No newline at end of file
+diff --git a/apps/apparatus/src/dashboard/components/layout/Sidebar.tsx b/apps/apparatus/src/dashboard/components/layout/Sidebar.tsx
+new file mode 100644
+index 0000000..d500d90
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/components/layout/Sidebar.tsx
+@@ -0,0 +1,111 @@
++import { NavLink } from 'react-router-dom';
++import {
++  LayoutDashboard,
++  Shield,
++  Zap,
++  Network,
++  FlaskConical,
++  Settings,
++  Activity,
++  FileWarning,
++  Globe,
++  Webhook,
++  Key,
++} from 'lucide-react';
++import { cn } from '../ui/cn';
++
++// Define nav items outside component to prevent recreation on each render
++const NAV_ITEMS = [
++  { path: '/', label: 'Overview', icon: LayoutDashboard },
++  { path: '/traffic', label: 'Traffic', icon: Activity },
++  { path: '/defense', label: 'Defense', icon: Shield },
++  { path: '/deception', label: 'Deception', icon: FileWarning },
++  { path: '/chaos', label: 'Chaos', icon: Zap },
++  { path: '/cluster', label: 'Cluster', icon: Globe },
++  { path: '/webhooks', label: 'Webhooks', icon: Webhook },
++  { path: '/mtd', label: 'MTD', icon: Key },
++  { path: '/testing', label: 'Testing Lab', icon: FlaskConical },
++  { path: '/network', label: 'Network', icon: Network },
++  { path: '/settings', label: 'Settings', icon: Settings },
++] as const;
++
++export function Sidebar() {
++  return (
++    <aside className="w-64 h-screen bg-neutral-950 border-r border-neutral-800 flex flex-col relative overflow-hidden">
++      {/* Tech Decoration */}
++      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary-500 via-transparent to-transparent opacity-50" />
++      
++      {/* Logo/Brand */}
++      <div className="h-16 flex items-center px-6 border-b border-neutral-800/50 bg-neutral-900/20 backdrop-blur-sm">
++        <div className="flex items-center gap-3">
++          <div className="w-8 h-8 rounded-sm bg-primary-500/10 border border-primary-500 flex items-center justify-center">
++            <span className="text-primary-400 font-bold font-mono">A</span>
++          </div>
++          <span className="text-lg font-bold text-neutral-100 tracking-tight font-mono uppercase">Apparatus</span>
++        </div>
++      </div>
++
++      {/* Navigation */}
++      <nav className="flex-1 overflow-y-auto py-6" aria-label="Main navigation">
++        <div className="px-4 mb-2 text-xs font-mono text-neutral-500 uppercase tracking-widest pl-4">
++          Modules
++        </div>
++        <ul className="space-y-0.5">
++          {NAV_ITEMS.map(({ path, label, icon: Icon }) => (
++            <li key={path}>
++              <NavLink
++                to={path}
++                className={({ isActive }) =>
++                  cn(
++                    'flex items-center gap-3 px-4 py-2.5 text-sm font-medium font-mono tracking-tight relative group',
++                    'transition-all duration-200 border-l-2',
++                    'focus-visible:outline-none focus-visible:bg-neutral-800',
++                    isActive
++                      ? 'bg-neutral-900/50 text-primary-400 border-primary-500 shadow-[inset_10px_0_20px_-10px_rgba(0,240,255,0.1)]'
++                      : 'border-transparent text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900/30 hover:border-neutral-700'
++                  )
++                }
++              >
++                {({ isActive }) => (
++                  <>
++                    <Icon className={cn(
++                      "h-4 w-4 transition-colors",
++                      isActive ? "text-primary-500 drop-shadow-[0_0_5px_rgba(0,240,255,0.5)]" : "text-neutral-500 group-hover:text-neutral-300"
++                    )} />
++                    <span>{label}</span>
++                    
++                    {/* Active Indicator (Dot) */}
++                    <span className={cn(
++                      "absolute right-4 w-1.5 h-1.5 rounded-full bg-primary-500 shadow-[0_0_5px_rgba(0,240,255,1)] transition-transform duration-300",
++                      isActive ? "scale-100 opacity-100" : "scale-0 opacity-0"
++                    )} />
++                  </>
++                )}
++              </NavLink>
++            </li>
++          ))}
++        </ul>
++      </nav>
++
++      {/* Footer / System Status */}
++      <div className="p-4 border-t border-neutral-800 bg-neutral-900/30">
++        <div className="flex items-center justify-between mb-2">
++          <span className="text-[10px] font-mono text-neutral-500 uppercase">System Status</span>
++          <span className="text-[10px] font-mono text-success-400 flex items-center gap-1.5">
++            <span className="w-1.5 h-1.5 rounded-full bg-success-500 animate-pulse" />
++            ONLINE
++          </span>
++        </div>
++        <div className="w-full h-1 bg-neutral-800 rounded-full overflow-hidden">
++          <div className="h-full bg-success-500 w-[98%] shadow-[0_0_10px_rgba(0,255,148,0.5)]" />
++        </div>
++        <div className="mt-3 flex justify-between text-[10px] font-mono text-neutral-600">
++          <span>v1.0.0</span>
++          <span>Build 8942</span>
++        </div>
++      </div>
++    </aside>
++  );
++}
++
++Sidebar.displayName = 'Sidebar';
+diff --git a/apps/apparatus/src/dashboard/components/layout/index.ts b/apps/apparatus/src/dashboard/components/layout/index.ts
+new file mode 100644
+index 0000000..b345968
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/components/layout/index.ts
+@@ -0,0 +1,3 @@
++export { Sidebar } from './Sidebar';
++export { Header } from './Header';
++export { MainContent } from './MainContent';
+diff --git a/apps/apparatus/src/dashboard/components/ui/Badge.tsx b/apps/apparatus/src/dashboard/components/ui/Badge.tsx
+new file mode 100644
+index 0000000..ce0859f
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/components/ui/Badge.tsx
+@@ -0,0 +1,62 @@
++import { type HTMLAttributes } from 'react';
++import { cn } from './cn';
++
++type BadgeVariant = 'success' | 'warning' | 'danger' | 'info' | 'neutral' | 'primary';
++type BadgeSize = 'sm' | 'md';
++
++interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
++  variant?: BadgeVariant;
++  size?: BadgeSize;
++  dot?: boolean;
++}
++
++const variants: Record<BadgeVariant, string> = {
++  success: 'bg-success-900/20 text-success-400 border-success-500/30 shadow-[0_0_10px_rgba(0,255,148,0.1)]',
++  warning: 'bg-warning-900/20 text-warning-400 border-warning-500/30 shadow-[0_0_10px_rgba(255,184,0,0.1)]',
++  danger: 'bg-danger-900/20 text-danger-400 border-danger-500/30 shadow-[0_0_10px_rgba(255,0,85,0.1)]',
++  info: 'bg-info-900/20 text-info-400 border-info-500/30 shadow-[0_0_10px_rgba(0,163,255,0.1)]',
++  neutral: 'bg-neutral-800 text-neutral-400 border-neutral-700',
++  primary: 'bg-primary-900/20 text-primary-400 border-primary-500/30 shadow-[0_0_10px_rgba(0,240,255,0.1)]',
++};
++
++const sizes: Record<BadgeSize, string> = {
++  sm: 'px-1.5 py-0.5 text-[10px]',
++  md: 'px-2.5 py-0.5 text-xs',
++};
++
++const dotColors: Record<BadgeVariant, string> = {
++  success: 'bg-success-500',
++  warning: 'bg-warning-500',
++  danger: 'bg-danger-500',
++  info: 'bg-info-500',
++  neutral: 'bg-neutral-500',
++  primary: 'bg-primary-500',
++};
++
++export function Badge({
++  variant = 'neutral',
++  size = 'md',
++  dot = false,
++  className,
++  children,
++  ...props
++}: BadgeProps) {
++  return (
++    <span
++      className={cn(
++        'inline-flex items-center font-mono font-medium rounded-sm border uppercase tracking-wider',
++        variants[variant],
++        sizes[size],
++        className
++      )}
++      {...props}
++    >
++      {dot && (
++        <span className={cn('w-1.5 h-1.5 rounded-full mr-1.5 animate-pulse', dotColors[variant])} />
++      )}
++      {children}
++    </span>
++  );
++}
++
++Badge.displayName = 'Badge';
+\ No newline at end of file
+diff --git a/apps/apparatus/src/dashboard/components/ui/Button.tsx b/apps/apparatus/src/dashboard/components/ui/Button.tsx
+new file mode 100644
+index 0000000..9dc3d99
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/components/ui/Button.tsx
+@@ -0,0 +1,85 @@
++import { forwardRef, type ButtonHTMLAttributes } from 'react';
++import { cn } from './cn';
++
++type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'neon' | 'outline';
++type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
++
++interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
++  variant?: ButtonVariant;
++  size?: ButtonSize;
++  isLoading?: boolean;
++  leftIcon?: React.ReactNode;
++  rightIcon?: React.ReactNode;
++}
++
++const baseStyles = [
++  'inline-flex items-center justify-center font-mono font-medium tracking-wide',
++  'transition-all duration-200 ease-out',
++  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950',
++  'disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none',
++  'rounded-sm', // Tech/Industrial look
++  'uppercase text-xs letter-spacing-1',
++].join(' ');
++
++const variants: Record<ButtonVariant, string> = {
++  primary: 'bg-primary-600 text-white hover:bg-primary-500 hover:shadow-glow-primary border border-transparent',
++  secondary: 'bg-neutral-800 text-neutral-200 hover:bg-neutral-700 border border-neutral-700',
++  danger: 'bg-danger-600 text-white hover:bg-danger-500 hover:shadow-glow-danger border border-transparent',
++  ghost: 'bg-transparent text-primary-400 hover:bg-primary-500/10 hover:text-primary-300',
++  neon: 'bg-transparent border border-primary-500 text-primary-400 shadow-[0_0_10px_rgba(0,240,255,0.3)] hover:bg-primary-500/10 hover:shadow-glow-primary hover:text-primary-300',
++  outline: 'bg-transparent border border-neutral-700 text-neutral-400 hover:border-neutral-500 hover:text-neutral-200',
++};
++
++const sizes: Record<ButtonSize, string> = {
++  sm: 'h-8 px-3 text-xs gap-2',
++  md: 'h-10 px-5 text-xs gap-2',
++  lg: 'h-12 px-8 text-sm gap-3',
++  icon: 'h-10 w-10 p-2',
++};
++
++export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
++  ({ 
++    variant = 'primary', 
++    size = 'md', 
++    isLoading, 
++    disabled, 
++    className, 
++    children, 
++    leftIcon,
++    rightIcon,
++    ...props 
++  }, ref) => {
++    const isDisabled = disabled || isLoading;
++
++    return (
++      <button
++        ref={ref}
++        disabled={isDisabled}
++        className={cn(
++          baseStyles,
++          variants[variant],
++          sizes[size],
++          className
++        )}
++        {...props}
++      >
++        {isLoading && (
++           <svg
++              className="animate-spin -ml-1 mr-2 h-4 w-4"
++              xmlns="http://www.w3.org/2000/svg"
++              fill="none"
++              viewBox="0 0 24 24"
++            >
++              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
++              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
++            </svg>
++        )}
++        {!isLoading && leftIcon && <span className="flex-shrink-0">{leftIcon}</span>}
++        <span>{children}</span>
++        {!isLoading && rightIcon && <span className="flex-shrink-0">{rightIcon}</span>}
++      </button>
++    );
++  }
++);
++
++Button.displayName = 'Button';
+\ No newline at end of file
+diff --git a/apps/apparatus/src/dashboard/components/ui/Card.tsx b/apps/apparatus/src/dashboard/components/ui/Card.tsx
+new file mode 100644
+index 0000000..bb2bd6c
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/components/ui/Card.tsx
+@@ -0,0 +1,96 @@
++import { forwardRef, type HTMLAttributes } from 'react';
++import { cn } from './cn';
++
++interface CardProps extends HTMLAttributes<HTMLDivElement> {
++  variant?: 'default' | 'panel' | 'outline' | 'glass';
++  noPadding?: boolean;
++}
++
++const variants = {
++  default: 'bg-neutral-900 border border-neutral-800',
++  panel: 'bg-surface-panel border border-surface-border shadow-panel',
++  outline: 'bg-transparent border border-neutral-800',
++  glass: 'bg-neutral-900/60 backdrop-blur-md border border-white/5',
++};
++
++export const Card = forwardRef<HTMLDivElement, CardProps>(
++  ({ variant = 'panel', noPadding = false, className, children, ...props }, ref) => {
++    return (
++      <div
++        ref={ref}
++        className={cn(
++          'rounded-sm overflow-hidden relative group', // Tech look: rounded-sm
++          variants[variant],
++          className
++        )}
++        {...props}
++      >
++        {/* Tech Corner Accent (Top Left) */}
++        {variant === 'panel' && (
++          <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-primary-500/50 opacity-0 group-hover:opacity-100 transition-opacity" />
++        )}
++        
++        {/* Tech Corner Accent (Bottom Right) */}
++        {variant === 'panel' && (
++          <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-primary-500/50 opacity-0 group-hover:opacity-100 transition-opacity" />
++        )}
++
++        <div className={cn('relative', !noPadding && 'p-5')}>
++          {children}
++        </div>
++      </div>
++    );
++  }
++);
++Card.displayName = 'Card';
++
++export const CardHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
++  ({ className, ...props }, ref) => (
++    <div
++      ref={ref}
++      className={cn('flex flex-col space-y-1.5 mb-4', className)}
++      {...props}
++    />
++  )
++);
++CardHeader.displayName = 'CardHeader';
++
++export const CardTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadingElement>>(
++  ({ className, ...props }, ref) => (
++    <h3
++      ref={ref}
++      className={cn('text-base font-semibold font-mono tracking-tight text-neutral-100 uppercase', className)}
++      {...props}
++    />
++  )
++);
++CardTitle.displayName = 'CardTitle';
++
++export const CardDescription = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLParagraphElement>>(
++  ({ className, ...props }, ref) => (
++    <p
++      ref={ref}
++      className={cn('text-xs text-neutral-400 font-sans', className)}
++      {...props}
++    />
++  )
++);
++CardDescription.displayName = 'CardDescription';
++
++export const CardContent = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
++  ({ className, ...props }, ref) => (
++    <div ref={ref} className={cn('', className)} {...props} />
++  )
++);
++CardContent.displayName = 'CardContent';
++
++export const CardFooter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
++  ({ className, ...props }, ref) => (
++    <div
++      ref={ref}
++      className={cn('flex items-center mt-4 pt-4 border-t border-neutral-800/50', className)}
++      {...props}
++    />
++  )
++);
++CardFooter.displayName = 'CardFooter';
+\ No newline at end of file
+diff --git a/apps/apparatus/src/dashboard/components/ui/Spinner.tsx b/apps/apparatus/src/dashboard/components/ui/Spinner.tsx
+new file mode 100644
+index 0000000..27e9451
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/components/ui/Spinner.tsx
+@@ -0,0 +1,47 @@
++import { cn } from './cn';
++
++type SpinnerSize = 'sm' | 'md' | 'lg' | 'xl';
++
++interface SpinnerProps {
++  size?: SpinnerSize;
++  className?: string;
++  label?: string;
++}
++
++const sizeStyles: Record<SpinnerSize, string> = {
++  sm: 'h-4 w-4',
++  md: 'h-6 w-6',
++  lg: 'h-8 w-8',
++  xl: 'h-12 w-12',
++};
++
++export function Spinner({ size = 'md', className, label = 'Loading' }: SpinnerProps) {
++  return (
++    <div role="status" aria-label={label}>
++      <svg
++        className={cn('animate-spin text-primary-500', sizeStyles[size], className)}
++        xmlns="http://www.w3.org/2000/svg"
++        fill="none"
++        viewBox="0 0 24 24"
++        aria-hidden="true"
++      >
++        <circle
++          className="opacity-25"
++          cx="12"
++          cy="12"
++          r="10"
++          stroke="currentColor"
++          strokeWidth="4"
++        />
++        <path
++          className="opacity-75"
++          fill="currentColor"
++          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
++        />
++      </svg>
++      <span className="sr-only">{label}</span>
++    </div>
++  );
++}
++
++Spinner.displayName = 'Spinner';
+diff --git a/apps/apparatus/src/dashboard/components/ui/StatCard.tsx b/apps/apparatus/src/dashboard/components/ui/StatCard.tsx
+new file mode 100644
+index 0000000..ef4ea80
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/components/ui/StatCard.tsx
+@@ -0,0 +1,66 @@
++import { Card, CardContent } from './Card';
++import { cn } from './cn';
++import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
++
++interface StatCardProps {
++  label: string;
++  value: string | number;
++  trend?: {
++    value: number; // percentage
++    direction: 'up' | 'down' | 'neutral';
++  };
++  icon?: React.ElementType;
++  className?: string;
++  chart?: React.ReactNode; // Slot for a mini sparkline
++}
++
++export function StatCard({ label, value, trend, icon: Icon, className, chart }: StatCardProps) {
++  const isPositive = trend?.direction === 'up';
++  const isNeutral = trend?.direction === 'neutral';
++  
++  // For "Command Center", positive isn't always green (e.g. high load).
++  // But generally Up = Green for metrics like "Uptime", "Traffic".
++  // Let's assume standard coloring for now.
++  
++  return (
++    <Card className={cn('relative overflow-hidden', className)}>
++      <CardContent className="p-5">
++        <div className="flex justify-between items-start">
++          <div className="space-y-1">
++            <span className="text-xs font-mono text-neutral-500 uppercase tracking-widest block">
++              {label}
++            </span>
++            <div className="text-2xl font-bold font-mono text-neutral-100 tracking-tight">
++              {value}
++            </div>
++          </div>
++          
++          {Icon && (
++            <div className="p-2 bg-neutral-800/50 rounded-sm text-primary-400">
++              <Icon size={18} />
++            </div>
++          )}
++        </div>
++
++        <div className="mt-4 flex items-center justify-between">
++          {trend ? (
++            <div className={cn(
++              "flex items-center text-xs font-mono",
++              isPositive ? "text-success-400" : isNeutral ? "text-neutral-400" : "text-danger-400"
++            )}>
++              {isPositive ? <ArrowUpRight size={14} className="mr-1" /> : <ArrowDownRight size={14} className="mr-1" />}
++              <span>{Math.abs(trend.value)}%</span>
++            </div>
++          ) : (
++            <div className="text-xs font-mono text-neutral-600">NO DATA</div>
++          )}
++          
++          {chart && <div className="h-8 w-24">{chart}</div>}
++        </div>
++        
++        {/* Background Decoration */}
++        <div className="absolute -right-6 -top-6 w-24 h-24 bg-gradient-to-br from-primary-500/10 to-transparent rounded-full blur-2xl pointer-events-none" />
++      </CardContent>
++    </Card>
++  );
++}
+diff --git a/apps/apparatus/src/dashboard/components/ui/StatusIndicator.tsx b/apps/apparatus/src/dashboard/components/ui/StatusIndicator.tsx
+new file mode 100644
+index 0000000..969098f
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/components/ui/StatusIndicator.tsx
+@@ -0,0 +1,70 @@
++import { cn } from './cn';
++
++type Status = 'connected' | 'connecting' | 'disconnected' | 'error';
++type StatusSize = 'sm' | 'md' | 'lg';
++
++interface StatusIndicatorProps {
++  status: Status;
++  size?: StatusSize;
++  showLabel?: boolean;
++  className?: string;
++}
++
++const STATUS_COLORS: Record<Status, string> = {
++  connected: 'bg-success-500',
++  connecting: 'bg-warning-500',
++  disconnected: 'bg-neutral-500',
++  error: 'bg-danger-500',
++};
++
++const STATUS_LABELS: Record<Status, string> = {
++  connected: 'Connected',
++  connecting: 'Connecting',
++  disconnected: 'Disconnected',
++  error: 'Error',
++};
++
++const SIZE_STYLES: Record<StatusSize, string> = {
++  sm: 'h-2 w-2',
++  md: 'h-2.5 w-2.5',
++  lg: 'h-3 w-3',
++};
++
++export function StatusIndicator({
++  status,
++  size = 'md',
++  showLabel = false,
++  className,
++}: StatusIndicatorProps) {
++  const isPulsing = status === 'connected' || status === 'connecting';
++
++  return (
++    <div className={cn('inline-flex items-center gap-2', className)}>
++      <span className="relative flex">
++        {isPulsing && (
++          <span
++            className={cn(
++              'absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping',
++              STATUS_COLORS[status]
++            )}
++            aria-hidden="true"
++          />
++        )}
++        <span
++          className={cn(
++            'relative inline-flex rounded-full',
++            SIZE_STYLES[size],
++            STATUS_COLORS[status]
++          )}
++          role="img"
++          aria-label={STATUS_LABELS[status]}
++        />
++      </span>
++      {showLabel && (
++        <span className="text-sm text-neutral-400">{STATUS_LABELS[status]}</span>
++      )}
++    </div>
++  );
++}
++
++StatusIndicator.displayName = 'StatusIndicator';
+diff --git a/apps/apparatus/src/dashboard/components/ui/cn.ts b/apps/apparatus/src/dashboard/components/ui/cn.ts
+new file mode 100644
+index 0000000..75613a2
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/components/ui/cn.ts
+@@ -0,0 +1,10 @@
++import { type ClassValue, clsx } from 'clsx';
++import { twMerge } from 'tailwind-merge';
++
++/**
++ * Utility function to merge Tailwind CSS classes with clsx
++ * Handles class conflicts and conditional classes properly
++ */
++export function cn(...inputs: ClassValue[]): string {
++  return twMerge(clsx(inputs));
++}
+diff --git a/apps/apparatus/src/dashboard/components/ui/index.ts b/apps/apparatus/src/dashboard/components/ui/index.ts
+new file mode 100644
+index 0000000..57db2a5
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/components/ui/index.ts
+@@ -0,0 +1,7 @@
++// UI Component Library
++export { Button } from './Button';
++export { Badge } from './Badge';
++export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './Card';
++export { Spinner } from './Spinner';
++export { StatusIndicator } from './StatusIndicator';
++export { cn } from './cn';
+diff --git a/apps/apparatus/src/dashboard/hooks/index.ts b/apps/apparatus/src/dashboard/hooks/index.ts
+new file mode 100644
+index 0000000..27b40c3
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/hooks/index.ts
+@@ -0,0 +1,6 @@
++// Hook exports
++export { useClient } from './useClient';
++export { useSSE } from './useSSE';
++export { useSSEEvent, useSSEEvents } from './useSSEEvent';
++export { useHealth } from './useHealth';
++export type { HealthState } from './useHealth';
+diff --git a/apps/apparatus/src/dashboard/hooks/useClient.ts b/apps/apparatus/src/dashboard/hooks/useClient.ts
+new file mode 100644
+index 0000000..b7cf373
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/hooks/useClient.ts
+@@ -0,0 +1,26 @@
++import { ApparatusClient } from '@apparatus/client';
++import { useApparatus } from '../providers/ApparatusProvider';
++
++/**
++ * Returns the Apparatus client instance from context.
++ *
++ * @returns Client instance or null if baseUrl not configured
++ * @throws Error if used outside ApparatusProvider
++ *
++ * @example
++ * ```tsx
++ * function MyComponent() {
++ *   const client = useClient();
++ *
++ *   if (!client) {
++ *     return <div>Configure server URL first</div>;
++ *   }
++ *
++ *   // Use client...
++ * }
++ * ```
++ */
++export function useClient(): ApparatusClient | null {
++  const { client } = useApparatus();
++  return client;
++}
+diff --git a/apps/apparatus/src/dashboard/hooks/useHealth.ts b/apps/apparatus/src/dashboard/hooks/useHealth.ts
+new file mode 100644
+index 0000000..036a13f
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/hooks/useHealth.ts
+@@ -0,0 +1,31 @@
++import { useApparatus } from '../providers/ApparatusProvider';
++
++export interface HealthState {
++  status: 'healthy' | 'unhealthy' | 'checking' | 'unknown';
++  message?: string;
++  latencyMs?: number;
++  version?: string;
++}
++
++/**
++ * Hook to access the health state from ApparatusProvider.
++ * Health is automatically polled by the provider.
++ *
++ * @example
++ * ```tsx
++ * function HealthIndicator() {
++ *   const health = useHealth();
++ *
++ *   return (
++ *     <div>
++ *       Status: {health.status}
++ *       {health.latencyMs && <span>({health.latencyMs}ms)</span>}
++ *     </div>
++ *   );
++ * }
++ * ```
++ */
++export function useHealth(): HealthState {
++  const { health } = useApparatus();
++  return health;
++}
+diff --git a/apps/apparatus/src/dashboard/hooks/useSSE.ts b/apps/apparatus/src/dashboard/hooks/useSSE.ts
+new file mode 100644
+index 0000000..6631c10
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/hooks/useSSE.ts
+@@ -0,0 +1,168 @@
++import { useState, useEffect, useRef, useCallback } from 'react';
++
++type SSEStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
++
++interface UseSSEOptions {
++  enabled?: boolean;
++  maxRetries?: number;
++  onOpen?: () => void;
++  onError?: (event: Event) => void;
++  onMaxRetriesExceeded?: () => void;
++}
++
++interface UseSSEReturn {
++  status: SSEStatus;
++  retryCount: number;
++  subscribe: <T>(eventType: string, callback: (data: T) => void) => () => void;
++  close: () => void;
++}
++
++const BASE_DELAY = 1000;
++const MAX_DELAY = 30000;
++
++/**
++ * Hook for managing SSE (Server-Sent Events) connections with:
++ * - Automatic reconnection with exponential backoff
++ * - Proper cleanup on URL change or unmount
++ * - Type-safe event subscriptions
++ */
++export function useSSE(url: string, options: UseSSEOptions = {}): UseSSEReturn {
++  const {
++    enabled = true,
++    maxRetries = 5,
++    onOpen,
++    onError,
++    onMaxRetriesExceeded,
++  } = options;
++
++  const [status, setStatus] = useState<SSEStatus>('disconnected');
++  const [retryCount, setRetryCount] = useState(0);
++
++  const eventSourceRef = useRef<EventSource | null>(null);
++  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
++  const listenersRef = useRef<Map<string, Set<(data: unknown) => void>>>(new Map());
++
++  // Clear any pending reconnect timeout
++  const clearReconnectTimeout = useCallback(() => {
++    if (reconnectTimeoutRef.current) {
++      clearTimeout(reconnectTimeoutRef.current);
++      reconnectTimeoutRef.current = null;
++    }
++  }, []);
++
++  // Close current connection
++  const closeConnection = useCallback(() => {
++    clearReconnectTimeout();
++    if (eventSourceRef.current) {
++      eventSourceRef.current.close();
++      eventSourceRef.current = null;
++    }
++  }, [clearReconnectTimeout]);
++
++  // Subscribe to an event type
++  const subscribe = useCallback(<T,>(eventType: string, callback: (data: T) => void) => {
++    if (!listenersRef.current.has(eventType)) {
++      listenersRef.current.set(eventType, new Set());
++
++      // Add listener to EventSource if connected
++      if (eventSourceRef.current) {
++        eventSourceRef.current.addEventListener(eventType, (event: MessageEvent) => {
++          const listeners = listenersRef.current.get(eventType);
++          if (listeners) {
++            try {
++              const data = JSON.parse(event.data);
++              listeners.forEach((cb) => cb(data));
++            } catch (e) {
++              console.error(`Failed to parse SSE event "${eventType}":`, e);
++            }
++          }
++        });
++      }
++    }
++
++    const typedCallback = callback as (data: unknown) => void;
++    listenersRef.current.get(eventType)!.add(typedCallback);
++
++    // Return unsubscribe function
++    return () => {
++      const listeners = listenersRef.current.get(eventType);
++      if (listeners) {
++        listeners.delete(typedCallback);
++        if (listeners.size === 0) {
++          listenersRef.current.delete(eventType);
++        }
++      }
++    };
++  }, []);
++
++  // Main connection effect
++  useEffect(() => {
++    if (!url || !enabled) {
++      closeConnection();
++      setStatus('disconnected');
++      setRetryCount(0);
++      return;
++    }
++
++    // Close any existing connection before opening new one
++    closeConnection();
++    setStatus('connecting');
++
++    const eventSource = new EventSource(url);
++    eventSourceRef.current = eventSource;
++
++    eventSource.onopen = () => {
++      setStatus('connected');
++      setRetryCount(0);
++      onOpen?.();
++    };
++
++    eventSource.onerror = (event) => {
++      setStatus('error');
++      onError?.(event);
++      eventSource.close();
++      eventSourceRef.current = null;
++
++      // Attempt reconnection with exponential backoff
++      setRetryCount((currentRetry) => {
++        if (currentRetry >= maxRetries) {
++          onMaxRetriesExceeded?.();
++          return currentRetry;
++        }
++
++        const delay = Math.min(BASE_DELAY * Math.pow(2, currentRetry), MAX_DELAY);
++        reconnectTimeoutRef.current = setTimeout(() => {
++          setRetryCount((r) => r + 1);
++        }, delay);
++
++        return currentRetry;
++      });
++    };
++
++    // Re-attach all existing event listeners
++    listenersRef.current.forEach((listeners, eventType) => {
++      eventSource.addEventListener(eventType, (event: MessageEvent) => {
++        try {
++          const data = JSON.parse(event.data);
++          listeners.forEach((cb) => cb(data));
++        } catch (e) {
++          console.error(`Failed to parse SSE event "${eventType}":`, e);
++        }
++      });
++    });
++
++    // Cleanup on URL change or unmount
++    return () => {
++      clearReconnectTimeout();
++      eventSource.close();
++      eventSourceRef.current = null;
++    };
++  }, [url, enabled, retryCount, maxRetries, onOpen, onError, onMaxRetriesExceeded, closeConnection, clearReconnectTimeout]);
++
++  return {
++    status,
++    retryCount,
++    subscribe,
++    close: closeConnection,
++  };
++}
+diff --git a/apps/apparatus/src/dashboard/hooks/useSSEEvent.ts b/apps/apparatus/src/dashboard/hooks/useSSEEvent.ts
+new file mode 100644
+index 0000000..32aa369
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/hooks/useSSEEvent.ts
+@@ -0,0 +1,116 @@
++import { useState, useEffect } from 'react';
++import { useSSE } from './useSSE';
++
++type SSEEventData = Record<string, unknown>;
++
++interface UseSSEEventOptions {
++  enabled?: boolean;
++}
++
++interface UseSSEEventReturn<T> {
++  data: T | null;
++  error: Error | null;
++  isConnected: boolean;
++}
++
++/**
++ * Hook to subscribe to a specific SSE event type.
++ *
++ * @param url - SSE endpoint URL
++ * @param eventType - The event type to subscribe to
++ * @param options - Optional configuration
++ *
++ * @example
++ * ```tsx
++ * interface TrafficEvent {
++ *   method: string;
++ *   path: string;
++ *   status: number;
++ * }
++ *
++ * function TrafficMonitor() {
++ *   const { data, isConnected } = useSSEEvent<TrafficEvent>(
++ *     '/events',
++ *     'request'
++ *   );
++ *
++ *   if (!isConnected) return <div>Connecting...</div>;
++ *   if (!data) return <div>Waiting for events...</div>;
++ *
++ *   return <div>{data.method} {data.path}</div>;
++ * }
++ * ```
++ */
++export function useSSEEvent<T extends SSEEventData>(
++  url: string,
++  eventType: string,
++  options: UseSSEEventOptions = {}
++): UseSSEEventReturn<T> {
++  const { enabled = true } = options;
++
++  const [data, setData] = useState<T | null>(null);
++  const [error, setError] = useState<Error | null>(null);
++
++  const { status, subscribe } = useSSE(url, {
++    enabled,
++    onError: () => setError(new Error('SSE connection error')),
++  });
++
++  useEffect(() => {
++    if (status !== 'connected') return;
++
++    const unsubscribe = subscribe<T>(eventType, (eventData) => {
++      setData(eventData);
++      setError(null);
++    });
++
++    return unsubscribe;
++  }, [status, eventType, subscribe]);
++
++  return {
++    data,
++    error,
++    isConnected: status === 'connected',
++  };
++}
++
++/**
++ * Hook to subscribe to multiple SSE event types.
++ * Returns the most recent event of any subscribed type.
++ */
++export function useSSEEvents<T extends SSEEventData>(
++  url: string,
++  eventTypes: string[],
++  options: UseSSEEventOptions = {}
++): UseSSEEventReturn<T & { _eventType: string }> {
++  const { enabled = true } = options;
++
++  const [data, setData] = useState<(T & { _eventType: string }) | null>(null);
++  const [error, setError] = useState<Error | null>(null);
++
++  const { status, subscribe } = useSSE(url, {
++    enabled,
++    onError: () => setError(new Error('SSE connection error')),
++  });
++
++  useEffect(() => {
++    if (status !== 'connected') return;
++
++    const unsubscribes = eventTypes.map((eventType) =>
++      subscribe<T>(eventType, (eventData) => {
++        setData({ ...eventData, _eventType: eventType });
++        setError(null);
++      })
++    );
++
++    return () => {
++      unsubscribes.forEach((unsub) => unsub());
++    };
++  }, [status, eventTypes, subscribe]);
++
++  return {
++    data,
++    error,
++    isConnected: status === 'connected',
++  };
++}
+diff --git a/apps/apparatus/src/dashboard/hooks/useTrafficStream.ts b/apps/apparatus/src/dashboard/hooks/useTrafficStream.ts
+new file mode 100644
+index 0000000..03a8f71
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/hooks/useTrafficStream.ts
+@@ -0,0 +1,69 @@
++import { useState, useEffect, useRef } from 'react';
++import { useApparatus } from '../providers/ApparatusProvider';
++
++export interface TrafficEvent {
++  method: string;
++  path: string;
++  status: number;
++  ip: string;
++  timestamp: string;
++  latencyMs: number;
++}
++
++export function useTrafficStream(bufferSize = 50) {
++  const { baseUrl } = useApparatus();
++  const [events, setEvents] = useState<TrafficEvent[]>([]);
++  const [isConnected, setIsConnected] = useState(false);
++  const eventSourceRef = useRef<EventSource | null>(null);
++
++  useEffect(() => {
++    if (!baseUrl) return;
++
++    // Close existing connection
++    if (eventSourceRef.current) {
++      eventSourceRef.current.close();
++    }
++
++    const sseUrl = `${baseUrl}/sse`;
++    const eventSource = new EventSource(sseUrl);
++    eventSourceRef.current = eventSource;
++
++    eventSource.onopen = () => {
++      setIsConnected(true);
++    };
++
++    eventSource.onerror = () => {
++      setIsConnected(false);
++      eventSource.close();
++      // Simple reconnect strategy handled by browser or could be manual here
++    };
++
++    eventSource.addEventListener('request', (e) => {
++      try {
++        const data = JSON.parse(e.data);
++        const newEvent: TrafficEvent = {
++            method: data.method,
++            path: data.path,
++            status: data.status,
++            ip: data.ip,
++            timestamp: data.timestamp,
++            latencyMs: data.latencyMs
++        };
++
++        setEvents((prev) => {
++          const updated = [newEvent, ...prev];
++          return updated.slice(0, bufferSize);
++        });
++      } catch (err) {
++        console.error('Failed to parse SSE data', err);
++      }
++    });
++
++    return () => {
++      eventSource.close();
++      setIsConnected(false);
++    };
++  }, [baseUrl, bufferSize]);
++
++  return { events, isConnected };
++}
+diff --git a/apps/apparatus/src/dashboard/index.html b/apps/apparatus/src/dashboard/index.html
+new file mode 100644
+index 0000000..f28dc67
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/index.html
+@@ -0,0 +1,14 @@
++<!DOCTYPE html>
++<html lang="en" class="dark">
++  <head>
++    <meta charset="UTF-8" />
++    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
++    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++    <meta name="color-scheme" content="dark light" />
++    <title>Apparatus Dashboard</title>
++  </head>
++  <body>
++    <div id="root"></div>
++    <script type="module" src="/main.tsx"></script>
++  </body>
++</html>
+diff --git a/apps/apparatus/src/dashboard/main.tsx b/apps/apparatus/src/dashboard/main.tsx
+new file mode 100644
+index 0000000..049d969
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/main.tsx
+@@ -0,0 +1,10 @@
++import React from 'react'
++import ReactDOM from 'react-dom/client'
++import App from './App.tsx'
++import './styles/index.css'
++
++ReactDOM.createRoot(document.getElementById('root')!).render(
++  <React.StrictMode>
++    <App />
++  </React.StrictMode>,
++)
+diff --git a/apps/apparatus/src/dashboard/package.json b/apps/apparatus/src/dashboard/package.json
+new file mode 100644
+index 0000000..f6070b0
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/package.json
+@@ -0,0 +1,32 @@
++{
++  "name": "@apparatus/dashboard",
++  "version": "0.1.0",
++  "private": true,
++  "type": "module",
++  "scripts": {
++    "dev": "vite",
++    "build": "tsc && vite build",
++    "preview": "vite preview",
++    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
++    "type-check": "tsc --noEmit"
++  },
++  "dependencies": {
++    "@apparatus/client": "workspace:*",
++    "clsx": "^2.1.0",
++    "lucide-react": "^0.312.0",
++    "react": "^18.2.0",
++    "react-dom": "^18.2.0",
++    "react-router-dom": "^6.21.0",
++    "tailwind-merge": "^2.2.0"
++  },
++  "devDependencies": {
++    "@types/react": "^18.2.0",
++    "@types/react-dom": "^18.2.0",
++    "@vitejs/plugin-react": "^4.2.0",
++    "autoprefixer": "^10.4.16",
++    "postcss": "^8.4.32",
++    "tailwindcss": "^3.4.0",
++    "typescript": "^5.3.0",
++    "vite": "^5.0.0"
++  }
++}
+diff --git a/apps/apparatus/src/dashboard/postcss.config.js b/apps/apparatus/src/dashboard/postcss.config.js
+new file mode 100644
+index 0000000..2aa7205
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/postcss.config.js
+@@ -0,0 +1,6 @@
++export default {
++  plugins: {
++    tailwindcss: {},
++    autoprefixer: {},
++  },
++};
+diff --git a/apps/apparatus/src/dashboard/providers/ApparatusProvider.tsx b/apps/apparatus/src/dashboard/providers/ApparatusProvider.tsx
+new file mode 100644
+index 0000000..22dbb67
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/providers/ApparatusProvider.tsx
+@@ -0,0 +1,159 @@
++import {
++  createContext,
++  useContext,
++  useState,
++  useEffect,
++  useMemo,
++  useCallback,
++  type ReactNode,
++} from 'react';
++import { ApparatusClient } from '@apparatus/client';
++
++interface HealthState {
++  status: 'healthy' | 'unhealthy' | 'checking' | 'unknown';
++  message?: string;
++  latencyMs?: number;
++  version?: string;
++}
++
++interface ApparatusContextValue {
++  client: ApparatusClient | null;
++  baseUrl: string;
++  setBaseUrl: (url: string) => void;
++  health: HealthState;
++  isConnected: boolean;
++}
++
++const ApparatusContext = createContext<ApparatusContextValue | undefined>(undefined);
++
++const STORAGE_KEY = 'apparatus-base-url';
++const DEFAULT_URL = 'http://localhost:8090';
++
++function getStoredUrl(): string {
++  try {
++    return localStorage.getItem(STORAGE_KEY) || DEFAULT_URL;
++  } catch {
++    return DEFAULT_URL;
++  }
++}
++
++function saveUrl(url: string): void {
++  try {
++    localStorage.setItem(STORAGE_KEY, url);
++  } catch {
++    // localStorage unavailable
++  }
++}
++
++function isValidUrl(url: string): boolean {
++  try {
++    const parsed = new URL(url);
++    return ['http:', 'https:'].includes(parsed.protocol);
++  } catch {
++    return false;
++  }
++}
++
++interface ApparatusProviderProps {
++  children: ReactNode;
++  defaultUrl?: string;
++}
++
++export function ApparatusProvider({ children, defaultUrl }: ApparatusProviderProps) {
++  const [baseUrl, setBaseUrlState] = useState<string>(() => defaultUrl ?? getStoredUrl());
++  const [health, setHealth] = useState<HealthState>({ status: 'unknown' });
++
++  // Create client when baseUrl changes (with validation)
++  const client = useMemo(() => {
++    if (!baseUrl || !isValidUrl(baseUrl)) return null;
++    return new ApparatusClient({ baseUrl });
++  }, [baseUrl]);
++
++  // Validated URL setter
++  const setBaseUrl = useCallback((newUrl: string) => {
++    if (!isValidUrl(newUrl)) {
++      console.warn('Invalid URL rejected:', newUrl);
++      return;
++    }
++    setBaseUrlState(newUrl);
++    saveUrl(newUrl);
++  }, []);
++
++  // Health check with proper cleanup
++  useEffect(() => {
++    if (!client) {
++      setHealth({ status: 'unknown', message: 'No client configured' });
++      return;
++    }
++
++    const abortController = new AbortController();
++    let intervalId: ReturnType<typeof setInterval> | null = null;
++
++    const checkHealth = async () => {
++      if (abortController.signal.aborted) return;
++
++      setHealth((prev) => ({ ...prev, status: 'checking' }));
++      const start = performance.now();
++
++      try {
++        const response = await client.core.health();
++        if (abortController.signal.aborted) return;
++
++        setHealth({
++          status: 'healthy',
++          message: 'Connected',
++          latencyMs: Math.round(performance.now() - start),
++          version: response.version,
++        });
++      } catch (error) {
++        if (abortController.signal.aborted) return;
++        setHealth({
++          status: 'unhealthy',
++          message: error instanceof Error ? error.message : 'Connection failed',
++        });
++      }
++    };
++
++    // Initial check
++    checkHealth();
++
++    // Poll every 30 seconds
++    intervalId = setInterval(checkHealth, 30000);
++
++    return () => {
++      abortController.abort();
++      if (intervalId) clearInterval(intervalId);
++    };
++  }, [client]);
++
++  // Memoize context value
++  const isConnected = health.status === 'healthy';
++  const contextValue = useMemo<ApparatusContextValue>(
++    () => ({
++      client,
++      baseUrl,
++      setBaseUrl,
++      health,
++      isConnected,
++    }),
++    [client, baseUrl, setBaseUrl, health, isConnected]
++  );
++
++  return (
++    <ApparatusContext.Provider value={contextValue}>
++      {children}
++    </ApparatusContext.Provider>
++  );
++}
++
++/**
++ * Hook to access Apparatus client context.
++ * @throws Error if used outside of ApparatusProvider
++ */
++export function useApparatus(): ApparatusContextValue {
++  const context = useContext(ApparatusContext);
++  if (context === undefined) {
++    throw new Error('useApparatus must be used within a ApparatusProvider');
++  }
++  return context;
++}
+diff --git a/apps/apparatus/src/dashboard/styles/globals.css b/apps/apparatus/src/dashboard/styles/globals.css
+new file mode 100644
+index 0000000..8771f8e
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/styles/globals.css
+@@ -0,0 +1,67 @@
++@tailwind base;
++@tailwind components;
++@tailwind utilities;
++
++@layer base {
++  :root {
++    --radius: 0.5rem;
++  }
++
++  * {
++    @apply border-neutral-800;
++  }
++
++  body {
++    @apply bg-neutral-950 text-neutral-100 antialiased;
++  }
++
++  /* Scrollbar styling */
++  ::-webkit-scrollbar {
++    width: 8px;
++    height: 8px;
++  }
++
++  ::-webkit-scrollbar-track {
++    @apply bg-neutral-900;
++  }
++
++  ::-webkit-scrollbar-thumb {
++    @apply bg-neutral-700 rounded-full;
++  }
++
++  ::-webkit-scrollbar-thumb:hover {
++    @apply bg-neutral-600;
++  }
++
++  /* Focus styles */
++  :focus-visible {
++    @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-neutral-900;
++  }
++
++  /* Selection */
++  ::selection {
++    @apply bg-primary-500/30 text-primary-100;
++  }
++}
++
++@layer components {
++  /* Skip link for accessibility */
++  .skip-link {
++    @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4;
++    @apply bg-primary-500 text-white px-4 py-2 rounded-md z-50;
++  }
++}
++
++@layer utilities {
++  /* Reduced motion */
++  @media (prefers-reduced-motion: reduce) {
++    *,
++    *::before,
++    *::after {
++      animation-duration: 0.01ms !important;
++      animation-iteration-count: 1 !important;
++      transition-duration: 0.01ms !important;
++      scroll-behavior: auto !important;
++    }
++  }
++}
+diff --git a/apps/apparatus/src/dashboard/styles/index.css b/apps/apparatus/src/dashboard/styles/index.css
+new file mode 100644
+index 0000000..c99f6cf
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/styles/index.css
+@@ -0,0 +1,17 @@
++@tailwind base;
++@tailwind components;
++@tailwind utilities;
++
++@layer base {
++  :root {
++    --color-primary-500: 0 87 183;
++    --color-neutral-950: 5 5 5;
++    --color-neutral-900: 13 13 13;
++    --color-neutral-800: 22 22 22;
++    --color-neutral-100: 255 255 255;
++  }
++}
++
++body {
++  @apply bg-neutral-950 text-neutral-100 antialiased;
++}
+diff --git a/apps/apparatus/src/dashboard/tailwind.config.ts b/apps/apparatus/src/dashboard/tailwind.config.ts
+new file mode 100644
+index 0000000..04fce70
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/tailwind.config.ts
+@@ -0,0 +1,44 @@
++import type { Config } from 'tailwindcss';
++import { colors } from './theme/colors';
++
++const config = {
++  content: [
++    './index.html',
++    './**/*.{js,ts,jsx,tsx}',
++  ],
++  darkMode: 'class',
++  theme: {
++    extend: {
++      colors: {
++        primary: colors.primary,
++        success: colors.success,
++        warning: colors.warning,
++        danger: colors.danger,
++        info: colors.info,
++        neutral: colors.neutral,
++        surface: colors.surface,
++      },
++      fontFamily: {
++        sans: ['Inter', 'system-ui', 'sans-serif'],
++        mono: ['JetBrains Mono', 'Menlo', 'monospace'],
++      },
++      boxShadow: {
++        'glow-primary': '0 0 20px -5px rgba(0, 240, 255, 0.5)',
++        'glow-success': '0 0 20px -5px rgba(0, 255, 148, 0.5)',
++        'glow-danger': '0 0 20px -5px rgba(255, 0, 85, 0.5)',
++        'panel': '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.15)',
++      },
++      backgroundImage: {
++        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
++        'grid-pattern': "linear-gradient(to right, #1f2633 1px, transparent 1px), linear-gradient(to bottom, #1f2633 1px, transparent 1px)",
++      },
++      animation: {
++        'spin-slow': 'spin 3s linear infinite',
++        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
++      },
++    },
++  },
++  plugins: [],
++} satisfies Config;
++
++export default config;
+\ No newline at end of file
+diff --git a/apps/apparatus/src/dashboard/theme/ThemeProvider.tsx b/apps/apparatus/src/dashboard/theme/ThemeProvider.tsx
+new file mode 100644
+index 0000000..a52ef50
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/theme/ThemeProvider.tsx
+@@ -0,0 +1,109 @@
++import { createContext, useContext, useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
++
++export type Theme = 'light' | 'dark' | 'system';
++type ResolvedTheme = 'light' | 'dark';
++
++interface ThemeContextValue {
++  theme: Theme;
++  resolvedTheme: ResolvedTheme;
++  setTheme: (theme: Theme) => void;
++  toggleTheme: () => void;
++}
++
++const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
++
++const THEME_STORAGE_KEY = 'apparatus-theme';
++
++function getSystemTheme(): ResolvedTheme {
++  if (typeof window === 'undefined') return 'dark';
++  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
++}
++
++function getStoredTheme(): Theme {
++  try {
++    const stored = localStorage.getItem(THEME_STORAGE_KEY);
++    if (stored === 'light' || stored === 'dark' || stored === 'system') {
++      return stored;
++    }
++  } catch {
++    // localStorage unavailable (private browsing, etc.)
++  }
++  return 'dark';
++}
++
++function saveTheme(theme: Theme): void {
++  try {
++    localStorage.setItem(THEME_STORAGE_KEY, theme);
++  } catch {
++    // localStorage unavailable
++  }
++}
++
++interface ThemeProviderProps {
++  children: ReactNode;
++  defaultTheme?: Theme;
++}
++
++export function ThemeProvider({ children, defaultTheme }: ThemeProviderProps) {
++  const [theme, setThemeState] = useState<Theme>(() => defaultTheme ?? getStoredTheme());
++  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(() =>
++    theme === 'system' ? getSystemTheme() : theme
++  );
++
++  const setTheme = useCallback((newTheme: Theme) => {
++    setThemeState(newTheme);
++    saveTheme(newTheme);
++  }, []);
++
++  const toggleTheme = useCallback(() => {
++    setThemeState((current) => {
++      const next = current === 'dark' ? 'light' : 'dark';
++      saveTheme(next);
++      return next;
++    });
++  }, []);
++
++  // Update resolved theme when theme changes or system preference changes
++  useEffect(() => {
++    const updateResolvedTheme = () => {
++      const resolved = theme === 'system' ? getSystemTheme() : theme;
++      setResolvedTheme(resolved);
++      document.documentElement.classList.remove('light', 'dark');
++      document.documentElement.classList.add(resolved);
++    };
++
++    updateResolvedTheme();
++
++    if (theme === 'system') {
++      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
++      mediaQuery.addEventListener('change', updateResolvedTheme);
++      return () => mediaQuery.removeEventListener('change', updateResolvedTheme);
++    }
++  }, [theme]);
++
++  // Memoize context value to prevent unnecessary re-renders
++  const contextValue = useMemo<ThemeContextValue>(() => ({
++    theme,
++    resolvedTheme,
++    setTheme,
++    toggleTheme,
++  }), [theme, resolvedTheme, setTheme, toggleTheme]);
++
++  return (
++    <ThemeContext.Provider value={contextValue}>
++      {children}
++    </ThemeContext.Provider>
++  );
++}
++
++/**
++ * Hook to access theme context.
++ * @throws Error if used outside of ThemeProvider
++ */
++export function useTheme(): ThemeContextValue {
++  const context = useContext(ThemeContext);
++  if (context === undefined) {
++    throw new Error('useTheme must be used within a ThemeProvider');
++  }
++  return context;
++}
+diff --git a/apps/apparatus/src/dashboard/theme/ThemeToggle.tsx b/apps/apparatus/src/dashboard/theme/ThemeToggle.tsx
+new file mode 100644
+index 0000000..18fc814
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/theme/ThemeToggle.tsx
+@@ -0,0 +1,24 @@
++import { Moon, Sun } from 'lucide-react';
++import { useTheme } from './ThemeProvider';
++import { Button } from '../components/ui/Button';
++
++export function ThemeToggle() {
++  const { resolvedTheme, toggleTheme } = useTheme();
++
++  return (
++    <Button
++      variant="ghost"
++      size="sm"
++      onClick={toggleTheme}
++      aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
++    >
++      {resolvedTheme === 'dark' ? (
++        <Sun className="h-5 w-5" aria-hidden="true" />
++      ) : (
++        <Moon className="h-5 w-5" aria-hidden="true" />
++      )}
++    </Button>
++  );
++}
++
++ThemeToggle.displayName = 'ThemeToggle';
+diff --git a/apps/apparatus/src/dashboard/theme/colors.ts b/apps/apparatus/src/dashboard/theme/colors.ts
+new file mode 100644
+index 0000000..174caca
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/theme/colors.ts
+@@ -0,0 +1,107 @@
++/**
++ * Apparatus "Command Center" Color Palette
++ * Designed for high-contrast dark mode interfaces.
++ */
++
++export const colors = {
++  // Primary: Electric Blue / Cyber Blue
++  primary: {
++    DEFAULT: '#00F0FF',
++    50: '#E0FDFF',
++    100: '#B3FAFF',
++    200: '#80F6FF',
++    300: '#4DF2FF',
++    400: '#26EFFF',
++    500: '#00F0FF', // Main Brand
++    600: '#00C0CC',
++    700: '#009099',
++    800: '#006066',
++    900: '#003033',
++    950: '#00181A',
++  },
++
++  // Semantic Colors
++  success: {
++    DEFAULT: '#00FF94', // Neon Green
++    50: '#E0FFE9',
++    100: '#B3FFD6',
++    200: '#80FFC2',
++    300: '#4DFFAD',
++    400: '#26FF9E',
++    500: '#00FF94',
++    600: '#00CC76',
++    700: '#009959',
++    800: '#00663B',
++    900: '#00331E',
++  },
++
++  warning: {
++    DEFAULT: '#FFB800', // Amber
++    50: '#FFF7E0',
++    100: '#FFEDB3',
++    200: '#FFE380',
++    300: '#FFD94D',
++    400: '#FFCF26',
++    500: '#FFB800',
++    600: '#CC9300',
++    700: '#996E00',
++    800: '#664A00',
++    900: '#332500',
++  },
++
++  danger: {
++    DEFAULT: '#FF0055', // Neon Red/Pink
++    50: '#FFE0EA',
++    100: '#FFB3CB',
++    200: '#FF80AB',
++    300: '#FF4D8B',
++    400: '#FF2672',
++    500: '#FF0055',
++    600: '#CC0044',
++    700: '#990033',
++    800: '#660022',
++    900: '#330011',
++  },
++
++  info: {
++    DEFAULT: '#00A3FF', // Sky Blue
++    50: '#E0F4FF',
++    100: '#B3E3FF',
++    200: '#80D2FF',
++    300: '#4DC1FF',
++    400: '#26B2FF',
++    500: '#00A3FF',
++    600: '#0082CC',
++    700: '#006299',
++    800: '#004166',
++    900: '#002133',
++  },
++
++  // Neutral Colors - Deep, bluish grays for "Space" feel
++  neutral: {
++    50: '#F5F7FA',
++    100: '#EBEFF5',
++    200: '#DDE4ED',
++    300: '#C9D3E0',
++    400: '#9BA9BF',
++    500: '#708099',
++    600: '#4D5B70',
++    700: '#323C4D',
++    800: '#1F2633',
++    900: '#131720',
++    950: '#0A0C11', // Almost Black
++  },
++  
++  // Specific UI Surfaces
++  surface: {
++    DEFAULT: '#131720',
++    muted: '#1F2633',
++    highlight: '#323C4D',
++    panel: '#0A0C11',
++    border: '#323C4D',
++  }
++} as const;
++
++export type Colors = typeof colors;
++export type PrimaryShade = keyof typeof colors.primary;
++export type SemanticColor = 'success' | 'warning' | 'danger' | 'info';
+\ No newline at end of file
+diff --git a/apps/apparatus/src/dashboard/tsconfig.json b/apps/apparatus/src/dashboard/tsconfig.json
+new file mode 100644
+index 0000000..ff6ed15
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/tsconfig.json
+@@ -0,0 +1,26 @@
++{
++  "compilerOptions": {
++    "target": "ES2020",
++    "useDefineForClassFields": true,
++    "lib": ["ES2020", "DOM", "DOM.Iterable"],
++    "module": "ESNext",
++    "skipLibCheck": true,
++    "moduleResolution": "bundler",
++    "allowImportingTsExtensions": true,
++    "resolveJsonModule": true,
++    "isolatedModules": true,
++    "noEmit": true,
++    "jsx": "react-jsx",
++    "strict": true,
++    "noUnusedLocals": true,
++    "noUnusedParameters": true,
++    "noFallthroughCasesInSwitch": true,
++    "baseUrl": ".",
++    "paths": {
++      "@/*": ["./*"]
++    }
++  },
++  "include": ["./**/*.ts", "./**/*.tsx"],
++  "exclude": ["vite.config.ts"],
++  "references": [{ "path": "./tsconfig.node.json" }]
++}
+\ No newline at end of file
+diff --git a/apps/apparatus/src/dashboard/tsconfig.node.json b/apps/apparatus/src/dashboard/tsconfig.node.json
+new file mode 100644
+index 0000000..42872c5
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/tsconfig.node.json
+@@ -0,0 +1,10 @@
++{
++  "compilerOptions": {
++    "composite": true,
++    "skipLibCheck": true,
++    "module": "ESNext",
++    "moduleResolution": "bundler",
++    "allowSyntheticDefaultImports": true
++  },
++  "include": ["vite.config.ts"]
++}
+diff --git a/apps/apparatus/src/dashboard/vite.config.ts b/apps/apparatus/src/dashboard/vite.config.ts
+new file mode 100644
+index 0000000..61f6a9f
+--- /dev/null
++++ b/apps/apparatus/src/dashboard/vite.config.ts
+@@ -0,0 +1,40 @@
++import { defineConfig } from 'vite';
++import react from '@vitejs/plugin-react';
++import path from 'path';
++
++export default defineConfig({
++  plugins: [react()],
++  root: path.resolve(__dirname),
++  base: '/dashboard/',
++  resolve: {
++    alias: {
++      '@': path.resolve(__dirname),
++    },
++  },
++  server: {
++    port: 5174,
++    proxy: {
++      '/api': {
++        target: 'http://localhost:8090',
++        changeOrigin: true,
++        rewrite: (p) => p.replace(/^\/api/, ''),
++      },
++      '/events': {
++        target: 'http://localhost:8090',
++        changeOrigin: true,
++      },
++    },
++  },
++  build: {
++    outDir: path.resolve(__dirname, '../dist-dashboard'),
++    emptyOutDir: true,
++    rollupOptions: {
++      output: {
++        manualChunks: {
++          'react-vendor': ['react', 'react-dom'],
++          'router': ['react-router-dom'],
++        },
++      },
++    },
++  },
++});
+diff --git a/apps/apparatus/src/sse-broadcast.ts b/apps/apparatus/src/sse-broadcast.ts
+new file mode 100644
+index 0000000..8e9d985
+--- /dev/null
++++ b/apps/apparatus/src/sse-broadcast.ts
+@@ -0,0 +1,142 @@
++import { Response } from "express";
++import { EventEmitter } from "events";
++import { randomUUID } from "crypto";
++
++// Configuration
++const MAX_SSE_CLIENTS = 100;
++const HEARTBEAT_INTERVAL_MS = 30000;
++
++// Event types that can be broadcast
++export type SSEEventType =
++    | 'request'      // New HTTP request received
++    | 'deception'    // Honeypot/deception event
++    | 'tarpit'       // IP trapped/released
++    | 'health'       // System health update
++
++export interface SSEEvent {
++    type: SSEEventType;
++    timestamp: string;
++    data: any;
++}
++
++interface ClientInfo {
++    res: Response;
++    clientId: string;
++    connectedAt: Date;
++    heartbeatInterval: NodeJS.Timeout;
++}
++
++// Global event emitter for SSE
++class SSEBroadcaster extends EventEmitter {
++    private clients: Map<string, ClientInfo> = new Map();
++
++    /**
++     * Registers a new SSE client for receiving broadcast events.
++     * @param res - Express Response object configured for SSE streaming
++     * @returns clientId if added, null if max clients reached
++     */
++    addClient(res: Response): string | null {
++        // Check max client limit (DoS protection)
++        if (this.clients.size >= MAX_SSE_CLIENTS) {
++            return null;
++        }
++
++        const clientId = randomUUID();
++
++        // Setup heartbeat to keep connection alive through proxies
++        const heartbeatInterval = setInterval(() => {
++            if (!res.writableEnded) {
++                res.write(`: heartbeat ${new Date().toISOString()}\n\n`);
++            }
++        }, HEARTBEAT_INTERVAL_MS);
++
++        const clientInfo: ClientInfo = {
++            res,
++            clientId,
++            connectedAt: new Date(),
++            heartbeatInterval
++        };
++
++        this.clients.set(clientId, clientInfo);
++
++        // Cleanup function for all disconnect scenarios
++        const cleanup = (): void => {
++            const client = this.clients.get(clientId);
++            if (client) {
++                clearInterval(client.heartbeatInterval);
++                this.clients.delete(clientId);
++            }
++        };
++
++        // Handle all disconnect scenarios (P0 fix: add error/finish handlers)
++        res.once('close', cleanup);
++        res.once('error', cleanup);
++        res.once('finish', cleanup);
++
++        // Send connection event
++        this.sendToClient(res, {
++            type: 'health' as SSEEventType,
++            timestamp: new Date().toISOString(),
++            data: { status: 'connected', clientId, clients: this.clients.size }
++        });
++
++        return clientId;
++    }
++
++    private sendToClient(res: Response, event: SSEEvent): void {
++        try {
++            if (!res.writableEnded) {
++                // Sanitize JSON to prevent SSE injection via newlines
++                const jsonString = JSON.stringify(event);
++                res.write(`event: ${event.type}\n`);
++                res.write(`data: ${jsonString}\n\n`);
++            }
++        } catch (e) {
++            // Client disconnected, will be cleaned up by event handlers
++        }
++    }
++
++    broadcast(type: SSEEventType, data: any): void {
++        const event: SSEEvent = {
++            type,
++            timestamp: new Date().toISOString(),
++            data
++        };
++
++        for (const [, client] of this.clients) {
++            this.sendToClient(client.res, event);
++        }
++
++        // Also emit locally for any internal listeners
++        this.emit(type, event);
++    }
++
++    getClientCount(): number {
++        return this.clients.size;
++    }
++
++    getMaxClients(): number {
++        return MAX_SSE_CLIENTS;
++    }
++}
++
++// Singleton instance
++export const sseBroadcaster = new SSEBroadcaster();
++
++// Convenience functions
++export function broadcastRequest(request: any): void {
++    sseBroadcaster.broadcast('request', request);
++}
++
++export function broadcastDeception(event: any): void {
++    sseBroadcaster.broadcast('deception', event);
++}
++
++export function broadcastTarpit(action: 'trapped' | 'released', ip: string): void {
++    sseBroadcaster.broadcast('tarpit', { action, ip });
++}
++
++export function broadcastHealth(status: any): void {
++    sseBroadcaster.broadcast('health', status);
++}
++

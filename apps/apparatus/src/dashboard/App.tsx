@@ -40,7 +40,7 @@ function Layout() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/dashboard">
       <ThemeProvider>
         <ApparatusProvider>
           <Routes>
