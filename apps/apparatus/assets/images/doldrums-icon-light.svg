@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100" height="100" rx="6" fill="#0057B7"/>
+  <rect x="7" y="7" width="86" height="86" rx="4" fill="#001E62"/>
+  
+  <!-- Hourglass frame -->
+  <rect x="30" y="18" width="40" height="4" rx="1" fill="#D62598"/>
+  <rect x="30" y="78" width="40" height="4" rx="1" fill="#D62598"/>
+  
+  <!-- Hourglass glass -->
+  <path d="M34 22 L34 40 Q50 52 50 50 Q50 52 66 40 L66 22 Z" fill="white" opacity="0.9"/>
+  <path d="M34 78 L34 60 Q50 48 50 50 Q50 48 66 60 L66 78 Z" fill="white" opacity="0.9"/>
+  
+  <!-- Sand in top -->
+  <path d="M38 22 L38 32 Q50 42 50 40 Q50 42 62 32 L62 22 Z" fill="#D62598" opacity="0.6"/>
+  
+  <!-- Sand stream -->
+  <rect x="48" y="42" width="4" height="16" fill="#D62598" opacity="0.8"/>
+  
+  <!-- Sand in bottom (mostly full - time wasted) -->
+  <path d="M36 78 L36 62 Q50 52 50 58 Q50 52 64 62 L64 78 Z" fill="#D62598" opacity="0.8"/>
+  
+  <!-- Infinity/loop suggestion - small arrows -->
+  <path d="M22 50 Q22 40 32 40" fill="none" stroke="white" stroke-width="2" opacity="0.5"/>
+  <path d="M78 50 Q78 60 68 60" fill="none" stroke="white" stroke-width="2" opacity="0.5"/>
+</svg>

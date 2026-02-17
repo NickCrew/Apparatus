@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloud-imposter
+  namespace: demo-targets
+  labels:
+    app: cloud-imposter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloud-imposter
+  template:
+    metadata:
+      labels:
+        app: cloud-imposter
+    spec:
+      containers:
+      - name: imposter
+        image: ts-apparatus:latest
+        imagePullPolicy: IfNotPresent
+        command: ["npm", "run", "imposter"]
+        env:
+        - name: IMPOSTER_PORT
+          value: "80"
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloud-imposter
+  namespace: demo-targets
+spec:
+  selector:
+    app: cloud-imposter
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP

@@ -1,0 +1,37 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+*.tsbuildinfo
+
+# test / coverage
+coverage/
+
+# environment
+.env
+.env.local
+.env.*.local
+
+# nx
+.nx/
+
+# os
+.DS_Store
+Thumbs.db
+
+# ide
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# certs (keep examples, ignore generated)
+certs/*.key
+certs/*.crt
+!certs/server.key
+!certs/server.crt
+
+# logs
+*.log
+pino-*.log

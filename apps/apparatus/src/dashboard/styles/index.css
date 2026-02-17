@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary-500: 0 87 183;
+    --color-neutral-950: 5 5 5;
+    --color-neutral-900: 13 13 13;
+    --color-neutral-800: 22 22 22;
+    --color-neutral-100: 255 255 255;
+  }
+}
+
+body {
+  @apply bg-neutral-950 text-neutral-100 antialiased;
+}

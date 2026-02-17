@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>root@prod-web-01:~</title>
+    <style>
+        body { background-color: #0c0c0c; color: #00ff00; font-family: "Courier New", Courier, monospace; margin: 0; padding: 20px; font-size: 16px; }
+        #output { white-space: pre-wrap; margin-bottom: 10px; }
+        #input-line { display: flex; }
+        #prompt { margin-right: 10px; color: #00ff00; }
+        input { background: transparent; border: none; color: #00ff00; font-family: inherit; font-size: inherit; flex-grow: 1; outline: none; }
+    </style>
+</head>
+<body>
+    <div id="output">Welcome to Ubuntu 22.04.3 LTS (GNU/Linux 5.15.0-91-generic x86_64)
+System information as of Mon Oct 12 14:02:22 UTC 2024
+
+Last login: Mon Oct 12 10:00:01 2024 from 10.0.0.5
+</div>
+    <div id="input-line">
+        <span id="prompt">www-data@prod-web-01:/var/www/html$</span>
+        <input type="text" id="cmd" autofocus autocomplete="off" spellcheck="false">
+    </div>
+
+    <script>
+        const cmdInput = document.getElementById('cmd');
+        const outputDiv = document.getElementById('output');
+        const promptText = "www-data@prod-web-01:/var/www/html$";
+
+        // Generate a random session ID
+        const sessionId = "sess-" + Math.random().toString(36).substring(7);
+
+        cmdInput.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter') {
+                const command = cmdInput.value;
+                if (!command.trim()) return;
+
+                // Echo command
+                outputDiv.textContent += `\n${promptText} ${command}\n`;
+                cmdInput.value = '';
+                cmdInput.disabled = true;
+
+                // Send to AI backend
+                try {
+                    const res = await fetch('/console/api', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ command, sessionId })
+                    });
+                    const data = await res.json();
+                    outputDiv.textContent += data.output;
+                } catch (err) {
+                    outputDiv.textContent += "Connection lost.";
+                }
+
+                cmdInput.disabled = false;
+                cmdInput.focus();
+                window.scrollTo(0, document.body.scrollHeight);
+            }
+        });
+
+        document.body.addEventListener('click', () => cmdInput.focus());
+    </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+namespace: echo
+image:
+  repository: ts-apparatus
+  tag: latest
+  pullPolicy: IfNotPresent
+replicaCount: 2
+env:
+  HOST: "0.0.0.0"
+  PORT_HTTP1: "8080"
+  PORT_HTTP2: "8443"
+  CORS: "true"
+  BODY_LIMIT: "50mb"
+  H2C: "true"
+  LOG_LEVEL: "info"
+service:
+  type: ClusterIP
+  ports:
+    http: 80
+    https: 443
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+ingress:
+  enabled: true
+  className: nginx
+  host: echo.localtest.me
+  tls:
+    enabled: true
+    secretName: ts-apparatus-tls
+    hosts:
+      - echo.localtest.me
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+probePaths:
+  readiness: /healthz
+  liveness: /healthz

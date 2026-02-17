@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: escape-artist-daily
+  namespace: demo-targets
+spec:
+  schedule: "0 * * * *" # Every hour
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: escape-artist
+            image: ts-apparatus:latest
+            imagePullPolicy: IfNotPresent
+            command: ["npm", "run", "escape", "--"]
+            args: 
+              - "--report"
+              - "--target"
+              - "http://risk-server.demo-targets.svc.cluster.local:4100" # Self-attack to verify internal routing, or external C2
+              - "--dlp"
+              - "cc"
+            env:
+            - name: RISK_SERVER_URL
+              value: "http://risk-server.demo-targets.svc.cluster.local:4100"
+          restartPolicy: OnFailure

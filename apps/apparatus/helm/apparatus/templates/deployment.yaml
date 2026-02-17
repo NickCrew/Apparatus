@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ts-apparatus
+  namespace: {{ .Values.namespace }}
+  labels:
+{{ include "ts-apparatus.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "ts-apparatus.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "ts-apparatus.name" . }}
+{{ include "ts-apparatus.labels" . | indent 8 }}
+    spec:
+      containers:
+        - name: app
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8080
+            - containerPort: 8443
+          envFrom:
+            - configMapRef:
+                name: ts-apparatus-config
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probePaths.readiness }}
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probePaths.liveness }}
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+{{ toYaml .Values.resources | indent 12 }}

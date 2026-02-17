@@ -1,0 +1,46 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "apparatus",
+  "projectType": "application",
+  "root": "apps/apparatus",
+  "sourceRoot": "apps/apparatus/src",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/dist"],
+      "options": {
+        "cwd": "apps/apparatus",
+        "command": "pnpm run build"
+      }
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/apparatus",
+        "command": "pnpm run dev"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/apparatus",
+        "command": "pnpm run test"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/apparatus",
+        "command": "pnpm run lint"
+      }
+    },
+    "docker": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/apparatus",
+        "command": "docker compose up --build"
+      }
+    }
+  },
+  "tags": ["type:application", "scope:server"]
+}

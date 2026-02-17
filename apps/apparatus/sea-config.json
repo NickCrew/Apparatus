@@ -1,0 +1,5 @@
+{
+  "main": "dist/escape.bundled.js",
+  "output": "dist/escape.blob",
+  "disableExperimentalSEAWarning": true
+}

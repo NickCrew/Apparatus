@@ -1,0 +1,17 @@
+version: "3.9"
+services:
+  apparatus:
+    build: .
+    environment:
+      PORT_HTTP1: 8080
+      PORT_HTTP2: 8443
+      HOST: 0.0.0.0
+      CORS: "true"
+      BODY_LIMIT: 50mb
+      H2C: "true"
+    ports:
+      - "18080:8080"
+      - "18443:8443"
+      - "18081:8081"
+    volumes:
+      - ./certs:/app/certs:ro

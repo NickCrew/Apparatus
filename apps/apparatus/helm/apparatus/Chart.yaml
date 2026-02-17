@@ -1,0 +1,5 @@
+apiVersion: v2
+name: ts-apparatus
+version: 0.1.0
+appVersion: "1.0.0"
+description: Helm chart for ts-apparatus echo service with HTTP/1.1, HTTP/2, and optional h2c.

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ts-apparatus
+  namespace: {{ .Values.namespace }}
+  labels:
+{{ include "ts-apparatus.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app: {{ include "ts-apparatus.name" . }}
+  ports:
+    - name: http
+      port: {{ .Values.service.ports.http }}
+      targetPort: 8080
+    - name: https
+      port: {{ .Values.service.ports.https }}
+      targetPort: 8443
