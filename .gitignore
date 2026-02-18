@@ -35,3 +35,8 @@ certs/*.crt
 # logs
 *.log
 pino-*.log
+*.diff
+
+
+.agents/reviews
+**/reviews
