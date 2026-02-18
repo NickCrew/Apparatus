@@ -7,6 +7,8 @@ import { ApparatusProvider } from './providers/ApparatusProvider';
 import { Overview } from './components/dashboard/Overview';
 import { ChaosConsole } from './components/dashboard/ChaosConsole';
 import { DefenseConsole } from './components/dashboard/DefenseConsole';
+import { DeceptionConsole } from './components/dashboard/DeceptionConsole';
+import { ClusterConsole } from './components/dashboard/ClusterConsole';
 
 // Placeholder Components with basic styling
 const Placeholder = ({ title }: { title: string }) => (
@@ -16,8 +18,6 @@ const Placeholder = ({ title }: { title: string }) => (
 );
 
 const Traffic = () => <Placeholder title="Traffic" />;
-const Deception = () => <Placeholder title="Deception" />;
-const Cluster = () => <Placeholder title="Cluster" />;
 const Webhooks = () => <Placeholder title="Webhooks" />;
 const MTD = () => <Placeholder title="MTD" />;
 const Testing = () => <Placeholder title="Testing" />;
@@ -40,7 +40,7 @@ function Layout() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/dashboard">
       <ThemeProvider>
         <ApparatusProvider>
           <Routes>
@@ -48,9 +48,9 @@ export default function App() {
               <Route index element={<Overview />} />
               <Route path="traffic" element={<Traffic />} />
               <Route path="defense" element={<DefenseConsole />} />
-              <Route path="deception" element={<Deception />} />
+              <Route path="deception" element={<DeceptionConsole />} />
               <Route path="chaos" element={<ChaosConsole />} />
-              <Route path="cluster" element={<Cluster />} />
+              <Route path="cluster" element={<ClusterConsole />} />
               <Route path="webhooks" element={<Webhooks />} />
               <Route path="mtd" element={<MTD />} />
               <Route path="testing" element={<Testing />} />

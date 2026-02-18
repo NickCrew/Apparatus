@@ -8,10 +8,21 @@ import { useDefense } from '../../hooks/useDefense';
 export function DefenseConsole() {
   const { rules, addRule, deleteRule, isLoading } = useDefense();
   const [newPattern, setNewPattern] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const handleAdd = async (e: React.FormEvent) => {
       e.preventDefault();
       if (!newPattern) return;
+      
+      // Client-side ReDoS / Syntax validation
+      try {
+          new RegExp(newPattern);
+      } catch (e) {
+          setError("Invalid Regex Pattern");
+          return;
+      }
+      
+      setError(null);
       await addRule(newPattern, 'block');
       setNewPattern('');
   };
@@ -77,14 +88,19 @@ export function DefenseConsole() {
                 <CardContent>
                     <form onSubmit={handleAdd} className="space-y-3">
                         <div>
-                            <label className="text-xs font-mono text-neutral-400 uppercase">Regex Pattern</label>
+                            <label htmlFor="regex-pattern" className="text-xs font-mono text-neutral-400 uppercase">Regex Pattern</label>
                             <input 
+                                id="regex-pattern"
                                 type="text" 
                                 value={newPattern}
-                                onChange={e => setNewPattern(e.target.value)}
+                                onChange={e => {
+                                    setNewPattern(e.target.value);
+                                    if (error) setError(null);
+                                }}
                                 placeholder="e.g. \/admin|drop tables"
                                 className="w-full mt-1 px-3 py-2 bg-neutral-900 border border-neutral-800 rounded-sm text-sm font-mono text-white focus:outline-none focus:border-primary-500"
                             />
+                            {error && <span className="text-xs text-danger-500 mt-1 block">{error}</span>}
                         </div>
                         <Button type="submit" variant="primary" className="w-full" disabled={isLoading || !newPattern}>
                             <Plus className="h-4 w-4" />

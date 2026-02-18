@@ -17,6 +17,8 @@ export function useDefense() {
     if (!baseUrl) return;
     try {
       const res = await fetch(`${baseUrl}/sentinel/rules`);
+      if (!res.ok) throw new Error(res.statusText);
+      
       const data = await res.json();
       if (Array.isArray(data)) {
         setRules(data);
@@ -30,11 +32,14 @@ export function useDefense() {
     if (!baseUrl) return;
     setIsLoading(true);
     try {
-      await fetch(`${baseUrl}/sentinel/rules`, {
+      const res = await fetch(`${baseUrl}/sentinel/rules`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ pattern, action })
       });
+      
+      if (!res.ok) throw new Error(res.statusText);
+      
       await fetchRules();
     } catch (e) {
       console.error('Failed to add rule', e);
@@ -46,9 +51,12 @@ export function useDefense() {
   const deleteRule = useCallback(async (id: string) => {
     if (!baseUrl) return;
     try {
-      await fetch(`${baseUrl}/sentinel/rules?id=${id}`, {
+      const res = await fetch(`${baseUrl}/sentinel/rules?id=${encodeURIComponent(id)}`, {
         method: 'DELETE'
       });
+      
+      if (!res.ok) throw new Error(res.statusText);
+      
       setRules(prev => prev.filter(r => r.id !== id));
     } catch (e) {
       console.error('Failed to delete rule', e);

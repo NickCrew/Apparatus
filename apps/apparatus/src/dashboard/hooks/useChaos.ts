@@ -10,13 +10,20 @@ export function useChaos() {
     if (!baseUrl) return;
     setIsLoading(true);
     try {
-      // ApparatusClient doesn't have chaos methods typed yet, using raw fetch for now
-      // or extending client if possible. Let's use fetch relative to baseUrl for now.
-      const res = await fetch(`${baseUrl}/chaos/cpu?duration=${duration}`);
+      const res = await fetch(`${baseUrl}/chaos/cpu`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ duration })
+      });
+      
+      if (!res.ok) {
+          throw new Error(`Server error: ${res.status}`);
+      }
+
       const text = await res.text();
       setResult(text);
-    } catch (e: any) {
-      setResult(`Error: ${e.message}`);
+    } catch (e: unknown) {
+      setResult(`Error: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
       setIsLoading(false);
     }
@@ -26,11 +33,20 @@ export function useChaos() {
     if (!baseUrl) return;
     setIsLoading(true);
     try {
-      const res = await fetch(`${baseUrl}/chaos/memory?amount=${amountMb}&action=${action}`);
+      const res = await fetch(`${baseUrl}/chaos/memory`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: amountMb, action })
+      });
+
+      if (!res.ok) {
+          throw new Error(`Server error: ${res.status}`);
+      }
+
       const text = await res.text();
       setResult(text);
-    } catch (e: any) {
-      setResult(`Error: ${e.message}`);
+    } catch (e: unknown) {
+      setResult(`Error: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
       setIsLoading(false);
     }
@@ -40,11 +56,15 @@ export function useChaos() {
     if (!baseUrl) return;
     if (!confirm('Are you sure you want to CRASH the backend?')) return;
     
+    setIsLoading(true);
     try {
-      await fetch(`${baseUrl}/chaos/crash`, { method: 'POST' });
+      const res = await fetch(`${baseUrl}/chaos/crash`, { method: 'POST' });
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
       setResult('Server crashing...');
-    } catch (e: any) {
-      setResult(`Error: ${e.message}`);
+    } catch (e: unknown) {
+      setResult(`Error: ${e instanceof Error ? e.message : String(e)}`);
+    } finally {
+        setIsLoading(false);
     }
   }, [baseUrl]);
 
