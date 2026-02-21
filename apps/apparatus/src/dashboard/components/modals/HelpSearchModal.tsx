@@ -119,13 +119,13 @@ export function HelpSearchModal({ open, onOpenChange, onSelectDoc }: HelpSearchM
       
       {/* Category filters */}
       {categories.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 p-3 border-b border-border bg-muted/20">
+        <div className="flex flex-wrap gap-1.5 p-3 border-b border-neutral-700/80 bg-neutral-950">
           <button
             onClick={() => setSelectedCategory(null)}
             className={`text-[10px] font-mono uppercase tracking-widest px-2 py-1 border rounded-[1px] transition-all ${
               selectedCategory === null
                 ? 'bg-primary border-primary text-primary-foreground font-bold shadow-glow-primary'
-                : 'bg-neutral-900/50 border-neutral-700 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900/80 hover:border-neutral-600'
+                : 'bg-neutral-900/85 border-neutral-700 text-neutral-300 hover:text-neutral-100 hover:bg-neutral-800 hover:border-neutral-500'
             }`}
           >
             All
@@ -137,7 +137,7 @@ export function HelpSearchModal({ open, onOpenChange, onSelectDoc }: HelpSearchM
               className={`text-[10px] font-mono uppercase tracking-widest px-2 py-1 border rounded-[1px] transition-all ${
                 selectedCategory === cat
                   ? 'bg-primary border-primary text-primary-foreground font-bold shadow-glow-primary'
-                  : 'bg-neutral-900/50 border-neutral-700 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900/80 hover:border-neutral-600'
+                  : 'bg-neutral-900/85 border-neutral-700 text-neutral-300 hover:text-neutral-100 hover:bg-neutral-800 hover:border-neutral-500'
               }`}
             >
               {cat}
@@ -186,7 +186,7 @@ export function HelpSearchModal({ open, onOpenChange, onSelectDoc }: HelpSearchM
         )}
 
         {!loading && !query && (
-          <div className="py-12 text-center text-muted-foreground border-t border-border/20">
+          <div className="py-12 text-center text-muted-foreground border-t border-neutral-700/40 bg-neutral-950">
             <p className="text-xs font-mono uppercase tracking-widest">Awaiting search query...</p>
             <div className="mt-6 space-y-3">
               <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-600">Common Subjects</p>
@@ -196,7 +196,7 @@ export function HelpSearchModal({ open, onOpenChange, onSelectDoc }: HelpSearchM
                     <button
                       key={suggestion}
                       onClick={() => setQuery(suggestion)}
-                      className="px-2 py-1 text-[10px] font-mono uppercase border border-neutral-700 bg-neutral-900/40 text-neutral-400 hover:text-primary hover:border-primary/50 hover:bg-neutral-900/70 transition-all rounded-[1px]"
+                      className="px-2 py-1 text-[10px] font-mono uppercase border border-neutral-700 bg-neutral-900/85 text-neutral-300 hover:text-primary hover:border-primary/50 hover:bg-neutral-800 transition-all rounded-[1px]"
                     >
                       {suggestion}
                     </button>
@@ -208,7 +208,7 @@ export function HelpSearchModal({ open, onOpenChange, onSelectDoc }: HelpSearchM
         )}
       </CommandList>
       
-      <div className="border-t border-border/30 px-4 py-2 text-[10px] font-mono text-neutral-600 flex items-center justify-between uppercase tracking-widest bg-black/40">
+      <div className="border-t border-neutral-700/50 px-4 py-2 text-[10px] font-mono text-neutral-500 flex items-center justify-between uppercase tracking-widest bg-neutral-950">
         <div className="flex gap-4">
           <span><span className="text-neutral-400">↑↓</span> Navigate</span>
           <span><span className="text-neutral-400">Enter</span> Select</span>

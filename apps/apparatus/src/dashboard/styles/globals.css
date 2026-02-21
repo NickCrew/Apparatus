@@ -7,10 +7,10 @@
     --background: 0 0% 2%; /* #050505 */
     --foreground: 0 0% 100%;
 
-    --card: 220 20% 8%; /* #0F1318 - Elevated from 5% for more depth */
+    --card: 220 20% 10%; /* #131822 - Stronger elevated surface for panel clarity */
     --card-foreground: 0 0% 100%;
 
-    --popover: 220 20% 12%; /* #1A1F2B - Elevated from 5% for clarity on modals */
+    --popover: 220 20% 16%; /* #222939 - Higher contrast modal/popover surfaces */
     --popover-foreground: 0 0% 100%;
 
     --primary: 184 90% 42%; /* Deeper Teal for better white text contrast */
@@ -39,10 +39,10 @@
     --background: 0 0% 2%;
     --foreground: 0 0% 100%;
 
-    --card: 220 20% 8%;
+    --card: 220 20% 10%;
     --card-foreground: 0 0% 100%;
 
-    --popover: 220 20% 12%;
+    --popover: 220 20% 16%;
     --popover-foreground: 0 0% 100%;
 
     --primary: 184 90% 42%;
