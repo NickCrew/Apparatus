@@ -14,6 +14,11 @@ All notable changes to this project are documented in this file.
   - `GhostConsole` UI for creating/deleting/monitoring ghosts
   - `useGhosts` hook for ghost CRUD/list refresh flows
   - New `/dashboard/ghosts` route and sidebar navigation entry
+- Dashboard documentation hub:
+  - New full-page docs experience at `/dashboard/docs` and `/dashboard/docs/:docId`
+  - Dedicated document sidebar with search and grouped categories
+  - In-page outline navigation for large markdown files
+  - Docs hub entry points in both sidebar nav and command palette
 - New tests:
   - `apps/apparatus/test/ghosting.test.ts`
   - `apps/apparatus/test/demo-mode-config.test.ts`
