@@ -27,6 +27,7 @@ import { CommandPalette } from './components/layout/CommandPalette';
 import { HelpSearchModal } from './components/modals/HelpSearchModal';
 import { DocViewer } from './components/layout/DocViewer';
 import { DocumentationHub } from './components/docs/DocumentationHub';
+import { HudOverlayLayer } from './components/hud/HudOverlayLayer';
 import { useState, useEffect } from 'react';
 
 function Layout() {
@@ -76,6 +77,7 @@ export default function App() {
       <ThemeProvider>
         <ApparatusProvider>
           <DocViewerProvider>
+            <HudOverlayLayer />
             <Routes>
               <Route path="docs" element={<DocumentationHub />} />
               <Route path="docs/:docId" element={<DocumentationHub />} />
