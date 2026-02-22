@@ -14,6 +14,10 @@ export default defineConfig({
   server: {
     port: 5174,
     proxy: {
+      '/dashboard/assets/diagrams': {
+        target: 'http://localhost:8090',
+        changeOrigin: true,
+      },
       '/api/docs-index': {
         target: 'http://localhost:8090',
         changeOrigin: true,
