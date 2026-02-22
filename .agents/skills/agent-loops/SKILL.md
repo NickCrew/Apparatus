@@ -47,7 +47,8 @@ skills. You never grade your own homework.
 | **Test Auditor** | Claude | Invoked via `test-review-request` skill — finds gaps AND flags bad tests |
 | **Remediator** | Codex or Gemini | Fixes findings from Claude's reviews |
 
-**Critical rule:** Codex and Gemini NEVER self-review. Every review step means invoking a skill to send work to Claude. If you cannot invoke the review skill, STOP and escalate — do not substitute your own review.
+**Critical rule:** Codex and Gemini NEVER self-review. Every review step means invoking a skill to send work to Claude. If you cannot invoke the review skill, STOP and escalate to the user — do not substitute your own review.
+If shelling out to Claude fails (script error, CLI unavailable, permissions/network failure, timeout), escalate to the user immediately.
 
 ---
 
@@ -104,6 +105,7 @@ the entire repo diff to Claude, wasting tokens and risking timeouts.
 - **Summarizing the diff before shelling out** — Unnecessary. The script reads the diff directly.
 - **Ignoring the output file** — The review is written to a file. Read it.
 - **Using sub-agents for the review** — The script invokes a single Claude CLI process.
+- **Proceeding after a failed shell-out** — Escalate to the user instead of continuing without Claude review.
 
 ### `test-review-request` — Request Test Audit from Claude
 
@@ -153,6 +155,7 @@ Act on findings:
 - **Pre-reading source before shelling out** — Unnecessary. The script passes the module path to Claude.
 - **Ignoring the output file** — The gap report is written to a file. Read it.
 - **Using sub-agents for the audit** — The script invokes a single Claude CLI process.
+- **Proceeding after a failed shell-out** — Escalate to the user instead of continuing without Claude audit.
 
 ---
 
