@@ -298,7 +298,7 @@ export function HudOverlayLayer() {
   if (hudHidden) {
     return createPortal(
       <div className="fixed inset-0 z-[9000] pointer-events-none select-none" role="complementary" aria-label="HUD overlay">
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 pointer-events-auto">
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 pointer-events-auto">
           <button
             type="button"
             onClick={() => setHudHidden(false)}
