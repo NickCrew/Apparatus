@@ -158,16 +158,11 @@ export function Sidebar() {
       {/* Brand */}
       <div className="h-14 flex items-center justify-between px-5 border-b border-neutral-800/40">
         {!sidebarCollapsed && (
-          <div className="flex items-center gap-2.5">
-            <img
-              src="/assets/logo/apparatus-logo.svg"
-              alt="Apparatus"
-              className="w-7 h-7"
-            />
-            <span className="text-base font-display font-semibold text-neutral-200 tracking-wide">
-              Apparatus
-            </span>
-          </div>
+          <img
+            src="/assets/logo/apparatus-logo.svg"
+            alt="Apparatus"
+            className="h-7"
+          />
         )}
         <button
           onClick={toggleSidebarCollapse}
