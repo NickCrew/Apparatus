@@ -159,9 +159,11 @@ export function Sidebar() {
       <div className="h-14 flex items-center justify-between px-5 border-b border-neutral-800/40">
         {!sidebarCollapsed && (
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-[3px] bg-primary-500/8 border border-primary-500/40 flex items-center justify-center shadow-glow-primary">
-              <span className="text-primary-400 font-bold font-display text-sm leading-none">A</span>
-            </div>
+            <img
+              src="/assets/logo/apparatus-logo.svg"
+              alt="Apparatus"
+              className="w-7 h-7"
+            />
             <span className="text-base font-display font-semibold text-neutral-200 tracking-wide">
               Apparatus
             </span>
