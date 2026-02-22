@@ -1,0 +1,325 @@
+- generic:
+  - generic:
+    - generic:
+      - complementary:
+        - generic:
+          - generic:
+            - generic:
+              - generic: A
+            - generic: Apparatus
+        - navigation:
+          - generic: Modules
+          - list:
+            - listitem:
+              - link:
+                - /url: /dashboard
+                - img
+                - generic: Overview
+            - listitem:
+              - link:
+                - /url: /dashboard/traffic
+                - img
+                - generic: Traffic
+            - listitem:
+              - link:
+                - /url: /dashboard/defense
+                - img
+                - generic: Defense
+            - listitem:
+              - link:
+                - /url: /dashboard/deception
+                - img
+                - generic: Deception
+            - listitem:
+              - link:
+                - /url: /dashboard/chaos
+                - img
+                - generic: Chaos
+            - listitem:
+              - link:
+                - /url: /dashboard/cluster
+                - img
+                - generic: Cluster
+            - listitem:
+              - link:
+                - /url: /dashboard/webhooks
+                - img
+                - generic: Webhooks
+            - listitem:
+              - link:
+                - /url: /dashboard/listeners
+                - img
+                - generic: Listeners
+            - listitem:
+              - link:
+                - /url: /dashboard/mtd
+                - img
+                - generic: MTD
+            - listitem:
+              - link:
+                - /url: /dashboard/testing
+                - img
+                - generic: Testing Lab
+            - listitem:
+              - link:
+                - /url: /dashboard/dependencies
+                - img
+                - generic: Supply Chain
+            - listitem:
+              - link:
+                - /url: /dashboard/network
+                - img
+                - generic: Network
+            - listitem:
+              - link:
+                - /url: /dashboard/identity
+                - img
+                - generic: Identity
+            - listitem:
+              - link:
+                - /url: /dashboard/scenarios
+                - img
+                - generic: Scenarios
+            - listitem:
+              - link:
+                - /url: /dashboard/drill
+                - img
+                - generic: Breach Protocol
+            - listitem:
+              - link:
+                - /url: /dashboard/ghosts
+                - img
+                - generic: Ghost Mocker
+            - listitem:
+              - link:
+                - /url: /dashboard/autopilot
+                - img
+                - generic: Autopilot
+            - listitem:
+              - link:
+                - /url: /dashboard/settings
+                - img
+                - generic: Settings
+        - generic:
+          - generic:
+            - button:
+              - generic: Keyboard
+              - img
+          - generic:
+            - generic:
+              - generic: Status
+              - generic: UNHEALTHY
+            - generic:
+              - generic: v—
+      - generic:
+        - banner:
+          - generic:
+            - generic: System
+            - generic: /
+            - generic: OVERVIEW
+          - generic:
+            - generic:
+              - img
+              - textbox:
+                - /placeholder: SYSTEM_SEARCH...
+              - generic:
+                - generic: ⌘
+                - text: K
+            - generic:
+              - generic:
+                - generic: Status
+                - generic: UNHEALTHY
+            - button:
+              - img
+            - button:
+              - img
+            - button:
+              - img
+        - main:
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - heading [level=1]: System Overview
+                  - paragraph: Real-time telemetry / Control status
+                - generic:
+                  - button: EXPORT
+                  - button:
+                    - generic:
+                      - img
+                    - text: ENGAGE DEFENSE
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: THROUGHPUT
+                        - generic: 2.4 GB/s
+                      - img
+                    - generic:
+                      - generic:
+                        - img
+                        - generic: 12%
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: ACTIVE_THREATS
+                        - generic: "42"
+                      - img
+                    - generic:
+                      - generic:
+                        - img
+                        - generic: 5%
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: SYSTEM_LOAD
+                        - generic: 78%
+                      - img
+                    - generic:
+                      - generic:
+                        - img
+                        - generic: 2%
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic: NETWORK_HEALTH
+                        - generic: DEGRADED
+                      - img
+                    - generic:
+                      - generic:
+                        - img
+                        - generic: 0%
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - heading [level=3]:
+                            - img
+                            - text: System Performance Metrics
+                          - generic:
+                            - button:
+                              - img
+                              - text: GENERATE SYNTHETIC
+                            - generic: LIVE
+                      - generic:
+                        - generic:
+                          - generic:
+                            - generic:
+                              - img
+                              - generic: Throughput (RPS)
+                            - generic:
+                              - generic: "0"
+                              - generic: req/s
+                        - generic:
+                          - generic:
+                            - generic:
+                              - img
+                              - generic: Avg Latency
+                            - generic:
+                              - generic: "0"
+                              - generic: ms
+                        - generic:
+                          - generic:
+                            - generic:
+                              - img
+                              - generic: Error Rate
+                            - generic:
+                              - generic: "0.0"
+                              - generic: "%"
+                  - generic:
+                    - generic:
+                      - generic:
+                        - heading [level=3]:
+                          - img
+                          - text: Active Defenses
+                      - generic:
+                        - generic:
+                          - generic: WAF Ruleset
+                          - generic: Active
+                        - generic:
+                          - generic: IP Reputation
+                          - generic: Learning
+                        - generic:
+                          - generic: Rate Limiter
+                          - generic: Active
+                    - generic:
+                      - generic:
+                        - heading [level=3]:
+                          - img
+                          - text: Chaos Experiments
+                      - generic:
+                        - generic:
+                          - generic: Latency Injection
+                          - generic: Idle
+                        - generic:
+                          - generic: Pod Kill
+                          - generic: Running
+                        - generic:
+                          - generic: DNS Chaos
+                          - generic: Idle
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - heading [level=3]: Telemetry Logs
+                      - generic:
+                        - generic:
+                          - generic:
+                            - generic: 10:42:05
+                            - generic: WARN
+                            - generic: Rate limit exceeded for IP 192.168.1.42
+                          - generic:
+                            - generic: 10:41:58
+                            - generic: INFO
+                            - generic: "New session established: user-admin"
+                          - generic:
+                            - generic: 10:41:12
+                            - generic: ERR
+                            - generic: "Latency injection failed: payment-gateway"
+                          - generic:
+                            - generic: 10:40:30
+                            - generic: INFO
+                            - generic: Inbound traffic spike on port 443
+                          - generic:
+                            - generic: 10:39:44
+                            - generic: INFO
+                            - generic: Certificate rotation completed
+                  - generic:
+                    - generic:
+                      - generic:
+                        - heading [level=3]: Manual Overrides
+                      - generic:
+                        - button: FLUSH_CACHE
+                        - button: ROTATE_KEYS
+                        - button: EMERGENCY_SHUTDOWN
+  - dialog "Documentation search" [ref=e365]:
+    - heading "Documentation search" [level=2] [ref=e366]
+    - paragraph [ref=e367]: Search and open dashboard documentation pages.
+    - generic [ref=e368]:
+      - generic [ref=e370]:
+        - img [ref=e371]
+        - combobox [expanded] [active] [ref=e374]
+      - listbox "Suggestions" [ref=e375]:
+        - generic [ref=e377]:
+          - paragraph [ref=e378]: Awaiting search query...
+          - generic [ref=e379]:
+            - paragraph [ref=e380]: Common Subjects
+            - generic [ref=e381]:
+              - button "chaos" [ref=e382] [cursor=pointer]
+              - button "scenarios" [ref=e383] [cursor=pointer]
+              - button "defense" [ref=e384] [cursor=pointer]
+              - button "webhooks" [ref=e385] [cursor=pointer]
+              - button "architecture" [ref=e386] [cursor=pointer]
+      - generic [ref=e388]:
+        - generic [ref=e389]: ↑↓ Navigate
+        - generic [ref=e390]: Enter Select
+        - generic [ref=e391]: Esc Close
+    - button "Close" [ref=e392] [cursor=pointer]:
+      - img [ref=e393]
+      - generic [ref=e396]: Close

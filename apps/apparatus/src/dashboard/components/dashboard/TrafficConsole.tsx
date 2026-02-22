@@ -1,11 +1,12 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { Pause, Play } from 'lucide-react';
+import { Pause, Play, ChefHat } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { TrafficGenerator } from './TrafficGenerator';
 import { useTrafficStream, TrafficEvent } from '../../hooks/useTrafficStream';
 import { cn } from '../ui/cn';
+import { openInCyberChef } from '../../utils/cyberchef';
 
 export function TrafficConsole() {
   const { events } = useTrafficStream(500); // Larger buffer for full view
@@ -134,13 +135,13 @@ export function TrafficConsole() {
                             <div 
                                 key={ev.id} 
                                 className={cn(
-                                    "p-3 flex justify-between items-center group transition-colors",
+                                    "p-3 flex justify-between items-center group transition-colors relative",
                                     isError ? "bg-danger/5 hover:bg-danger/10" :
                                     isWarning ? "bg-warning/5 hover:bg-warning/10" :
                                     "hover:bg-neutral-900/50"
                                 )}
                             >
-                                <div className="flex flex-col gap-1 overflow-hidden">
+                                <div className="flex flex-col gap-1 overflow-hidden pr-8">
                                     <div className="flex items-center gap-2">
                                         <Badge size="sm" variant={
                                             isError ? 'danger' :
@@ -153,6 +154,14 @@ export function TrafficConsole() {
                                     </div>
                                     <span className="text-neutral-200 truncate font-medium" title={ev.path}>{ev.path}</span>
                                 </div>
+                                <button 
+                                    onClick={() => openInCyberChef(ev)}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity p-1 hover:bg-primary/10 rounded-sm text-primary/60 hover:text-primary outline-none focus:ring-2 focus:ring-primary/50"
+                                    title="Analyze request in CyberChef"
+                                    aria-label={`Analyze request ${ev.id} in CyberChef`}
+                                >
+                                    <ChefHat className="h-3 w-3" />
+                                </button>
                             </div>
                         );
                     })}

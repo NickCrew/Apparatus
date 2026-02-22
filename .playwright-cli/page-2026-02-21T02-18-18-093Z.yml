@@ -1,0 +1,272 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e7]:
+      - generic [ref=e9]: A
+      - generic [ref=e10]: Apparatus
+    - navigation "Main navigation" [ref=e11]:
+      - generic [ref=e12]: Modules
+      - list [ref=e13]:
+        - listitem [ref=e14]:
+          - link "Overview" [ref=e15] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e17]
+            - generic [ref=e22]: Overview
+        - listitem [ref=e23]:
+          - link "Traffic" [ref=e24] [cursor=pointer]:
+            - /url: /dashboard/traffic
+            - img [ref=e25]
+            - generic [ref=e27]: Traffic
+        - listitem [ref=e28]:
+          - link "Defense" [ref=e29] [cursor=pointer]:
+            - /url: /dashboard/defense
+            - img [ref=e30]
+            - generic [ref=e32]: Defense
+        - listitem [ref=e33]:
+          - link "Deception" [ref=e34] [cursor=pointer]:
+            - /url: /dashboard/deception
+            - img [ref=e35]
+            - generic [ref=e37]: Deception
+        - listitem [ref=e38]:
+          - link "Chaos" [ref=e39] [cursor=pointer]:
+            - /url: /dashboard/chaos
+            - img [ref=e40]
+            - generic [ref=e42]: Chaos
+        - listitem [ref=e43]:
+          - link "Cluster" [ref=e44] [cursor=pointer]:
+            - /url: /dashboard/cluster
+            - img [ref=e45]
+            - generic [ref=e48]: Cluster
+        - listitem [ref=e49]:
+          - link "Webhooks" [ref=e50] [cursor=pointer]:
+            - /url: /dashboard/webhooks
+            - img [ref=e51]
+            - generic [ref=e55]: Webhooks
+        - listitem [ref=e56]:
+          - link "MTD" [ref=e57] [cursor=pointer]:
+            - /url: /dashboard/mtd
+            - img [ref=e58]
+            - generic [ref=e62]: MTD
+        - listitem [ref=e63]:
+          - link "Testing Lab" [ref=e64] [cursor=pointer]:
+            - /url: /dashboard/testing
+            - img [ref=e65]
+            - generic [ref=e67]: Testing Lab
+        - listitem [ref=e68]:
+          - link "Supply Chain" [ref=e69] [cursor=pointer]:
+            - /url: /dashboard/dependencies
+            - img [ref=e70]
+            - generic [ref=e75]: Supply Chain
+        - listitem [ref=e76]:
+          - link "Network" [ref=e77] [cursor=pointer]:
+            - /url: /dashboard/network
+            - img [ref=e78]
+            - generic [ref=e80]: Network
+        - listitem [ref=e81]:
+          - link "Identity" [ref=e82] [cursor=pointer]:
+            - /url: /dashboard/identity
+            - img [ref=e83]
+            - generic [ref=e92]: Identity
+        - listitem [ref=e93]:
+          - link "Scenarios" [ref=e94] [cursor=pointer]:
+            - /url: /dashboard/scenarios
+            - img [ref=e95]
+            - generic [ref=e97]: Scenarios
+        - listitem [ref=e98]:
+          - link "Breach Protocol" [ref=e99] [cursor=pointer]:
+            - /url: /dashboard/drill
+            - img [ref=e100]
+            - generic [ref=e102]: Breach Protocol
+        - listitem [ref=e103]:
+          - link "Ghost Mocker" [ref=e104] [cursor=pointer]:
+            - /url: /dashboard/ghosts
+            - img [ref=e105]
+            - generic [ref=e107]: Ghost Mocker
+        - listitem [ref=e108]:
+          - link "Autopilot" [ref=e109] [cursor=pointer]:
+            - /url: /dashboard/autopilot
+            - img [ref=e110]
+            - generic [ref=e113]: Autopilot
+        - listitem [ref=e114]:
+          - link "Settings" [ref=e115] [cursor=pointer]:
+            - /url: /dashboard/settings
+            - img [ref=e116]
+            - generic [ref=e119]: Settings
+    - generic [ref=e120]:
+      - button "Keyboard" [ref=e122] [cursor=pointer]:
+        - generic [ref=e123]: Keyboard
+        - img [ref=e124]
+      - generic [ref=e126]:
+        - generic [ref=e127]:
+          - generic [ref=e128]: Status
+          - generic [ref=e129]: UNHEALTHY
+        - generic [ref=e134]: v—
+  - generic [ref=e135]:
+    - banner [ref=e136]:
+      - generic [ref=e137]:
+        - generic [ref=e139]: System
+        - generic [ref=e140]: /
+        - generic [ref=e141]: OVERVIEW
+      - generic [ref=e142]:
+        - generic [ref=e143]:
+          - img [ref=e144]
+          - textbox "SYSTEM_SEARCH..." [ref=e147]
+          - generic [ref=e148]:
+            - generic [ref=e149]: ⌘
+            - text: K
+        - generic [ref=e152]:
+          - generic [ref=e153]: Status
+          - generic [ref=e154]: UNHEALTHY
+        - button [ref=e156] [cursor=pointer]:
+          - img [ref=e157]
+        - button "Open help (⌘?)" [ref=e160] [cursor=pointer]:
+          - img [ref=e161]
+        - button [ref=e164] [cursor=pointer]:
+          - img [ref=e165]
+    - main [ref=e167]:
+      - generic [ref=e169]:
+        - generic [ref=e170]:
+          - generic [ref=e171]:
+            - heading "System Overview" [level=1] [ref=e172]
+            - paragraph [ref=e173]: Real-time telemetry / Control status
+          - generic [ref=e174]:
+            - button "EXPORT" [ref=e175] [cursor=pointer]
+            - button "ENGAGE DEFENSE" [ref=e176] [cursor=pointer]:
+              - img [ref=e178]
+              - text: ENGAGE DEFENSE
+        - generic [ref=e180]:
+          - generic [ref=e183]:
+            - generic [ref=e184]:
+              - generic [ref=e185]:
+                - generic [ref=e186]: THROUGHPUT
+                - generic [ref=e187]: 2.4 GB/s
+              - img [ref=e188]
+            - generic [ref=e191]:
+              - img [ref=e192]
+              - generic [ref=e195]: 12%
+          - generic [ref=e198]:
+            - generic [ref=e199]:
+              - generic [ref=e200]:
+                - generic [ref=e201]: ACTIVE_THREATS
+                - generic [ref=e202]: "42"
+              - img [ref=e203]
+            - generic [ref=e206]:
+              - img [ref=e207]
+              - generic [ref=e210]: 5%
+          - generic [ref=e213]:
+            - generic [ref=e214]:
+              - generic [ref=e215]:
+                - generic [ref=e216]: SYSTEM_LOAD
+                - generic [ref=e217]: 78%
+              - img [ref=e218]
+            - generic [ref=e222]:
+              - img [ref=e223]
+              - generic [ref=e226]: 2%
+          - generic [ref=e229]:
+            - generic [ref=e230]:
+              - generic [ref=e231]:
+                - generic [ref=e232]: NETWORK_HEALTH
+                - generic [ref=e233]: DEGRADED
+              - img [ref=e234]
+            - generic [ref=e238]:
+              - img [ref=e239]
+              - generic [ref=e240]: 0%
+        - generic [ref=e241]:
+          - generic [ref=e242]:
+            - generic [ref=e244]:
+              - generic [ref=e246]:
+                - heading "System Performance Metrics" [level=3] [ref=e247]:
+                  - img [ref=e248]
+                  - text: System Performance Metrics
+                - generic [ref=e250]:
+                  - button "GENERATE SYNTHETIC" [ref=e251] [cursor=pointer]:
+                    - img [ref=e252]
+                    - text: GENERATE SYNTHETIC
+                  - generic [ref=e254]: LIVE
+              - generic [ref=e256]:
+                - generic [ref=e258]:
+                  - generic [ref=e259]:
+                    - img [ref=e260]
+                    - generic [ref=e262]: Throughput (RPS)
+                  - generic [ref=e263]:
+                    - generic [ref=e264]: "0"
+                    - generic [ref=e265]: req/s
+                - generic [ref=e269]:
+                  - generic [ref=e270]:
+                    - img [ref=e271]
+                    - generic [ref=e274]: Avg Latency
+                  - generic [ref=e275]:
+                    - generic [ref=e276]: "0"
+                    - generic [ref=e277]: ms
+                - generic [ref=e281]:
+                  - generic [ref=e282]:
+                    - img [ref=e283]
+                    - generic [ref=e285]: Error Rate
+                  - generic [ref=e286]:
+                    - generic [ref=e287]: "0.0"
+                    - generic [ref=e288]: "%"
+            - generic [ref=e291]:
+              - generic [ref=e292]:
+                - heading "Active Defenses" [level=3] [ref=e294]:
+                  - img [ref=e295]
+                  - text: Active Defenses
+                - generic [ref=e297]:
+                  - generic [ref=e298]:
+                    - generic [ref=e299]: WAF Ruleset
+                    - generic [ref=e300]: Active
+                  - generic [ref=e301]:
+                    - generic [ref=e302]: IP Reputation
+                    - generic [ref=e303]: Learning
+                  - generic [ref=e304]:
+                    - generic [ref=e305]: Rate Limiter
+                    - generic [ref=e306]: Active
+              - generic [ref=e307]:
+                - heading "Chaos Experiments" [level=3] [ref=e309]:
+                  - img [ref=e310]
+                  - text: Chaos Experiments
+                - generic [ref=e312]:
+                  - generic [ref=e313]:
+                    - generic [ref=e314]: Latency Injection
+                    - generic [ref=e315]: Idle
+                  - generic [ref=e316]:
+                    - generic [ref=e317]: Pod Kill
+                    - generic [ref=e318]: Running
+                  - generic [ref=e320]:
+                    - generic [ref=e321]: DNS Chaos
+                    - generic [ref=e322]: Idle
+            - generic [ref=e324]:
+              - heading "Telemetry Logs" [level=3] [ref=e326]
+              - generic [ref=e328]:
+                - generic [ref=e329]:
+                  - generic [ref=e330]: 10:42:05
+                  - generic [ref=e331]: WARN
+                  - generic [ref=e332]: Rate limit exceeded for IP 192.168.1.42
+                - generic [ref=e333]:
+                  - generic [ref=e334]: 10:41:58
+                  - generic [ref=e335]: INFO
+                  - generic [ref=e336]: "New session established: user-admin"
+                - generic [ref=e337]:
+                  - generic [ref=e338]: 10:41:12
+                  - generic [ref=e339]: ERR
+                  - generic [ref=e340]: "Latency injection failed: payment-gateway"
+                - generic [ref=e341]:
+                  - generic [ref=e342]: 10:40:30
+                  - generic [ref=e343]: INFO
+                  - generic [ref=e344]: Inbound traffic spike on port 443
+                - generic [ref=e345]:
+                  - generic [ref=e346]: 10:39:44
+                  - generic [ref=e347]: INFO
+                  - generic [ref=e348]: Certificate rotation completed
+          - generic [ref=e349]:
+            - generic [ref=e351]:
+              - generic [ref=e353]:
+                - heading "Protocol Surface Area" [level=3] [ref=e354]:
+                  - img [ref=e355]
+                  - text: Protocol Surface Area
+                - generic [ref=e358]: 0 LISTENERS
+              - generic [ref=e361]: Infrastructure state is immutable for this session.
+            - generic [ref=e363]:
+              - heading "Manual Overrides" [level=3] [ref=e365]
+              - generic [ref=e366]:
+                - button "FLUSH_CACHE" [ref=e367] [cursor=pointer]
+                - button "ROTATE_KEYS" [ref=e368] [cursor=pointer]
+                - button "EMERGENCY_SHUTDOWN" [ref=e369] [cursor=pointer]

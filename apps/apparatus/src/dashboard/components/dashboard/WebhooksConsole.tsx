@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { Webhook, Copy, ArrowRight } from 'lucide-react';
+import { Webhook, Copy, ArrowRight, ChefHat, ExternalLink } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { useWebhooks, WebhookRequest } from '../../hooks/useWebhooks';
 import { cn } from '../ui/cn';
 import { useApparatus } from '../../providers/ApparatusProvider';
+import { openInCyberChef } from '../../utils/cyberchef';
 
 export function WebhooksConsole() {
   const { baseUrl } = useApparatus();
@@ -148,7 +149,19 @@ export function WebhooksConsole() {
 
                         {/* Body */}
                         <div className="flex-1 p-6">
-                            <label className="text-[10px] font-mono text-neutral-500 uppercase block mb-2">Body</label>
+                            <div className="flex justify-between items-center mb-2">
+                                <label className="text-[10px] font-mono text-neutral-500 uppercase block">Body</label>
+                                <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="h-6 text-[9px] text-primary-400 hover:text-primary-300"
+                                    onClick={() => selectedRequest.body && openInCyberChef(selectedRequest.body)}
+                                >
+                                    <ChefHat className="h-3 w-3 mr-1.5" />
+                                    CyberChef
+                                    <ExternalLink className="h-2.5 w-2.5 ml-1.5 opacity-50" />
+                                </Button>
+                            </div>
                             <pre className="bg-black/40 rounded p-4 font-mono text-xs text-neutral-300 overflow-x-auto h-full border border-white/5">
                                 {typeof selectedRequest.body === 'object' 
                                     ? JSON.stringify(selectedRequest.body, null, 2) 

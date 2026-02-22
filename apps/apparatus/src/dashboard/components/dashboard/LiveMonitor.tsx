@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { useApparatus } from '../../providers/ApparatusProvider';
 import { cn } from '../ui/cn';
-import { generateCyberChefUrl } from '../../utils/cyberchef';
+import { openInCyberChef } from '../../utils/cyberchef';
 
 interface PacketEvent {
   timestamp: string;
@@ -106,7 +106,7 @@ export function LiveMonitor() {
                   <span className="text-neutral-300 break-all leading-relaxed">{p.raw}</span>
                 </div>
                 <button 
-                  onClick={() => window.open(generateCyberChefUrl(p.raw), '_blank', 'noopener')}
+                  onClick={() => openInCyberChef(p.raw)}
                   className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-primary/10 rounded-sm text-primary/60 hover:text-primary"
                   title="Analyze packet in CyberChef"
                 >

@@ -1,0 +1,160 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e7]:
+      - generic [ref=e9]: A
+      - generic [ref=e10]: Apparatus
+    - navigation "Main navigation" [ref=e11]:
+      - generic [ref=e12]: Modules
+      - list [ref=e13]:
+        - listitem [ref=e14]:
+          - link "Overview" [ref=e15] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e16]
+            - generic [ref=e21]: Overview
+        - listitem [ref=e22]:
+          - link "Traffic" [ref=e23] [cursor=pointer]:
+            - /url: /dashboard/traffic
+            - img [ref=e24]
+            - generic [ref=e26]: Traffic
+        - listitem [ref=e27]:
+          - link "Defense" [ref=e28] [cursor=pointer]:
+            - /url: /dashboard/defense
+            - img [ref=e29]
+            - generic [ref=e31]: Defense
+        - listitem [ref=e32]:
+          - link "Deception" [ref=e33] [cursor=pointer]:
+            - /url: /dashboard/deception
+            - img [ref=e35]
+            - generic [ref=e37]: Deception
+        - listitem [ref=e38]:
+          - link "Chaos" [ref=e39] [cursor=pointer]:
+            - /url: /dashboard/chaos
+            - img [ref=e40]
+            - generic [ref=e42]: Chaos
+        - listitem [ref=e43]:
+          - link "Cluster" [ref=e44] [cursor=pointer]:
+            - /url: /dashboard/cluster
+            - img [ref=e45]
+            - generic [ref=e48]: Cluster
+        - listitem [ref=e49]:
+          - link "Webhooks" [ref=e50] [cursor=pointer]:
+            - /url: /dashboard/webhooks
+            - img [ref=e51]
+            - generic [ref=e55]: Webhooks
+        - listitem [ref=e56]:
+          - link "MTD" [ref=e57] [cursor=pointer]:
+            - /url: /dashboard/mtd
+            - img [ref=e58]
+            - generic [ref=e62]: MTD
+        - listitem [ref=e63]:
+          - link "Testing Lab" [ref=e64] [cursor=pointer]:
+            - /url: /dashboard/testing
+            - img [ref=e65]
+            - generic [ref=e67]: Testing Lab
+        - listitem [ref=e68]:
+          - link "Supply Chain" [ref=e69] [cursor=pointer]:
+            - /url: /dashboard/dependencies
+            - img [ref=e70]
+            - generic [ref=e75]: Supply Chain
+        - listitem [ref=e76]:
+          - link "Network" [ref=e77] [cursor=pointer]:
+            - /url: /dashboard/network
+            - img [ref=e78]
+            - generic [ref=e80]: Network
+        - listitem [ref=e81]:
+          - link "Identity" [ref=e82] [cursor=pointer]:
+            - /url: /dashboard/identity
+            - img [ref=e83]
+            - generic [ref=e92]: Identity
+        - listitem [ref=e93]:
+          - link "Scenarios" [ref=e94] [cursor=pointer]:
+            - /url: /dashboard/scenarios
+            - img [ref=e95]
+            - generic [ref=e97]: Scenarios
+        - listitem [ref=e98]:
+          - link "Breach Protocol" [ref=e99] [cursor=pointer]:
+            - /url: /dashboard/drill
+            - img [ref=e100]
+            - generic [ref=e102]: Breach Protocol
+        - listitem [ref=e103]:
+          - link "Ghost Mocker" [ref=e104] [cursor=pointer]:
+            - /url: /dashboard/ghosts
+            - img [ref=e105]
+            - generic [ref=e107]: Ghost Mocker
+        - listitem [ref=e108]:
+          - link "Autopilot" [ref=e109] [cursor=pointer]:
+            - /url: /dashboard/autopilot
+            - img [ref=e110]
+            - generic [ref=e113]: Autopilot
+        - listitem [ref=e114]:
+          - link "Settings" [ref=e115] [cursor=pointer]:
+            - /url: /dashboard/settings
+            - img [ref=e116]
+            - generic [ref=e119]: Settings
+    - generic [ref=e120]:
+      - button "Keyboard" [ref=e122] [cursor=pointer]:
+        - generic [ref=e123]: Keyboard
+        - img [ref=e124]
+      - generic [ref=e126]:
+        - generic [ref=e127]:
+          - generic [ref=e128]: Status
+          - generic [ref=e129]: ONLINE
+        - generic [ref=e133]:
+          - generic [ref=e134]: v—
+          - generic [ref=e135]: 65ms
+  - generic [ref=e136]:
+    - banner [ref=e137]:
+      - generic [ref=e138]:
+        - generic [ref=e140]: System
+        - generic [ref=e141]: /
+        - generic [ref=e142]: DECEPTION
+      - generic [ref=e143]:
+        - generic [ref=e144]:
+          - img [ref=e145]
+          - textbox "SYSTEM_SEARCH..." [ref=e148]
+          - generic [ref=e149]:
+            - generic [ref=e150]: ⌘
+            - text: K
+        - generic [ref=e152]:
+          - generic [ref=e153]:
+            - generic [ref=e154]: Status
+            - generic [ref=e155]: NOMINAL
+          - generic [ref=e156]:
+            - generic [ref=e157]: Latency
+            - generic [ref=e158]: 65ms
+        - button [ref=e160] [cursor=pointer]:
+          - img [ref=e161]
+        - button "Open help (⌘?)" [ref=e164] [cursor=pointer]:
+          - img [ref=e165]
+        - button [ref=e168] [cursor=pointer]:
+          - img [ref=e169]
+    - main [ref=e171]:
+      - generic [ref=e173]:
+        - generic [ref=e174]:
+          - generic [ref=e175]:
+            - heading "Deception Engine" [level=1] [ref=e176]
+            - paragraph [ref=e177]: Live honeypot activity and intruder analysis.
+          - generic [ref=e178]:
+            - generic [ref=e179]: FORENSICS_LIVE
+            - button "Clear Logs" [ref=e181] [cursor=pointer]:
+              - img [ref=e182]
+              - text: Clear Logs
+        - generic [ref=e185]:
+          - generic [ref=e187]:
+            - generic [ref=e189]:
+              - heading "Capture Feed" [level=3] [ref=e190]:
+                - img [ref=e191]
+                - text: Capture Feed
+              - generic [ref=e193]: 0 Events Recorded
+            - generic [ref=e195]: "[WAITING_FOR_INTERCEPTION]"
+          - generic [ref=e196]:
+            - generic [ref=e197]:
+              - generic [ref=e198]:
+                - heading "Tarpit Monitor" [level=3] [ref=e199]:
+                  - img [ref=e200]
+                  - text: Tarpit Monitor
+                - paragraph [ref=e202]: IPs currently trapped in slow-responses.
+              - generic [ref=e204]: NO ACTIVE THREATS
+            - generic [ref=e205]:
+              - heading "Event Inspector" [level=3] [ref=e207]
+              - generic [ref=e209]: Select an event to inspect

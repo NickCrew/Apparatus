@@ -1,0 +1,696 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - img [ref=e8]
+          - heading "Documentation Hub" [level=1] [ref=e11]
+        - button "Dashboard" [ref=e12] [cursor=pointer]:
+          - img [ref=e13]
+          - text: Dashboard
+      - paragraph [ref=e15]: Browse large documentation files with quick section navigation.
+      - generic [ref=e16]:
+        - img [ref=e17]
+        - textbox "Search docs..." [ref=e20]
+    - generic [ref=e21]:
+      - generic [ref=e22]:
+        - generic [ref=e23]: Documents (5)
+        - generic [ref=e24]:
+          - generic [ref=e25]: Architecture
+          - 'button "Architecture Guide Apparatus is designed to work alongside VulnLab as a complete security testing ecosystem: ~/Developer/ ├── apparatus/ # Thi..." [ref=e27] [cursor=pointer]':
+            - generic [ref=e28]:
+              - img [ref=e29]
+              - generic [ref=e32]:
+                - generic [ref=e33]: Architecture Guide
+                - generic [ref=e34]: "Apparatus is designed to work alongside VulnLab as a complete security testing ecosystem: ~/Developer/ ├── apparatus/ # Thi..."
+        - generic [ref=e35]:
+          - generic [ref=e36]: Features
+          - 'button "Apparatus: Complete Feature Catalog Comprehensive inventory of all 58+ major features across Apparatus cybersecurity testing and simulation platform. --- - What it does: Honeypot de..." [ref=e38] [cursor=pointer]':
+            - generic [ref=e39]:
+              - img [ref=e40]
+              - generic [ref=e43]:
+                - generic [ref=e44]: "Apparatus: Complete Feature Catalog"
+                - generic [ref=e45]: "Comprehensive inventory of all 58+ major features across Apparatus cybersecurity testing and simulation platform. --- - What it does: Honeypot de..."
+        - generic [ref=e46]:
+          - generic [ref=e47]: Getting Started
+          - button "Apparatus > All-in-one cybersecurity testing and simulation lab platform for red teams, chaos engineering, defense validation, and security tool testing. !Node..." [ref=e49] [cursor=pointer]:
+            - generic [ref=e50]:
+              - img [ref=e51]
+              - generic [ref=e54]:
+                - generic [ref=e55]: Apparatus
+                - generic [ref=e56]: "> All-in-one cybersecurity testing and simulation lab platform for red teams, chaos engineering, defense validation, and security tool testing. !Node..."
+        - generic [ref=e57]:
+          - generic [ref=e58]: Integration
+          - 'button "Integration Guide: Apparatus + VulnLab This guide explains how Apparatus and VulnLab work together as a complete security testing ecosystem. Apparatus and VulnLab are two separate monore..." [ref=e60] [cursor=pointer]':
+            - generic [ref=e61]:
+              - img [ref=e62]
+              - generic [ref=e65]:
+                - generic [ref=e66]: "Integration Guide: Apparatus + VulnLab"
+                - generic [ref=e67]: This guide explains how Apparatus and VulnLab work together as a complete security testing ecosystem. Apparatus and VulnLab are two separate monore...
+        - generic [ref=e68]:
+          - generic [ref=e69]: Quick Reference
+          - button "Quick Reference Guide bash cd apparatus docker-compose up Wait for all services to be healthy (30-60 seconds). bash cd apparatus pnpm install pnpm build pnpm start -..." [ref=e71] [cursor=pointer]:
+            - generic [ref=e72]:
+              - img [ref=e73]
+              - generic [ref=e76]:
+                - generic [ref=e77]: Quick Reference Guide
+                - generic [ref=e78]: bash cd apparatus docker-compose up Wait for all services to be healthy (30-60 seconds). bash cd apparatus pnpm install pnpm build pnpm start -...
+      - generic [ref=e79]:
+        - generic [ref=e80]:
+          - img [ref=e81]
+          - text: Outline
+        - generic [ref=e84]:
+          - button "Apparatus" [ref=e85] [cursor=pointer]
+          - button "What is Apparatus?" [ref=e86] [cursor=pointer]
+          - button "Key Features" [ref=e87] [cursor=pointer]
+          - button "🎭 Deception & Honeypots" [ref=e88] [cursor=pointer]
+          - button "🔴 Red Team & Exploitation" [ref=e89] [cursor=pointer]
+          - button "🛡️ Defense & Mitigation" [ref=e90] [cursor=pointer]
+          - button "⚙️ Chaos Engineering" [ref=e91] [cursor=pointer]
+          - button "🌐 Network & Diagnostics" [ref=e92] [cursor=pointer]
+          - button "🔐 Security Testing" [ref=e93] [cursor=pointer]
+          - button "📡 Multi-Protocol Support" [ref=e94] [cursor=pointer]
+  - main [ref=e95]:
+    - generic [ref=e96]:
+      - generic [ref=e97]:
+        - generic [ref=e98]: Getting Started
+        - generic [ref=e99]: Apparatus
+      - generic [ref=e100]: README.md
+    - generic [ref=e103]:
+      - heading "Apparatus" [level=1] [ref=e104]
+      - blockquote [ref=e105]:
+        - paragraph [ref=e106]: All-in-one cybersecurity testing and simulation lab platform for red teams, chaos engineering, defense validation, and security tool testing.
+      - paragraph [ref=e107]:
+        - img "Node.js"
+        - img "TypeScript"
+        - img "Multi-Protocol"
+        - img "Open Source"
+      - separator [ref=e108]
+      - heading "What is Apparatus?" [level=2] [ref=e109]
+      - paragraph [ref=e110]:
+        - text: Apparatus is a
+        - strong [ref=e111]: comprehensive security testing platform
+        - text: "that simulates real-world attacks, defense mechanisms, and infrastructure chaos in a controlled, sandboxed environment. It's designed for:"
+      - list [ref=e112]:
+        - listitem [ref=e113]:
+          - text: 🎯
+          - strong [ref=e114]: Red Teams
+          - text: "- Autonomous AI-driven exploitation and payload testing"
+        - listitem [ref=e115]:
+          - text: 🛡️
+          - strong [ref=e116]: Blue Teams
+          - text: "- Defense validation, WAF testing, deception engineering"
+        - listitem [ref=e117]:
+          - text: ⚙️
+          - strong [ref=e118]: Chaos Engineers
+          - text: "- Resilience testing, fault injection, system recovery"
+        - listitem [ref=e119]:
+          - text: 🔬
+          - strong [ref=e120]: Security Researchers
+          - text: "- Protocol fuzzing, vulnerability simulation, attack pattern modeling"
+        - listitem [ref=e121]:
+          - text: 📚
+          - strong [ref=e122]: Training
+          - text: "- Security tool evaluation, incident response drills, threat intelligence"
+      - paragraph [ref=e123]:
+        - text: Think of it as
+        - strong [ref=e124]: OWASP WebGoat meets Chaos Monkey meets a full-featured security lab
+        - text: —all in one platform.
+      - separator [ref=e125]
+      - heading "Key Features" [level=2] [ref=e126]
+      - heading "🎭 Deception & Honeypots" [level=3] [ref=e127]
+      - list [ref=e128]:
+        - listitem [ref=e129]:
+          - strong [ref=e130]: AI-Powered Honeypot
+          - text: "- Fake admin consoles, shell terminals, and databases with contextual AI responses"
+        - listitem [ref=e131]:
+          - strong [ref=e132]: Ghost Traffic
+          - text: "- Generate synthetic legitimate-looking traffic to confuse attribution"
+        - listitem [ref=e133]:
+          - strong [ref=e134]: Deception Events
+          - text: "- Real-time tracking and streaming of honeypot interactions"
+        - listitem [ref=e135]:
+          - strong [ref=e136]: Multi-Layer Traps
+          - text: "- Fake"
+          - code [ref=e137]: .env
+          - text: files,
+          - code [ref=e138]: /etc/passwd
+          - text: ", SQLi detection honeypots"
+      - heading "🔴 Red Team & Exploitation" [level=3] [ref=e139]
+      - list [ref=e140]:
+        - listitem [ref=e141]:
+          - strong [ref=e142]: AI Autopilot
+          - text: "- Autonomous red team agent that intelligently selects and executes tools"
+        - listitem [ref=e143]:
+          - strong [ref=e144]: Payload Validator
+          - text: "- Test app resilience to XSS, SQLi, path traversal, command injection, NoSQL injection"
+        - listitem [ref=e145]:
+          - strong [ref=e146]: Scenario Engine
+          - text: "- Template-based multi-step attack/defense sequences"
+        - listitem [ref=e147]:
+          - strong [ref=e148]: SSRF/Proxy Testing
+          - text: "- Test for request-based vulnerabilities"
+      - heading "🛡️ Defense & Mitigation" [level=3] [ref=e149]
+      - list [ref=e150]:
+        - listitem [ref=e151]:
+          - strong [ref=e152]: Active Shield (WAF)
+          - text: "- Pattern-based request blocking with rule management"
+        - listitem [ref=e153]:
+          - strong [ref=e154]: Tarpit Defense
+          - text: "- Honeypot that traps attackers in slow-response connections"
+        - listitem [ref=e155]:
+          - strong [ref=e156]: Moving Target Defense (MTD)
+          - text: "- Dynamic API hiding with rotating prefixes"
+        - listitem [ref=e157]:
+          - strong [ref=e158]: Self-Healing QoS
+          - text: "- Autonomous load shedding and event loop monitoring"
+        - listitem [ref=e159]:
+          - strong [ref=e160]: Rate Limiting
+          - text: "- Per-IP rate limit enforcement with 429 responses"
+      - heading "⚙️ Chaos Engineering" [level=3] [ref=e161]
+      - list [ref=e162]:
+        - listitem [ref=e163]:
+          - strong [ref=e164]: CPU Spike
+          - text: "- Trigger high CPU utilization for resilience testing"
+        - listitem [ref=e165]:
+          - strong [ref=e166]: Memory Spike
+          - text: "- Allocate memory to simulate OOM scenarios"
+        - listitem [ref=e167]:
+          - strong [ref=e168]: Crash Scenarios
+          - text: "- Test graceful shutdown and recovery"
+        - listitem [ref=e169]:
+          - strong [ref=e170]: Cluster Attacks
+          - text: "- Coordinate chaos across distributed nodes via UDP gossip"
+      - heading "🌐 Network & Diagnostics" [level=3] [ref=e171]
+      - list [ref=e172]:
+        - listitem [ref=e173]:
+          - strong [ref=e174]: DNS Resolver
+          - text: "- Query A/AAAA/MX/TXT/SRV/NS/CNAME records"
+        - listitem [ref=e175]:
+          - strong [ref=e176]: TCP Ping
+          - text: "- Connectivity testing to remote hosts"
+        - listitem [ref=e177]:
+          - strong [ref=e178]: Bandwidth Generator
+          - text: "- 1B to 1GB data streaming for load testing"
+        - listitem [ref=e179]:
+          - strong [ref=e180]: Packet Capture (PCAP)
+          - text: "- tcpdump-based traffic recording"
+        - listitem [ref=e181]:
+          - strong [ref=e182]: HAR Replay
+          - text: "- Replay HTTP requests from archive files"
+      - heading "🔐 Security Testing" [level=3] [ref=e183]
+      - list [ref=e184]:
+        - listitem [ref=e185]:
+          - strong [ref=e186]: Data Exfiltration Testing
+          - text: "- DLP generator with credit cards, SSNs, emails, fake SQL errors"
+        - listitem [ref=e187]:
+          - strong [ref=e188]: Container Escape Testing
+          - text: "- Egress channel and escape vector validation"
+        - listitem [ref=e189]:
+          - strong [ref=e190]: Cloud Credential Harvesting
+          - text: "- Simulated AWS/GCP/Azure metadata endpoints"
+        - listitem [ref=e191]:
+          - strong [ref=e192]: Supply Chain Attacks
+          - text: "- Package manager poisoning simulation"
+        - listitem [ref=e193]:
+          - strong [ref=e194]: Victim App
+          - text: "- Intentionally vulnerable application with XSS, SQLi, CSRF, auth bypass"
+      - heading "📡 Multi-Protocol Support" [level=3] [ref=e195]
+      - list [ref=e196]:
+        - listitem [ref=e197]:
+          - strong [ref=e198]: HTTP/1.1
+          - text: (port 8090)
+        - listitem [ref=e199]:
+          - strong [ref=e200]: HTTP/2 TLS
+          - text: (port 8443)
+        - listitem [ref=e201]:
+          - strong [ref=e202]: HTTP/2 Cleartext (h2c)
+          - text: (port 8091)
+        - listitem [ref=e203]:
+          - strong [ref=e204]: WebSocket
+          - text: (/ws)
+        - listitem [ref=e205]:
+          - strong [ref=e206]: gRPC
+          - text: (port 50051) with 4 RPC methods
+        - listitem [ref=e207]:
+          - strong [ref=e208]: Redis Mock
+          - text: (port 6379) with full RESP protocol
+        - listitem [ref=e209]:
+          - strong [ref=e210]: MQTT
+          - text: (port 1883)
+        - listitem [ref=e211]:
+          - strong [ref=e212]: SMTP
+          - text: (port 2525)
+        - listitem [ref=e213]:
+          - strong [ref=e214]: Syslog
+          - text: (ports 5140/5514)
+        - listitem [ref=e215]:
+          - strong [ref=e216]: ICAP
+          - text: (port 1344)
+        - listitem [ref=e217]:
+          - strong [ref=e218]: TCP/UDP Echo
+          - text: (ports 9000/9001)
+      - heading "📊 Real-Time Monitoring" [level=3] [ref=e219]
+      - list [ref=e220]:
+        - listitem [ref=e221]:
+          - strong [ref=e222]: Web Dashboard
+          - text: "- React-based UI with real-time SSE streaming"
+        - listitem [ref=e223]:
+          - strong [ref=e224]: Terminal UI
+          - text: "- 18+ widget types for terminal-based monitoring"
+        - listitem [ref=e225]:
+          - strong [ref=e226]: SSE Broadcasting
+          - text: "- Push events to all connected clients"
+        - listitem [ref=e227]:
+          - strong [ref=e228]: Request History
+          - text: "- Store and inspect recent requests"
+        - listitem [ref=e229]:
+          - strong [ref=e230]: Prometheus Metrics
+          - text: "- Request duration histograms and counters"
+      - heading "🧠 Advanced Features" [level=3] [ref=e231]
+      - list [ref=e232]:
+        - listitem [ref=e233]:
+          - strong [ref=e234]: AI Chat API
+          - text: "- LLM-powered context-aware responses"
+        - listitem [ref=e235]:
+          - strong [ref=e236]: Identity Testing
+          - text: "- OIDC/OAuth provider simulation, JWT debugging"
+        - listitem [ref=e237]:
+          - strong [ref=e238]: GraphQL Endpoint
+          - text: "- Full GraphQL API with introspection attacks"
+        - listitem [ref=e239]:
+          - strong [ref=e240]: JavaScript Execution
+          - text: "- Sandboxed VM for custom code testing"
+        - listitem [ref=e241]:
+          - strong [ref=e242]: Echo Handler
+          - text: "- Reflect all request details for debugging"
+        - listitem [ref=e243]:
+          - strong [ref=e244]: Webhook Sink
+          - text: "- Capture and inspect incoming webhooks"
+      - separator [ref=e245]
+      - heading "Quick Start" [level=2] [ref=e246]
+      - heading "Prerequisites" [level=3] [ref=e247]
+      - list [ref=e248]:
+        - listitem [ref=e249]: Node.js 23+
+        - listitem [ref=e250]: pnpm (or npm/yarn)
+        - listitem [ref=e251]: "Optional: tcpdump (for PCAP capture), Docker (for containerized deployment)"
+      - 'heading "Option 1: Full Lab with VulnLab (Recommended for Testing)" [level=3] [ref=e252]'
+      - code [ref=e254]: "# Clone both repositories cd ~/Developer git clone https://github.com/yourusername/apparatus.git git clone https://github.com/yourusername/VulnLab.git # Start complete testing environment cd apparatus docker-compose up"
+      - paragraph [ref=e255]: "This starts:"
+      - list [ref=e256]:
+        - listitem [ref=e257]:
+          - strong [ref=e258]: Apparatus
+          - text: ":"
+          - link "http://localhost:8090/dashboard" [ref=e259] [cursor=pointer]:
+            - /url: http://localhost:8090/dashboard
+          - text: (testing platform)
+        - listitem [ref=e260]:
+          - strong [ref=e261]: VulnWeb
+          - text: ":"
+          - link "http://localhost:3000" [ref=e262] [cursor=pointer]:
+            - /url: http://localhost:3000
+          - text: (vulnerable web app)
+        - listitem [ref=e263]:
+          - strong [ref=e264]: VulnAPI
+          - text: ":"
+          - link "http://localhost:5000" [ref=e265] [cursor=pointer]:
+            - /url: http://localhost:5000
+          - text: (vulnerable API)
+      - paragraph [ref=e266]:
+        - text: → See
+        - link "Quick Reference Guide" [ref=e267] [cursor=pointer]:
+          - /url: docs/quick-reference.md
+        - text: for usage examples
+      - 'heading "Option 2: Just Apparatus" [level=3] [ref=e268]'
+      - code [ref=e270]: "# Clone the repository git clone https://github.com/yourusername/apparatus.git cd apparatus # Install dependencies pnpm install # Generate TLS certificates (self-signed) mkdir -p certs openssl req -x509 -newkey rsa:2048 -keyout certs/server.key \\ -out certs/server.crt -days 365 -nodes -subj \"/CN=localhost\" # Build the project pnpm build # Start the server pnpm start"
+      - paragraph [ref=e271]: "The server will start on:"
+      - list [ref=e272]:
+        - listitem [ref=e273]:
+          - strong [ref=e274]: HTTP/1.1
+          - text: ":"
+          - link "http://localhost:8090" [ref=e275] [cursor=pointer]:
+            - /url: http://localhost:8090
+        - listitem [ref=e276]:
+          - strong [ref=e277]: Dashboard
+          - text: ":"
+          - link "http://localhost:8090/dashboard" [ref=e278] [cursor=pointer]:
+            - /url: http://localhost:8090/dashboard
+        - listitem [ref=e279]:
+          - strong [ref=e280]: HTTP/2 TLS
+          - text: ":"
+          - link "https://localhost:8443" [ref=e281] [cursor=pointer]:
+            - /url: https://localhost:8443
+        - listitem [ref=e282]:
+          - strong [ref=e283]: gRPC
+          - text: ": localhost:50051"
+        - listitem [ref=e284]:
+          - strong [ref=e285]: WebSocket
+          - text: ": ws://localhost:8090/ws"
+      - 'heading "Option 3: Docker (Apparatus Only)" [level=3] [ref=e286]'
+      - code [ref=e288]: "# Build Docker image docker build -t apparatus:latest ./apps/apparatus # Run container docker run -p 8090:8090 -p 8443:8443 -p 50051:50051 apparatus:latest # Access dashboard at http://localhost:8090/dashboard"
+      - separator [ref=e289]
+      - heading "Usage Examples" [level=2] [ref=e290]
+      - heading "1. Test Your Web App with the Red Team AI" [level=3] [ref=e291]
+      - code [ref=e293]: "# Start autopilot against your app curl -X POST http://localhost:8090/api/redteam/autopilot/start \\ -H \"Content-Type: application/json\" \\ -d '{ \"target\": \"http://myapp.local\", \"config\": { \"interval\": 2000, \"maxIterations\": 20, \"allowedTools\": [\"chaos.cpu\", \"cluster.attack\", \"mtd.rotate\"] } }' # Check status curl http://localhost:8090/api/redteam/autopilot/status # Get results curl http://localhost:8090/api/redteam/autopilot/reports"
+      - heading "2. Validate Payload Detection" [level=3] [ref=e294]
+      - code [ref=e296]: "# Test if your app blocks XSS/SQLi/command injection curl \"http://localhost:8090/redteam/validate?target=http://myapp&path=/search&method=GET\""
+      - heading "3. Run a Chaos Scenario" [level=3] [ref=e297]
+      - code [ref=e299]: "# Create a multi-step attack scenario curl -X POST http://localhost:8090/scenarios \\ -H \"Content-Type: application/json\" \\ -d '{ \"name\": \"distributed-attack\", \"steps\": [ { \"id\": \"1\", \"action\": \"chaos.cpu\", \"params\": { \"duration\": 5000 } }, { \"id\": \"2\", \"action\": \"delay\", \"params\": { \"duration\": 2000 } }, { \"id\": \"3\", \"action\": \"cluster.attack\", \"params\": { \"target\": \"http://127.0.0.1:8090/echo\", \"rate\": 100 } } ] }' # Get scenario ID from response, then run it curl -X POST http://localhost:8090/scenarios/{scenario_id}/run # Monitor execution curl http://localhost:8090/scenarios/{scenario_id}/status?executionId={execution_id}"
+      - heading "4. Activate Defense Mechanisms" [level=3] [ref=e300]
+      - code [ref=e302]: "# Add WAF rule to block admin panel access curl -X POST http://localhost:8090/sentinel/rules \\ -H \"Content-Type: application/json\" \\ -d '{ \"pattern\": \"/admin\", \"action\": \"block\" }' # Enable tarpit for suspicious IPs # Automatically traps access to /.env, /.git, /wp-admin, /admin.php # Activate Moving Target Defense curl -X POST http://localhost:8090/mtd -d '{\"prefix\": \"xyz123\"}' # Now all APIs require xyz123 prefix: /xyz123/echo, /xyz123/healthz, etc."
+      - heading "5. Monitor Real-Time Traffic" [level=3] [ref=e303]
+      - code [ref=e305]: "# Open web dashboard open http://localhost:8090/dashboard # Or use terminal UI pnpm tui # Or connect SSE client for raw events curl http://localhost:8090/sse"
+      - heading "6. Capture and Replay Traffic" [level=3] [ref=e306]
+      - code [ref=e308]: "# Capture network traffic for 30 seconds curl \"http://localhost:8090/capture.pcap?duration=30&iface=eth0\" -o traffic.pcap # Replay HAR (HTTP Archive) file curl -X POST http://localhost:8090/replay \\ -H \"Content-Type: application/json\" \\ -d @requests.har"
+      - separator [ref=e309]
+      - heading "Architecture" [level=2] [ref=e310]
+      - heading "Monorepo Structure" [level=3] [ref=e311]
+      - code [ref=e313]: "apparatus/ ├── apps/ │ ├── apparatus/ # Main server │ │ ├── src/ │ │ │ ├── app.ts # Express app with all routes │ │ │ ├── chaos.ts # CPU/memory/crash chaos handlers │ │ │ ├── deception.ts # AI honeypot engine │ │ │ ├── tarpit.ts # Tarpit defense │ │ │ ├── sentinel.ts # Active Shield (WAF) │ │ │ ├── scenarios.ts # Scenario engine │ │ │ ├── ai/ # AI autopilot and chat │ │ │ ├── server-*.ts # Protocol servers (HTTP/2, gRPC, Redis, etc.) │ │ │ └── dashboard/ # React dashboard (Vite) │ │ ├── test/ # Integration tests (39+ tests) │ │ └── dist/ # Compiled output │ └── cli/ # CLI application └── libs/ # Shared libraries"
+      - heading "Middleware Execution Order" [level=3] [ref=e314]
+      - list [ref=e315]:
+        - listitem [ref=e316]:
+          - strong [ref=e317]: MTD
+          - text: "- Polymorphic route hiding"
+        - listitem [ref=e318]:
+          - strong [ref=e319]: Self-Healing
+          - text: "- Load shedding"
+        - listitem [ref=e320]:
+          - strong [ref=e321]: Deception
+          - text: "- Honeypot trap"
+        - listitem [ref=e322]:
+          - strong [ref=e323]: Tarpit
+          - text: "- Slow-down trap"
+        - listitem [ref=e324]:
+          - strong [ref=e325]: Metrics
+          - text: "- Collection"
+        - listitem [ref=e326]:
+          - strong [ref=e327]: Compression
+          - text: "- Response compression"
+        - listitem [ref=e328]:
+          - strong [ref=e329]: Logging
+          - text: "- Pino logger"
+        - listitem [ref=e330]:
+          - strong [ref=e331]: Body Parsing
+          - text: "- JSON/URL/raw/text"
+        - listitem [ref=e332]:
+          - strong [ref=e333]: Active Shield
+          - text: "- WAF"
+        - listitem [ref=e334]:
+          - strong [ref=e335]: CORS
+          - text: "- Cross-origin handling"
+        - listitem [ref=e336]:
+          - strong [ref=e337]: Routes
+          - text: "- Endpoint handlers"
+        - listitem [ref=e338]:
+          - strong [ref=e339]: Echo
+          - text: "- Catch-all reflection"
+      - separator [ref=e340]
+      - heading "Configuration" [level=2] [ref=e341]
+      - heading "Environment Variables" [level=3] [ref=e342]
+      - code [ref=e344]: "# Server PORT_HTTP1=8090 # HTTP/1.1 port PORT_HTTP2=8443 # HTTP/2 TLS port HOST=0.0.0.0 # Bind address # TLS Certificates TLS_KEY=certs/server.key # Private key path TLS_CRT=certs/server.crt # Certificate path # Features DEMO_MODE=true # Enable all dangerous endpoints ENABLE_COMPRESSION=true # Enable gzip compression BODY_LIMIT=50mb # Request body size limit CLUSTER_SHARED_SECRET=mysecret # Cluster auth token # AI/LLM (for honeypot and autopilot) ANTHROPIC_API_KEY=sk-... # Claude API key"
+      - heading "Feature Toggles" [level=3] [ref=e345]
+      - code [ref=e347]: "# Toggle demo mode (enables all features without localhost check) curl -X POST http://localhost:8090/_sensor/demo/toggle # View configuration curl http://localhost:8090/_sensor/config/integrations # Update integrations curl -X PUT http://localhost:8090/_sensor/config/integrations \\ -H \"Content-Type: application/json\" \\ -d '{\"tunnel_url\": \"https://ngrok.io/...\", \"tunnel_api_key\": \"...\"}'"
+      - separator [ref=e348]
+      - heading "Testing" [level=2] [ref=e349]
+      - heading "Run All Tests" [level=3] [ref=e350]
+      - code [ref=e352]: "pnpm test # Run all tests pnpm test -- --reporter=verbose # Verbose output pnpm test -- test/chaos.test.ts # Run specific test file"
+      - heading "Coverage" [level=3] [ref=e353]
+      - paragraph [ref=e354]: "Tests cover:"
+      - list [ref=e355]:
+        - listitem [ref=e356]: ✅ Scenario validation (unknown actions, SQL injection patterns, param sanitization)
+        - listitem [ref=e357]: ✅ Chaos operations (CPU spike, memory allocation, concurrent spike detection)
+        - listitem [ref=e358]: ✅ Webhook capture and trimming (50 webhook limit per hook ID)
+        - listitem [ref=e359]: ✅ Attack scenario execution and failure tracking
+        - listitem [ref=e360]: ✅ Multi-protocol echo and SSE broadcasting
+        - listitem [ref=e361]: ✅ 38+ integration tests across all major features
+      - separator [ref=e362]
+      - heading "Use Cases" [level=2] [ref=e363]
+      - heading "🎓 Security Training" [level=3] [ref=e364]
+      - list [ref=e365]:
+        - listitem [ref=e366]: Simulate realistic attack scenarios for incident response drills
+        - listitem [ref=e367]: Train teams on detection and mitigation techniques
+        - listitem [ref=e368]: Safe environment for learning security concepts
+      - heading "🔒 Defense Validation" [level=3] [ref=e369]
+      - list [ref=e370]:
+        - listitem [ref=e371]: Test WAF/IDS/IPS effectiveness against known attack patterns
+        - listitem [ref=e372]: Validate SIEM detection rules
+        - listitem [ref=e373]: Measure incident response time
+      - heading "🧪 Tool Testing" [level=3] [ref=e374]
+      - list [ref=e375]:
+        - listitem [ref=e376]: Evaluate security scanning tools (Burp, OWASP ZAP, Nessus)
+        - listitem [ref=e377]: Test SIEMs, DLP systems, log aggregation
+        - listitem [ref=e378]: Benchmark performance under chaos conditions
+      - heading "🚀 Chaos Engineering" [level=3] [ref=e379]
+      - list [ref=e380]:
+        - listitem [ref=e381]: Inject faults to test application resilience
+        - listitem [ref=e382]: Validate auto-recovery mechanisms
+        - listitem [ref=e383]: Measure system performance degradation
+      - heading "🔍 Security Research" [level=3] [ref=e384]
+      - list [ref=e385]:
+        - listitem [ref=e386]: Model attack vectors and defense patterns
+        - listitem [ref=e387]: Test novel security concepts
+        - listitem [ref=e388]: Develop and validate exploitation techniques
+      - heading "🏢 Red Team Operations" [level=3] [ref=e389]
+      - list [ref=e390]:
+        - listitem [ref=e391]: Run automated red team campaigns with AI autopilot
+        - listitem [ref=e392]: Generate realistic attack scenarios
+        - listitem [ref=e393]: Validate security controls comprehensively
+      - separator [ref=e394]
+      - heading "Technology Stack" [level=2] [ref=e395]
+      - table [ref=e396]:
+        - rowgroup [ref=e397]:
+          - row "Component Tech" [ref=e398]:
+            - columnheader "Component" [ref=e399]
+            - columnheader "Tech" [ref=e400]
+        - rowgroup [ref=e401]:
+          - row "Runtime Node.js 23+" [ref=e402]:
+            - cell "Runtime" [ref=e403]:
+              - strong [ref=e404]: Runtime
+            - cell "Node.js 23+" [ref=e405]
+          - row "Language TypeScript (strict)" [ref=e406]:
+            - cell "Language" [ref=e407]:
+              - strong [ref=e408]: Language
+            - cell "TypeScript (strict)" [ref=e409]
+          - row "Framework Express.js" [ref=e410]:
+            - cell "Framework" [ref=e411]:
+              - strong [ref=e412]: Framework
+            - cell "Express.js" [ref=e413]
+          - row "Protocols HTTP/1.1, HTTP/2, gRPC, WebSocket, Redis, MQTT, SMTP, Syslog, ICAP" [ref=e414]:
+            - cell "Protocols" [ref=e415]:
+              - strong [ref=e416]: Protocols
+            - cell "HTTP/1.1, HTTP/2, gRPC, WebSocket, Redis, MQTT, SMTP, Syslog, ICAP" [ref=e417]
+          - row "Frontend React 18 + Vite + Tailwind CSS" [ref=e418]:
+            - cell "Frontend" [ref=e419]:
+              - strong [ref=e420]: Frontend
+            - cell "React 18 + Vite + Tailwind CSS" [ref=e421]
+          - row "Terminal UI Blessed + blessed-contrib" [ref=e422]:
+            - cell "Terminal UI" [ref=e423]:
+              - strong [ref=e424]: Terminal UI
+            - cell "Blessed + blessed-contrib" [ref=e425]
+          - row "Monitoring Prometheus metrics, Pino logging" [ref=e426]:
+            - cell "Monitoring" [ref=e427]:
+              - strong [ref=e428]: Monitoring
+            - cell "Prometheus metrics, Pino logging" [ref=e429]
+          - row "Testing Vitest + Supertest" [ref=e430]:
+            - cell "Testing" [ref=e431]:
+              - strong [ref=e432]: Testing
+            - cell "Vitest + Supertest" [ref=e433]
+          - row "Build Nx monorepo, TypeScript compiler, Vite" [ref=e434]:
+            - cell "Build" [ref=e435]:
+              - strong [ref=e436]: Build
+            - cell "Nx monorepo, TypeScript compiler, Vite" [ref=e437]
+          - row "Package Manager pnpm" [ref=e438]:
+            - cell "Package Manager" [ref=e439]:
+              - strong [ref=e440]: Package Manager
+            - cell "pnpm" [ref=e441]
+      - separator [ref=e442]
+      - heading "Security Notice" [level=2] [ref=e443]
+      - paragraph [ref=e444]:
+        - text: ⚠️
+        - strong [ref=e445]: Apparatus is designed for testing and lab environments only.
+        - text: "It is NOT suitable for production use:"
+      - list [ref=e446]:
+        - listitem [ref=e447]: All data is stored in-memory (no persistence)
+        - listitem [ref=e448]: No authentication/authorization on most endpoints
+        - listitem [ref=e449]: Deliberately vulnerable features (victim app, honeypots, chaos)
+        - listitem [ref=e450]: No audit trails or compliance features
+        - listitem [ref=e451]: Run only on isolated networks or localhost
+      - paragraph [ref=e452]: "Use Apparatus in:"
+      - list [ref=e453]:
+        - listitem [ref=e454]: ✅ Development environments
+        - listitem [ref=e455]: ✅ Lab networks
+        - listitem [ref=e456]: ✅ Isolated test systems
+        - listitem [ref=e457]: ✅ Docker containers
+        - listitem [ref=e458]: ✅ VMs on your machine
+      - paragraph [ref=e459]: "Do NOT use in:"
+      - list [ref=e460]:
+        - listitem [ref=e461]: ❌ Production systems
+        - listitem [ref=e462]: ❌ Public-facing networks
+        - listitem [ref=e463]: ❌ Shared infrastructure
+        - listitem [ref=e464]: ❌ Systems with real data
+      - separator [ref=e465]
+      - heading "Contributing" [level=2] [ref=e466]
+      - paragraph [ref=e467]: "Contributions are welcome! Areas for expansion:"
+      - list [ref=e468]:
+        - listitem [ref=e469]:
+          - checkbox [disabled] [ref=e470]
+          - text: Additional protocol servers
+        - listitem [ref=e471]:
+          - checkbox [disabled] [ref=e472]
+          - text: More chaos engineering scenarios
+        - listitem [ref=e473]:
+          - checkbox [disabled] [ref=e474]
+          - text: Enhanced AI models for autopilot
+        - listitem [ref=e475]:
+          - checkbox [disabled] [ref=e476]
+          - text: Persistence layer (PostgreSQL)
+        - listitem [ref=e477]:
+          - checkbox [disabled] [ref=e478]
+          - text: Kubernetes operator
+        - listitem [ref=e479]:
+          - checkbox [disabled] [ref=e480]
+          - text: Additional defense mechanisms
+        - listitem [ref=e481]:
+          - checkbox [disabled] [ref=e482]
+          - text: CLI enhancements
+        - listitem [ref=e483]:
+          - checkbox [disabled] [ref=e484]
+          - text: Dashboard visualizations
+      - paragraph [ref=e485]:
+        - text: See
+        - link "CONTRIBUTING.md" [ref=e486] [cursor=pointer]:
+          - /url: CONTRIBUTING.md
+        - text: for guidelines.
+      - separator [ref=e487]
+      - heading "Related Projects" [level=2] [ref=e488]
+      - paragraph [ref=e489]:
+        - text: Apparatus is designed to work seamlessly with
+        - strong [ref=e490]: VulnLab
+        - text: ":"
+      - list [ref=e491]:
+        - listitem [ref=e492]:
+          - strong [ref=e493]:
+            - link "VulnLab" [ref=e494] [cursor=pointer]:
+              - /url: ../VulnLab
+          - text: "- Vulnerable web application and REST API with 450+ endpoints and 12 UIs"
+          - list [ref=e495]:
+            - listitem [ref=e496]: Provides realistic attack targets for security testing
+            - listitem [ref=e497]: Includes XSS, SQLi, CSRF, auth bypass, insecure deserialization vulnerabilities
+            - listitem [ref=e498]:
+              - text: Runs alongside Apparatus via
+              - code [ref=e499]: docker-compose
+            - listitem [ref=e500]: Independent monorepo for separate development and deployment
+      - paragraph [ref=e501]:
+        - text: Use
+        - code [ref=e502]: docker-compose up
+        - text: in Apparatus to run both platforms together for a complete security testing lab.
+      - separator [ref=e503]
+      - heading "License" [level=2] [ref=e504]
+      - paragraph [ref=e505]:
+        - text: MIT License - See
+        - link "LICENSE" [ref=e506] [cursor=pointer]:
+          - /url: LICENSE
+        - text: for details
+      - separator [ref=e507]
+      - heading "Documentation" [level=2] [ref=e508]
+      - list [ref=e509]:
+        - listitem [ref=e510]:
+          - strong [ref=e511]:
+            - link "Quick Reference" [ref=e512] [cursor=pointer]:
+              - /url: docs/quick-reference.md
+          - text: "- Common commands, endpoints, and scenarios"
+        - listitem [ref=e513]:
+          - strong [ref=e514]:
+            - link "Features" [ref=e515] [cursor=pointer]:
+              - /url: docs/features.md
+          - text: "- Complete catalog of 58+ features"
+        - listitem [ref=e516]:
+          - strong [ref=e517]:
+            - link "Architecture" [ref=e518] [cursor=pointer]:
+              - /url: docs/architecture.md
+          - text: "- System design, data flow, and components"
+        - listitem [ref=e519]:
+          - strong [ref=e520]:
+            - link "API Reference" [ref=e521] [cursor=pointer]:
+              - /url: docs/api.md
+          - text: "- Detailed endpoint documentation"
+        - listitem [ref=e522]:
+          - strong [ref=e523]:
+            - 'link "Related: VulnLab" [ref=e524] [cursor=pointer]':
+              - /url: ../VulnLab
+          - text: "- Vulnerable web app and API (450+ endpoints, 12 UIs)"
+      - separator [ref=e525]
+      - heading "Support" [level=2] [ref=e526]
+      - list [ref=e527]:
+        - listitem [ref=e528]:
+          - text: 📖
+          - link "Full Documentation" [ref=e529] [cursor=pointer]:
+            - /url: docs/
+        - listitem [ref=e530]:
+          - text: 🐛
+          - link "Issue Tracker" [ref=e531] [cursor=pointer]:
+            - /url: https://github.com/yourusername/apparatus/issues
+        - listitem [ref=e532]:
+          - text: 💬
+          - link "Discussions" [ref=e533] [cursor=pointer]:
+            - /url: https://github.com/yourusername/apparatus/discussions
+        - listitem [ref=e534]:
+          - text: "📧 Contact:"
+          - link "security@apparatus.dev" [ref=e535] [cursor=pointer]:
+            - /url: mailto:security@apparatus.dev
+      - separator [ref=e536]
+      - heading "Acknowledgments" [level=2] [ref=e537]
+      - paragraph [ref=e538]: "Apparatus builds on ideas from:"
+      - list [ref=e539]:
+        - listitem [ref=e540]: OWASP WebGoat (intentional vulnerabilities)
+        - listitem [ref=e541]: Chaos Monkey (fault injection)
+        - listitem [ref=e542]: Gremlin (chaos engineering)
+        - listitem [ref=e543]: Honeypots and deception research
+        - listitem [ref=e544]: Red team methodology and tools
+      - separator [ref=e545]
+      - heading "Roadmap" [level=2] [ref=e546]
+      - heading "Q1 2026" [level=3] [ref=e547]
+      - list [ref=e548]:
+        - listitem [ref=e549]:
+          - checkbox [disabled] [ref=e550]
+          - text: PostgreSQL persistence layer
+        - listitem [ref=e551]:
+          - checkbox [disabled] [ref=e552]
+          - text: Kubernetes operator
+        - listitem [ref=e553]:
+          - checkbox [disabled] [ref=e554]
+          - text: Advanced threat intelligence integration
+        - listitem [ref=e555]:
+          - checkbox [disabled] [ref=e556]
+          - text: Multi-region cluster support
+      - heading "Q2 2026" [level=3] [ref=e557]
+      - list [ref=e558]:
+        - listitem [ref=e559]:
+          - checkbox [disabled] [ref=e560]
+          - text: Enhanced AI models
+        - listitem [ref=e561]:
+          - checkbox [disabled] [ref=e562]
+          - text: Mobile app for remote monitoring
+        - listitem [ref=e563]:
+          - checkbox [disabled] [ref=e564]
+          - text: GraphQL mutations
+        - listitem [ref=e565]:
+          - checkbox [disabled] [ref=e566]
+          - text: Advanced analytics dashboard
+      - heading "Q3 2026" [level=3] [ref=e567]
+      - list [ref=e568]:
+        - listitem [ref=e569]:
+          - checkbox [disabled] [ref=e570]
+          - text: YARA rule integration
+        - listitem [ref=e571]:
+          - checkbox [disabled] [ref=e572]
+          - text: MITRE ATT&CK framework alignment
+        - listitem [ref=e573]:
+          - checkbox [disabled] [ref=e574]
+          - text: Advanced persistence testing
+        - listitem [ref=e575]:
+          - checkbox [disabled] [ref=e576]
+          - text: Supply chain simulation enhancements
+      - separator [ref=e577]
+      - paragraph [ref=e578]:
+        - strong [ref=e579]: Made with ❤️ for the security community

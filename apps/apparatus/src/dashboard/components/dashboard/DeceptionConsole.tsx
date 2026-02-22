@@ -1,10 +1,11 @@
-import { Terminal, Ghost, ShieldAlert, Trash2, Eye, ExternalLink, Unlock } from 'lucide-react';
+import { Terminal, Ghost, ShieldAlert, Trash2, Eye, ExternalLink, Unlock, ChefHat } from 'lucide-react';
 import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { useDeception, DeceptionEvent } from '../../hooks/useDeception';
 import { cn } from '../ui/cn';
+import { openInCyberChef } from '../../utils/cyberchef';
 
 export function DeceptionConsole() {
   const { events, trappedIps, releaseIp, clearHistory, isConnected } = useDeception();
@@ -171,7 +172,17 @@ export function DeceptionConsole() {
                                     {JSON.stringify(selectedEvent.details).length > 10000 && "\n...[TRUNCATED]..."}
                                 </pre>
                             </div>
-                            <div className="p-4 mt-auto border-t border-white/5">
+                            <div className="p-4 mt-auto border-t border-white/5 space-y-2">
+                                <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    className="w-full text-primary-400 border-primary-500/20 hover:bg-primary-500/5 group"
+                                    onClick={() => selectedEvent.details && openInCyberChef(selectedEvent.details)}
+                                >
+                                    <ChefHat className="h-3 w-3 mr-2" />
+                                    Analyze in CyberChef
+                                    <ExternalLink className="h-3 w-3 ml-auto opacity-50 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                                </Button>
                                 {selectedEvent.type === 'shell_command' && (
                                     <Button variant="neon" size="sm" className="w-full group" onClick={() => window.open('/console', '_blank', 'noopener')}>
                                         <Terminal className="h-3 w-3" />
