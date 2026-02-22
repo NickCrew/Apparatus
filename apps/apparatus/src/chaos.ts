@@ -62,6 +62,15 @@ export function cpuSpikeHandler(req: Request, res: Response) {
 
 let memoryHogs: Buffer[] = [];
 
+export function getChaosStatus() {
+    const allocatedBytes = memoryHogs.reduce((total, chunk) => total + chunk.length, 0);
+    return {
+        cpuSpikeRunning,
+        memoryChunks: memoryHogs.length,
+        memoryAllocatedMb: Math.round(allocatedBytes / (1024 * 1024)),
+    };
+}
+
 export function clearMemorySpike() {
     memoryHogs = [];
     if (global.gc) global.gc(); // Requires --expose-gc

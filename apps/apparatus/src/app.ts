@@ -24,7 +24,7 @@ import { generatorHandler } from "./generator.js";
 import { sysInfoHandler } from "./sysinfo.js";
 import { dnsHandler, pingHandler } from "./infra-debug.js";
 import { webhookReceiveHandler, webhookListHandler } from "./webhook.js";
-import { eicarHandler, crashHandler, cpuSpikeHandler, memorySpikeHandler } from "./chaos.js";
+import { eicarHandler, crashHandler, cpuSpikeHandler, getChaosStatus, memorySpikeHandler } from "./chaos.js";
 import { kvHandler } from "./kv.js";
 import { scriptHandler } from "./scripting.js";
 import { pcapHandler, harReplayHandler, livePacketHandler } from "./forensics.js";
@@ -400,6 +400,9 @@ export function createApp(): Express {
     app.post("/chaos/crash", crashHandler);
     app.all("/chaos/cpu", cpuSpikeHandler); // Allow GET (old) and POST (new)
     app.all("/chaos/memory", memorySpikeHandler); // Allow GET (old) and POST (new)
+    app.get("/chaos/status", securityGate, (_req, res) => {
+        res.json(getChaosStatus());
+    });
 
     // Advanced Logic
     app.all("/kv/:key", kvHandler);
