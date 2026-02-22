@@ -432,21 +432,25 @@ describe('mitigation controls', () => {
         const broadcastSpy = vi.spyOn(sse, 'broadcastRequest').mockImplementation(() => {});
         blackholedIps.add('198.51.100.88');
 
-        const req = {
-            ip: '198.51.100.88',
-            socket: { remoteAddress: '198.51.100.88' },
-            method: 'GET',
-            path: '/blackholefoo',
-        } as any;
-        const status = vi.fn().mockReturnThis();
-        const json = vi.fn().mockReturnThis();
-        const res = { status, json } as any;
-        const next = vi.fn();
+        for (const path of ['/blackholefoo', '/tarpitfoo', '/api/attackersfoo']) {
+            const req = {
+                ip: '198.51.100.88',
+                socket: { remoteAddress: '198.51.100.88' },
+                method: 'GET',
+                path,
+            } as any;
+            const status = vi.fn().mockReturnThis();
+            const json = vi.fn().mockReturnThis();
+            const res = { status, json } as any;
+            const next = vi.fn();
 
-        blackholeMiddleware(req, res, next);
+            blackholeMiddleware(req, res, next);
 
-        expect(next).not.toHaveBeenCalled();
-        expect(status).toHaveBeenCalledWith(403);
+            expect(next).not.toHaveBeenCalled();
+            expect(status).toHaveBeenCalledWith(403);
+            expect(json).toHaveBeenCalledWith(expect.objectContaining({ ip: '198.51.100.88' }));
+        }
+
         expect(broadcastSpy).toHaveBeenCalledWith(expect.objectContaining({
             ip: '198.51.100.88',
             status: 403,
