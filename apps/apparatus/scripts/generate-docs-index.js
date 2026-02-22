@@ -14,21 +14,21 @@ const __dirname = path.dirname(__filename);
 const docsDir = path.join(__dirname, '../../../docs');
 const outputPath = path.join(__dirname, '../src/dashboard/public/docs-index.json');
 
-// Category mapping based on filename
+// Category mapping based on filename.
+// Files without a matching key are intentionally excluded from the public docs index.
 const categoryMap = {
   'architecture': 'Architecture',
   'features': 'Features',
   'integration-guide': 'Integration',
   'quick-reference': 'Getting Started',
   'tutorial': 'Tutorials',
-  'diagrams': 'Visual Reference',
 };
 
 function getCategoryFromFile(filename) {
   for (const [key, category] of Object.entries(categoryMap)) {
     if (filename.includes(key)) return category;
   }
-  return 'Other';
+  return null;
 }
 
 function extractTitle(content) {
@@ -65,27 +65,43 @@ function generateId(filename, title) {
 }
 
 function embedSvgDiagrams(content) {
-  // Replace SVG image links with embedded base64 data URIs
-  const svgRegex = /!\[([^\]]*)\]\(\/dashboard\/assets\/diagrams\/(diagram-[\w-]+\.svg)\)/g;
+  const diagramsDir = path.join(__dirname, '../../../docs/assets/diagrams');
+  const cache = new Map();
 
-  return content.replace(svgRegex, (match, alt, filename) => {
-    const diagramsDir = path.join(__dirname, '../../../docs/assets/diagrams');
+  const getDataUri = (filename) => {
+    if (cache.has(filename)) return cache.get(filename);
+
     const svgPath = path.join(diagramsDir, filename);
-
     try {
       if (!fs.existsSync(svgPath)) {
         console.warn(`⚠️  SVG not found: ${filename}`);
-        return match; // Return original if file not found
+        return null;
       }
 
       const svgContent = fs.readFileSync(svgPath, 'utf-8');
-      const base64 = Buffer.from(svgContent).toString('base64');
-      return `![${alt}](data:image/svg+xml;base64,${base64})`;
+      const dataUri = `data:image/svg+xml;base64,${Buffer.from(svgContent).toString('base64')}`;
+      cache.set(filename, dataUri);
+      return dataUri;
     } catch (error) {
       console.warn(`⚠️  Error embedding ${filename}: ${error.message}`);
-      return match; // Return original if error
+      return null;
     }
+  };
+
+  const markdownSvgRegex = /!\[([^\]]*)\]\((?:\/dashboard\/assets\/diagrams\/|(?:\.\/)?assets\/diagrams\/)(diagram-[\w-]+\.svg)\)/g;
+  const htmlSvgRegex = /<img([^>]*?)src=["'](?:\/dashboard\/assets\/diagrams\/|(?:\.\/)?assets\/diagrams\/)(diagram-[\w-]+\.svg)["']([^>]*)>/g;
+
+  let output = content.replace(markdownSvgRegex, (match, alt, filename) => {
+    const dataUri = getDataUri(filename);
+    return dataUri ? `![${alt}](${dataUri})` : match;
   });
+
+  output = output.replace(htmlSvgRegex, (match, beforeSrc, filename, afterSrc) => {
+    const dataUri = getDataUri(filename);
+    return dataUri ? `<img${beforeSrc}src="${dataUri}"${afterSrc}>` : match;
+  });
+
+  return output;
 }
 
 function main() {
@@ -95,6 +111,12 @@ function main() {
   const files = fs.readdirSync(docsDir).filter(f => f.endsWith('.md'));
 
   for (const filename of files.sort()) {
+    const category = getCategoryFromFile(filename);
+    if (!category) {
+      console.log(`⊘ Skipped (internal/non-public): ${filename}`);
+      continue;
+    }
+
     const filepath = path.join(docsDir, filename);
     let content = fs.readFileSync(filepath, 'utf-8');
 
@@ -102,7 +124,6 @@ function main() {
     content = embedSvgDiagrams(content);
 
     const title = extractTitle(content);
-    const category = getCategoryFromFile(filename);
     const id = generateId(filename, title);
 
     const doc = {

@@ -576,6 +576,8 @@ Comprehensive inventory of all 58+ major features across Apparatus cybersecurity
   - Scenario control
   - API status monitoring
 
+<img src="/dashboard/assets/diagrams/diagram-11-interface-comparison.svg" alt="Interface comparison across web dashboard, CLI, terminal UI, and HTTP API capabilities." width="760" style="max-width: 100%; height: auto;" />
+
 ---
 
 ## CLI APPLICATION

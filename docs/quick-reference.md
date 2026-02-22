@@ -1,7 +1,7 @@
 # Quick Reference Guide
 
 > 📚 **New to Apparatus?** Start with the [Documentation Navigator](NAVIGATOR.md) to find what you need.
-> 💡 **Visual Learner?** Check out [Visual Diagrams](diagrams.md) for system architecture flowcharts.
+> 💡 **Visual Learner?** Check the inline diagrams in [Architecture Guide](architecture.md) and [Dashboard Tutorial](tutorial-dashboard.md).
 
 ## Starting Everything
 
@@ -35,6 +35,12 @@ pnpm start
 | **VulnAPI** | http://localhost:5000 | Vulnerable REST API (450+ endpoints) |
 | **Apparatus Metrics** | http://localhost:8090/metrics | Prometheus metrics (Grafana-compatible) |
 | **Apparatus Docs** | http://localhost:8090/docs | Swagger API documentation |
+
+---
+
+## Learning Path At A Glance
+
+<img src="/dashboard/assets/diagrams/diagram-10-feature-adoption.svg" alt="Four-level feature adoption timeline from onboarding basics to advanced automation." width="760" style="max-width: 100%; height: auto;" />
 
 ---
 
