@@ -10,7 +10,7 @@ import {
 import { ApparatusClient } from '@apparatus/client';
 
 interface HealthState {
-  status: 'healthy' | 'unhealthy' | 'checking' | 'unknown';
+  status: 'healthy' | 'unhealthy' | 'degraded' | 'critical' | 'checking' | 'unknown';
   message?: string;
   latencyMs?: number;
   version?: string;

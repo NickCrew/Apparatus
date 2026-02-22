@@ -52,9 +52,9 @@ const config = {
         surface: colors.surface,
       },
       fontFamily: {
-        display: ['Rajdhani', 'system-ui', 'sans-serif'],
-        sans: ['Outfit', 'system-ui', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Menlo', 'monospace'],
+        display: ['Recursive', 'Rajdhani', 'system-ui', 'sans-serif'],
+        sans: ['Recursive', 'Outfit', 'system-ui', 'sans-serif'],
+        mono: ['Recursive', 'JetBrains Mono', 'Menlo', 'monospace'],
       },
       fontSize: {
         'display-lg': ['2.25rem', { lineHeight: '1.1', letterSpacing: '-0.01em', fontWeight: '600' }],
@@ -63,10 +63,12 @@ const config = {
         'label': ['0.6875rem', { lineHeight: '1', letterSpacing: '0.08em', fontWeight: '500' }],
       },
       boxShadow: {
-        'glow-primary': '0 0 20px -5px rgba(0, 240, 255, 0.5)',
+        'glow-primary': '0 0 20px -5px rgba(0, 196, 167, 0.5)',
         'glow-success': '0 0 20px -5px rgba(0, 255, 148, 0.5)',
-        'glow-danger': '0 0 20px -5px rgba(255, 0, 85, 0.5)',
-        'glow-sm': '0 0 10px -3px rgba(0, 240, 255, 0.3)',
+        'glow-warning': '0 0 20px -5px rgba(255, 184, 0, 0.5)',
+        'glow-danger': '0 0 20px -5px rgba(225, 29, 72, 0.5)',
+        'glow-info': '0 0 20px -5px rgba(0, 163, 255, 0.5)',
+        'glow-sm': '0 0 10px -3px rgba(0, 196, 167, 0.3)',
         'panel': '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.15)',
         'inner-glow': 'inset 0 1px 0 0 rgba(255, 255, 255, 0.03)',
       },

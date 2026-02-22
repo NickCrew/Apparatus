@@ -1,7 +1,7 @@
 import { useApparatus } from '../providers/ApparatusProvider';
 
 export interface HealthState {
-  status: 'healthy' | 'unhealthy' | 'checking' | 'unknown';
+  status: 'healthy' | 'unhealthy' | 'degraded' | 'critical' | 'checking' | 'unknown';
   message?: string;
   latencyMs?: number;
   version?: string;

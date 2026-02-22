@@ -3,7 +3,7 @@ import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { MainContent } from './components/layout/MainContent';
 import { ThemeProvider } from './theme/ThemeProvider';
-import { ApparatusProvider } from './providers/ApparatusProvider';
+import { ApparatusProvider, useApparatus } from './providers/ApparatusProvider';
 import { DocViewerProvider, useDocViewer } from './providers/DocViewerProvider';
 import { Overview } from './components/dashboard/Overview';
 import { ChaosConsole } from './components/dashboard/ChaosConsole';
@@ -23,6 +23,7 @@ import { SupplyChainConsole } from './components/dashboard/SupplyChainConsole';
 import { AutopilotConsole } from './components/dashboard/AutopilotConsole';
 import { GhostConsole } from './components/dashboard/GhostConsole';
 import { ListenersConsole } from './components/dashboard/ListenersConsole';
+import { IncidentTimeline } from './components/dashboard/IncidentTimeline';
 import { CommandPalette } from './components/layout/CommandPalette';
 import { HelpSearchModal } from './components/modals/HelpSearchModal';
 import { DocViewer } from './components/layout/DocViewer';
@@ -33,6 +34,14 @@ import { useState, useEffect } from 'react';
 function Layout() {
   const [helpModalOpen, setHelpModalOpen] = useState(false);
   const { selectedDocId, closeDoc } = useDocViewer();
+  const { health } = useApparatus();
+
+  // Geometric Morphing: Radius tightens as health degrades
+  const uiRadius = 
+    health.status === 'healthy' ? '8px' : 
+    health.status === 'degraded' ? '2px' : 
+    health.status === 'critical' || health.status === 'unhealthy' ? '0px' :
+    '6px'; // checking/unknown
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -48,7 +57,10 @@ function Layout() {
   }, []);
 
   return (
-    <div className="flex h-screen bg-neutral-950 text-neutral-100 font-sans antialiased selection:bg-primary-500/30 overflow-hidden">
+    <div 
+      className="flex h-screen bg-neutral-950 text-neutral-100 font-sans antialiased selection:bg-primary-500/30 overflow-hidden"
+      style={{ '--ui-radius': uiRadius } as React.CSSProperties}
+    >
       <CommandPalette />
       <HelpSearchModal
         open={helpModalOpen}
@@ -84,6 +96,7 @@ export default function App() {
               <Route path="/" element={<Layout />}>
                 <Route index element={<Overview />} />
                 <Route path="traffic" element={<TrafficConsole />} />
+                <Route path="timeline" element={<IncidentTimeline />} />
                 <Route path="defense" element={<DefenseConsole />} />
                 <Route path="deception" element={<DeceptionConsole />} />
                 <Route path="chaos" element={<ChaosConsole />} />
