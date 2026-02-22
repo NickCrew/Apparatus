@@ -1,8 +1,8 @@
-import { DragEvent, useCallback, useMemo, useState } from 'react';
+import { DragEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { Play, Plus, Save } from 'lucide-react';
 import { addEdge, ReactFlowInstance, useEdgesState, useNodesState, type Connection, type Edge } from 'reactflow';
 import { Button } from '../ui/Button';
-import { useScenarios, Scenario } from '../../hooks/useScenarios';
+import { useScenarios, Scenario, type ScenarioRunStatus } from '../../hooks/useScenarios';
 import { ScenarioBuilderCanvas } from '../scenarios/ScenarioBuilderCanvas';
 import { ScenarioBuilderConfigPanel } from '../scenarios/ScenarioBuilderConfigPanel';
 import { ScenarioBuilderPalette } from '../scenarios/ScenarioBuilderPalette';
@@ -33,9 +33,24 @@ const DEFAULT_SCENARIO: ScenarioBuilderPayload = {
 };
 
 const DND_MIME = 'application/apparatus-scenario-action';
+const RUN_STATUS_POLL_INTERVAL_MS = 1_500;
+const RUN_NODE_HIGHLIGHT_STYLES = {
+  running: {
+    borderColor: 'rgba(56, 189, 248, 0.95)',
+    boxShadow: '0 0 0 2px rgba(56, 189, 248, 0.6), 0 0 28px rgba(56, 189, 248, 0.35)',
+  },
+  completed: {
+    borderColor: 'rgba(34, 197, 94, 0.95)',
+    boxShadow: '0 0 0 2px rgba(34, 197, 94, 0.6), 0 0 28px rgba(34, 197, 94, 0.35)',
+  },
+  failed: {
+    borderColor: 'rgba(244, 63, 94, 0.95)',
+    boxShadow: '0 0 0 2px rgba(244, 63, 94, 0.6), 0 0 28px rgba(244, 63, 94, 0.35)',
+  },
+} as const;
 
 export function ScenarioConsole() {
-  const { scenarios, saveScenario, runScenario, isLoading } = useScenarios();
+  const { scenarios, saveScenario, runScenario, getScenarioRunStatus, isLoading } = useScenarios();
   const initialGraph = useMemo(() => scenarioPayloadToGraph(DEFAULT_SCENARIO), []);
   const initialPayload = useMemo(
     () =>
@@ -54,6 +69,8 @@ export function ScenarioConsole() {
   const [scenarioDescription, setScenarioDescription] = useState(DEFAULT_SCENARIO.description ?? '');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [activeRunScenarioId, setActiveRunScenarioId] = useState<string | null>(null);
+  const [activeRunStatus, setActiveRunStatus] = useState<ScenarioRunStatus | null>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance<ScenarioBuilderNodeData> | null>(null);
   const [baselineSnapshot, setBaselineSnapshot] = useState(() =>
     createScenarioSnapshot(initialPayload, initialGraph.edges)
@@ -82,6 +99,20 @@ export function ScenarioConsole() {
     if (!selectedNodeData) return [];
     return validateNodeParameters(selectedNodeData.action, selectedNodeData.params, selectedNodeData.delayMs);
   }, [selectedNodeData]);
+  const runtimeDecoratedNodes = useMemo(() => {
+    if (!activeRunStatus?.currentStepId) return nodes;
+    const highlight = RUN_NODE_HIGHLIGHT_STYLES[activeRunStatus.status];
+    return nodes.map((node) => {
+      if (node.id !== activeRunStatus.currentStepId) return node;
+      return {
+        ...node,
+        style: {
+          ...node.style,
+          ...highlight,
+        },
+      };
+    });
+  }, [nodes, activeRunStatus]);
 
   const flowValidationErrors = useMemo(() => validateScenarioGraph(nodes, edges), [edges, nodes]);
   const paramValidationErrors = useMemo(() => validateScenarioNodeParams(nodes), [nodes]);
@@ -111,6 +142,8 @@ export function ScenarioConsole() {
     setNodes(args.nodes);
     setEdges(args.edges);
     setBaselineSnapshot(createScenarioSnapshot(args.payload, args.edges));
+    setActiveRunScenarioId(null);
+    setActiveRunStatus(null);
     setError(null);
     setSuccess(null);
   }, [setEdges, setNodes]);
@@ -167,13 +200,22 @@ export function ScenarioConsole() {
     setError(null);
     setSuccess(null);
     try {
-      await runScenario(id);
-      setSuccess('Scenario started! Monitor logs for progress.');
+      const start = await runScenario(id);
+      const scenarioNameFromLibrary = scenarios.find((scenario) => scenario.id === id)?.name ?? scenarioName;
+      setActiveRunScenarioId(id);
+      setActiveRunStatus({
+        executionId: start.executionId,
+        scenarioId: id,
+        scenarioName: scenarioNameFromLibrary,
+        status: 'running',
+        startedAt: new Date().toISOString(),
+      });
+      setSuccess(`Scenario started (${start.executionId}). Tracking execution graph.`);
     } catch (runError) {
       console.error(runError);
       setError('Failed to start scenario.');
     }
-  }, [runScenario]);
+  }, [runScenario, scenarioName, scenarios]);
 
   const handleRunSelected = useCallback(() => {
     if (!selectedId) {
@@ -327,6 +369,58 @@ export function ScenarioConsole() {
     [addNode, reactFlowInstance]
   );
 
+  useEffect(() => {
+    if (!activeRunScenarioId || !activeRunStatus || activeRunStatus.status !== 'running') return;
+    const { executionId } = activeRunStatus;
+
+    let isStopped = false;
+    const pollRunStatus = async () => {
+      try {
+        const nextStatus = await getScenarioRunStatus(activeRunScenarioId, executionId);
+        if (!isStopped) {
+          setActiveRunStatus(nextStatus);
+        }
+      } catch (pollError) {
+        console.error(pollError);
+        if (isStopped) return;
+        setActiveRunStatus((current) =>
+          current
+            ? {
+                ...current,
+                status: 'failed',
+                error: 'Status polling failed before execution reached a terminal state.',
+              }
+            : current
+        );
+      }
+    };
+
+    void pollRunStatus();
+    const pollTimer = window.setInterval(() => {
+      void pollRunStatus();
+    }, RUN_STATUS_POLL_INTERVAL_MS);
+
+    return () => {
+      isStopped = true;
+      window.clearInterval(pollTimer);
+    };
+  }, [activeRunScenarioId, activeRunStatus?.executionId, activeRunStatus?.status, getScenarioRunStatus]);
+
+  useEffect(() => {
+    if (!activeRunStatus || activeRunStatus.status === 'running') return;
+    if (activeRunStatus.status === 'completed') {
+      setSuccess(
+        `Scenario completed (${activeRunStatus.executionId})${activeRunStatus.currentStepId ? ` at ${activeRunStatus.currentStepId}` : ''}.`
+      );
+      return;
+    }
+    setError(
+      activeRunStatus.error
+        ? `Scenario failed (${activeRunStatus.executionId}): ${activeRunStatus.error}`
+        : `Scenario failed (${activeRunStatus.executionId}).`
+    );
+  }, [activeRunStatus]);
+
   return (
     <div className="space-y-6 animate-in fade-in duration-500 h-[calc(100vh-140px)] flex flex-col">
       <div>
@@ -360,6 +454,25 @@ export function ScenarioConsole() {
       </div>
       {!selectedId && <div className="text-[11px] text-neutral-500 font-mono">Save and select a scenario from the library to enable running.</div>}
       {hasUnsavedChanges && <div className="text-[11px] text-warning-400 font-mono">Unsaved changes in builder.</div>}
+      {activeRunStatus && (
+        <div
+          role={activeRunStatus.status === 'failed' ? 'alert' : 'status'}
+          aria-live={activeRunStatus.status === 'running' ? 'polite' : 'assertive'}
+          className={
+            activeRunStatus.status === 'failed'
+              ? 'text-[11px] text-danger-300 font-mono bg-danger-900/20 p-2 rounded border border-danger-900/50'
+              : activeRunStatus.status === 'completed'
+                ? 'text-[11px] text-success-300 font-mono bg-success-900/20 p-2 rounded border border-success-900/50'
+                : 'text-[11px] text-primary-300 font-mono bg-primary-900/20 p-2 rounded border border-primary-900/50'
+          }
+        >
+          <div>
+            Execution `{activeRunStatus.executionId}` for {activeRunStatus.scenarioName}: {activeRunStatus.status}
+          </div>
+          {activeRunStatus.currentStepId && <div>Current step: {activeRunStatus.currentStepId}</div>}
+          {activeRunStatus.error && <div>Error: {activeRunStatus.error}</div>}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 flex-1 min-h-0">
         <ScenarioBuilderPalette
@@ -371,7 +484,7 @@ export function ScenarioConsole() {
           onPaletteDragStart={handlePaletteDragStart}
         />
         <ScenarioBuilderCanvas
-          nodes={nodes}
+          nodes={runtimeDecoratedNodes}
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}

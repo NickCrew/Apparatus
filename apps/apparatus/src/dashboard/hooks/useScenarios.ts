@@ -16,6 +16,25 @@ export interface Scenario {
     createdAt: string;
 }
 
+export type ScenarioRunState = 'running' | 'completed' | 'failed';
+
+export interface ScenarioRunStartResponse {
+  status: 'started';
+  executionId: string;
+  message: string;
+}
+
+export interface ScenarioRunStatus {
+  executionId: string;
+  scenarioId: string;
+  scenarioName: string;
+  status: ScenarioRunState;
+  startedAt: string;
+  finishedAt?: string;
+  currentStepId?: string;
+  error?: string;
+}
+
 export function useScenarios() {
   const { baseUrl } = useApparatus();
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
@@ -67,8 +86,23 @@ export function useScenarios() {
     if (!res.ok) {
       throw new Error(`Failed to run scenario (${res.status})`);
     }
-    // In a real app, we'd subscribe to progress updates
+    return (await res.json()) as ScenarioRunStartResponse;
   }, [baseUrl]);
+
+  const getScenarioRunStatus = useCallback(
+    async (scenarioId: string, executionId?: string) => {
+      if (!baseUrl) {
+        throw new Error('Scenario API base URL is unavailable.');
+      }
+      const query = executionId ? `?executionId=${encodeURIComponent(executionId)}` : '';
+      const res = await fetch(`${baseUrl}/scenarios/${scenarioId}/status${query}`);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch scenario status (${res.status})`);
+      }
+      return (await res.json()) as ScenarioRunStatus;
+    },
+    [baseUrl]
+  );
 
   useEffect(() => {
     fetchScenarios();
@@ -78,6 +112,7 @@ export function useScenarios() {
     scenarios,
     saveScenario,
     runScenario,
+    getScenarioRunStatus,
     isLoading
   };
 }
