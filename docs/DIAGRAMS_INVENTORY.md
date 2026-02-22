@@ -1,146 +1,29 @@
 # Documentation Diagrams Inventory
 
-A comprehensive catalog of all ASCII diagrams included in tutorials, plus sections that would benefit from visual enhancements (Mermaid, flowcharts, etc.).
+Catalog of tutorial diagrams, with conversion status from ASCII to Mermaid-rendered SVG assets.
 
 ---
 
-## 📊 ASCII Diagrams Currently Included
+## Completed Mermaid Replacements
 
-### **tutorial-attacker-fingerprinting.md** (2 diagrams)
+All ASCII instances previously tracked in this file have been replaced with Mermaid diagram images in the relevant docs.
 
-#### Diagram 1: Attacker Fingerprinting Console Layout (Line 69)
-```
-┌─ Attacker Fingerprinting Console ──────────────────┐
-│ Search, filters, list view, and detailed profile   │
-└───────────────────────────────────────────────────────┘
-```
-**Purpose:** Shows UI structure of main console
-**Shows:** Two-pane layout (list + detail)
-**Type:** UI mockup
-
-#### Diagram 2: Attacker Profile Card (Line 193)
-```
-┌─ Attacker Profile ──────────────────────────────┐
-│ Risk score, category, protocol heatmap, actions │
-└──────────────────────────────────────────────────┘
-```
-**Purpose:** Shows detailed attacker information structure
-**Shows:** Protocol heatmap with bar graphs
-**Type:** UI mockup with bar chart
+| Status | Tutorial File | Replaced Section | Mermaid Source | Embedded SVG |
+|---|---|---|---|---|
+| ✅ | `tutorial-attacker-fingerprinting.md` | Attacker Fingerprinting Layout | `docs/assets/diagrams/diagram-12-fingerprint-layout.mmd` | `/dashboard/assets/diagrams/diagram-12-fingerprint-layout.svg` |
+| ✅ | `tutorial-attacker-fingerprinting.md` | Attacker Profile Card | `docs/assets/diagrams/diagram-13-attacker-profile-card.mmd` | `/dashboard/assets/diagrams/diagram-13-attacker-profile-card.svg` |
+| ✅ | `tutorial-chaos-console.md` | Chaos Console Layout | `docs/assets/diagrams/diagram-14-chaos-console-layout.mmd` | `/dashboard/assets/diagrams/diagram-14-chaos-console-layout.svg` |
+| ✅ | `tutorial-overview-dashboard.md` | Overview Dashboard Sections | `docs/assets/diagrams/diagram-15-overview-sections.mmd` | `/dashboard/assets/diagrams/diagram-15-overview-sections.svg` |
+| ✅ | `tutorial-scenario-builder.md` | Scenario Structure | `docs/assets/diagrams/diagram-16-scenario-structure.mmd` | `/dashboard/assets/diagrams/diagram-16-scenario-structure.svg` |
+| ✅ | `tutorial-advanced-red-team.md` | Campaign Phases Structure | `docs/assets/diagrams/diagram-17-campaign-phases.mmd` | `/dashboard/assets/diagrams/diagram-17-campaign-phases.svg` |
+| ✅ | `tutorial-dashboard.md` | Console Panel Structure | `docs/assets/diagrams/diagram-18-console-panel-structure.mmd` | `/dashboard/assets/diagrams/diagram-18-console-panel-structure.svg` |
 
 ---
 
-### **tutorial-chaos-console.md** (1 diagram)
+## Tutorials Without Legacy ASCII Blocks
 
-#### Diagram 3: Chaos Console Layout (Line 99)
-```
-┌─ CHAOS CONSOLE ──────────────────────────────┐
-│ CPU spike, memory spike, crash controls      │
-│ Status indicators, action history            │
-└──────────────────────────────────────────────┘
-```
-**Purpose:** Shows control panel structure
-**Shows:** All three chaos tools (CPU, memory, crash)
-**Type:** UI mockup
-
----
-
-### **tutorial-live-payload-fuzzer.md** (0 diagrams)
-
-**Note:** This tutorial references diagram `/dashboard/assets/diagrams/diagram-8-dashboard-layout.svg` but doesn't include ASCII art. Would benefit from:
-- Request builder form layout
-- Request flow diagram
-- Defense classification decision tree
-
----
-
-### **tutorial-overview-dashboard.md** (1 diagram)
-
-#### Diagram 4: Overview Dashboard Sections (Line 23)
-```
-┌─ OVERVIEW DASHBOARD ──────────────────────────────┐
-│ Pressure gauge, metrics, incident feed, protocols │
-└────────────────────────────────────────────────────┘
-```
-**Purpose:** Shows main dashboard sections
-**Shows:** 4 key areas (health, metrics, incidents, activity)
-**Type:** UI mockup
-
----
-
-### **tutorial-scenario-builder.md** (1 diagram)
-
-#### Diagram 5: Scenario Structure (Line 55)
-```
-Scenario:
-├─ Name
-├─ Steps: [Step 1, Step 2, Step 3, ...]
-│  ├─ Step 1: { ID, Action, Params, DelayAfter }
-│  ├─ Step 2: { ID, Action, Params, DelayAfter }
-│  └─ Step 3: { ID, Action, Params, DelayAfter }
-└─ Result: COMPLETED with findings
-```
-**Purpose:** Shows scenario data structure
-**Shows:** Hierarchical tree of scenario components
-**Type:** Data structure diagram
-
----
-
-### **tutorial-advanced-red-team.md** (1 diagram)
-
-#### Diagram 6: Campaign Phases Structure (Line 64)
-```
-Campaign: "Comprehensive Security Assessment"
-├─ Phase 1: Reconnaissance (5 min)
-├─ Phase 2: Exploit (15 min)
-├─ Phase 3: Persistence (10 min)
-├─ Phase 4: Escalation (10 min)
-└─ Phase 5: Analysis (10 min)
-```
-**Purpose:** Shows campaign phase breakdown
-**Shows:** Timeline and sequence of phases
-**Type:** Timeline/phases diagram
-
----
-
-### **tutorial-testing-lab.md** (0 diagrams)
-
-**Note:** Could benefit from several diagrams:
-- k6 test lifecycle
-- Nuclei scan workflow
-- Escape Artist channel validation flow
-- Multi-tool coordination diagram
-
----
-
-### **tutorial-chaos-console.md** (3+ decision trees/flows)
-
-**Note:** Has concepts that would benefit from flowcharts:
-- CPU spike recovery flowchart
-- Memory allocation strategy decision tree
-- Graceful degradation vs. crash flowchart
-
----
-
-### **tutorial-dashboard.md** (1 diagram)
-
-#### Diagram 7: Console Panel Structure (Line 211)
-```
-┌─────────────────────────────────────────┐
-│  HEADER: Console title + status         │
-├─────────────────────────────────────────┤
-│  CONTROLS: Buttons                      │
-├─────────────────────────────────────────┤
-│  FILTERS: Status, date range, search    │
-├─────────────────────────────────────────┤
-│  DATA AREA: Events, requests, logs      │
-└─────────────────────────────────────────┘
-```
-**Purpose:** Shows standard console layout
-**Shows:** Reusable panel structure
-**Type:** UI mockup
-
----
+- `tutorial-live-payload-fuzzer.md` (already referenced existing diagram assets)
+- `tutorial-testing-lab.md` (no legacy ASCII blocks recorded)
 
 ## 🎯 Sections NEEDING Diagrams (Priority Order)
 
