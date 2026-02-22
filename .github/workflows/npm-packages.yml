@@ -1,0 +1,77 @@
+name: Build NPM Packages
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/npm-packages.yml
+      - apps/apparatus/**
+      - apps/cli/**
+      - libs/client/**
+      - package.json
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+      - nx.json
+      - tsconfig.base.json
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/npm-packages.yml
+      - apps/apparatus/**
+      - apps/cli/**
+      - libs/client/**
+      - package.json
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+      - nx.json
+      - tsconfig.base.json
+  workflow_dispatch:
+
+concurrency:
+  group: npm-packages-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  packages:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build server, client, and CLI
+        run: pnpm nx run-many -t build --projects=apparatus,client,cli
+
+      - name: Pack npm artifacts
+        run: |
+          mkdir -p artifacts/npm
+          (cd apps/apparatus && npm pack --pack-destination ../../artifacts/npm)
+          (cd libs/client && npm pack --pack-destination ../../artifacts/npm)
+          (cd apps/cli && npm pack --pack-destination ../../artifacts/npm)
+          ls -lah artifacts/npm
+
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-packages-${{ github.sha }}
+          path: artifacts/npm/*.tgz
+          if-no-files-found: error
+          retention-days: 14

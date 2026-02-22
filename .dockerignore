@@ -1,0 +1,14 @@
+.git
+.github
+.agents
+backlog
+
+**/.DS_Store
+**/.env
+**/.env.*
+**/node_modules
+**/coverage
+**/dist
+**/dist-dashboard
+
+artifacts
