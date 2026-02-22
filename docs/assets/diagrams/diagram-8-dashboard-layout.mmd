@@ -1,0 +1,11 @@
+graph TB
+    header["📱 HEADER<br/>System Status · Search · Theme · Help"]
+    sidebar["📋 SIDEBAR<br/>• Autopilot<br/>• Defense<br/>• Traffic<br/>• Webhooks"]
+    main["📊 MAIN CONTENT<br/>Currently Selected Console<br/>Updates via SSE"]
+
+    header --> sidebar
+    sidebar -->|Click| main
+
+    style header fill:#16213e
+    style sidebar fill:#0f3460
+    style main fill:#1a1a2e

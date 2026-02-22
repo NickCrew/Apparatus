@@ -1,0 +1,29 @@
+graph TD
+    MTD["MTD<br/>First defense"]
+    SelfHealing["Self-Healing<br/>Load shedding"]
+    Deception["Deception<br/>Honeypot"]
+    Tarpit["Tarpit<br/>Slow response"]
+    Metrics["Metrics<br/>Timing"]
+    BodyParser["Body Parser<br/>JSON/form"]
+    WAF["Active Shield<br/>WAF"]
+    Handler["Route Handler<br/>Logic"]
+    SSE["SSE Broadcaster<br/>Real-time"]
+
+    MTD --> SelfHealing
+    SelfHealing --> Deception
+    Deception --> Tarpit
+    Tarpit --> Metrics
+    Metrics --> BodyParser
+    BodyParser --> WAF
+    WAF --> Handler
+    Handler --> SSE
+
+    style MTD fill:#ffcdd2
+    style SelfHealing fill:#fff9c4
+    style Deception fill:#c8e6c9
+    style Tarpit fill:#b3e5fc
+    style Metrics fill:#f8bbd0
+    style BodyParser fill:#ede7f6
+    style WAF fill:#fff9c4
+    style Handler fill:#c8e6c9
+    style SSE fill:#b3e5fc

@@ -55,25 +55,7 @@ Think of it as **your war room dashboard** — everything happens here in real-t
 
 ### The Layout
 
-```
-┌─────────────────────────────────────────────────────────┐
-│  HEADER (System status, search, help, theme toggle)    │
-├────────────────┬──────────────────────────────────────┤
-│                │                                        │
-│   SIDEBAR      │         MAIN CONTENT AREA             │
-│  (Consoles)    │      (Currently selected console)      │
-│                │                                        │
-│  • Autopilot   │  ┌─ Console Title                     │
-│  • Defense     │  ├─ Real-time data                    │
-│  • Traffic     │  ├─ Controls and filters              │
-│  • Webhooks    │  └─ Export/save options               │
-│  • Chaos       │                                        │
-│  • Scenarios   │  (Updates via SSE - live streaming)   │
-│  • Cluster     │                                        │
-│  • ... (more)  │                                        │
-│                │                                        │
-└────────────────┴──────────────────────────────────────┘
-```
+![Dashboard Layout](/dashboard/assets/diagrams/diagram-8-dashboard-layout.svg)
 
 ### Try It: Open the Dashboard
 
