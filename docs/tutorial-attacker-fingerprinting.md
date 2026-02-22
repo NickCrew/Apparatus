@@ -65,32 +65,7 @@ Think of it as your **SOC (Security Operations Center) dashboard** — a central
 
 ### The Attacker Fingerprinting Layout
 
-```
-┌─ Attacker Fingerprinting Console ──────────────────┐
-│                                                     │
-│ Search: [______] Filter: [Risk ↓] [Category ↓]    │
-│                                                     │
-│ Attackers List:                  Attacker Profile: │
-│ ┌──────────────────────┐        ┌────────────────┐│
-│ │ IP Address │ Risk    │        │ IP: 192.168.1.││
-│ │ 192.168.1.1│ 🔴 85   │        │ Risk: 85/100   ││
-│ │ 10.0.0.50  │ 🟡 42   │   --→  │ Category: EXT  ││
-│ │ 172.16.0.1 │ 🟢 12   │        │ Last Seen: 2min││
-│ │ ...        │ ...     │        │                ││
-│ └──────────────────────┘        │ Protocols Used:││
-│                                  │ HTTP: 95 req   ││
-│                                  │ DNS: 12 req    ││
-│                                  │ TCP: 8 conn    ││
-│                                  │                ││
-│                                  │ Actions:       ││
-│                                  │ [Tarpit]       ││
-│                                  │ [Blackhole]    ││
-│                                  │ [Release]      ││
-│                                  │ [Details...]   ││
-│                                  └────────────────┘│
-│                                                     │
-└─────────────────────────────────────────────────────┘
-```
+<img src="/dashboard/assets/diagrams/diagram-12-fingerprint-layout.svg" alt="Attacker Fingerprinting console layout showing controls, attacker list, profile details, protocol heatmap, and response actions." width="940" style="max-width: 100%; height: auto;" />
 
 ### Checkpoint
 
@@ -189,42 +164,7 @@ Each IP is classified into a category:
 
 When you click on an IP in the Attackers List, you see a detailed **profile** showing:
 
-```
-┌─ Attacker Profile ──────────────────────────────┐
-│                                                  │
-│ IP Address: 192.168.1.50                        │
-│ Risk Score: 85/100 🔴 CRITICAL                 │
-│ Category: Unknown External                      │
-│ First Seen: 2026-02-22 14:30:15                │
-│ Last Seen: 2026-02-22 14:47:33 (2 min ago)    │
-│ Total Requests: 1,247                          │
-│ Requests Blocked: 1,208 (96.9%)                │
-│ Success Rate: 3.1%                             │
-│                                                  │
-│ Protocol Heatmap:                               │
-│ ┌─────────────────────────────────────────────┐│
-│ │ HTTP    ████████████████░░░  95%  1100 reqs││
-│ │ HTTPS   ██████░░░░░░░░░░░░░░  12%   140 reqs││
-│ │ TCP     ██░░░░░░░░░░░░░░░░░░   2%    20 reqs││
-│ │ DNS     █░░░░░░░░░░░░░░░░░░░   1%     7 reqs││
-│ └─────────────────────────────────────────────┘│
-│                                                  │
-│ Attack Types Detected:                          │
-│ ✓ XSS attempts: 412                            │
-│ ✓ SQLi attempts: 380                           │
-│ ✓ Path Traversal: 198                          │
-│ ✓ Command Injection: 165                       │
-│ ✓ Other: 92                                    │
-│                                                  │
-│ Actions Taken:                                  │
-│ - Tarpit (slowed responses): 47s cumulative    │
-│ - Blocked requests: 1,208                      │
-│ - Last action: Tarpit (5 min ago)             │
-│                                                  │
-│ [Tarpit] [Blackhole] [Release] [Details...]    │
-│                                                  │
-└──────────────────────────────────────────────────┘
-```
+<img src="/dashboard/assets/diagrams/diagram-13-attacker-profile-card.svg" alt="Attacker profile card flow showing identity, risk summary, protocol distribution, attack type breakdown, and response history." width="940" style="max-width: 100%; height: auto;" />
 
 ### Interpreting the Heatmap
 

@@ -59,19 +59,7 @@ A **campaign** is a **coordinated series of attacks** designed to:
 
 ### Campaign Structure
 
-```
-Campaign: "Comprehensive Security Assessment"
-├─ Phase 1: Reconnaissance (5 min)
-│  └─ Probe endpoints, identify attack surface
-├─ Phase 2: Exploit (15 min)
-│  └─ Test payloads across vectors (XSS, SQLi, etc.)
-├─ Phase 3: Persistence (10 min)
-│  └─ Test auth bypass, token manipulation
-├─ Phase 4: Escalation (10 min)
-│  └─ Trigger chaos, test under stress
-└─ Phase 5: Analysis (10 min)
-   └─ Correlate findings, measure effectiveness
-```
+<img src="/dashboard/assets/diagrams/diagram-17-campaign-phases.svg" alt="Five-phase attack campaign sequence from reconnaissance through analysis with time estimates." width="940" style="max-width: 100%; height: auto;" />
 
 ---
 

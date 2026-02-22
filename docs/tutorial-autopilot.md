@@ -65,6 +65,8 @@ Attack Tool #2 (e.g., CPU spike)
 Generate Report
 ```
 
+<img src="/dashboard/assets/diagrams/diagram-4-autopilot-loop.svg" alt="Autopilot control loop covering evaluate, select, execute, record, and stop/continue decision." width="940" style="max-width: 100%; height: auto;" />
+
 ### Key Concepts
 
 | Term | Meaning |

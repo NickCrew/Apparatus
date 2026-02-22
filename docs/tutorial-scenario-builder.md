@@ -59,30 +59,7 @@ Think of it as a **test script** or **attack playbook** — recipes for testing 
 
 Every scenario has:
 
-```
-Scenario:
-├─ Name: "Stress Test Attack"
-├─ Steps: [Step 1, Step 2, Step 3, ...]
-│  ├─ Step 1:
-│  │  ├─ ID: "1"
-│  │  ├─ Action: "cluster.attack"
-│  │  ├─ Params: { target, rate, duration }
-│  │  └─ DelayAfter: 2000 ms
-│  │
-│  ├─ Step 2:
-│  │  ├─ ID: "2"
-│  │  ├─ Action: "delay"
-│  │  ├─ Params: { duration: 5000 }
-│  │  └─ DelayAfter: 0 ms
-│  │
-│  └─ Step 3:
-│     ├─ ID: "3"
-│     ├─ Action: "chaos.cpu"
-│     ├─ Params: { duration: 10000 }
-│     └─ DelayAfter: 0 ms
-│
-└─ Result: COMPLETED with findings
-```
+<img src="/dashboard/assets/diagrams/diagram-16-scenario-structure.svg" alt="Scenario structure showing metadata, ordered steps with action and parameters, and final execution result." width="940" style="max-width: 100%; height: auto;" />
 
 ### Scenario Limits
 

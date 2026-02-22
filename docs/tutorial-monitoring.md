@@ -50,7 +50,7 @@ By the end, you'll have:
 
 ### Apparatus Monitoring Architecture
 
-![Monitoring Architecture](/dashboard/assets/diagrams/diagram-7-monitoring.svg)
+<img src="/dashboard/assets/diagrams/diagram-7-monitoring.svg" alt="Monitoring architecture across SSE, Prometheus metrics, logs, dashboards, and analysis tools." width="680" style="max-width: 100%; height: auto;" />
 
 ### Metrics Apparatus Tracks
 

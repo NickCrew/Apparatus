@@ -55,7 +55,7 @@ Think of it as **your war room dashboard** — everything happens here in real-t
 
 ### The Layout
 
-![Dashboard Layout](/dashboard/assets/diagrams/diagram-8-dashboard-layout.svg)
+<img src="/dashboard/assets/diagrams/diagram-8-dashboard-layout.svg" alt="Dashboard layout showing header, sidebar navigation, and main console workspace." width="680" style="max-width: 100%; height: auto;" />
 
 ### Try It: Open the Dashboard
 
@@ -207,22 +207,7 @@ Notice how **console state is preserved** — when you return to Autopilot, your
 
 Every console has these elements:
 
-```
-┌─────────────────────────────────────────┐
-│  HEADER: Console title + status         │
-├─────────────────────────────────────────┤
-│  CONTROLS: Buttons (Start, Stop, Clear) │
-├─────────────────────────────────────────┤
-│  FILTERS: Status, date range, search    │
-├─────────────────────────────────────────┤
-│                                         │
-│  DATA AREA: Events, requests, logs      │
-│  (Updates in real-time via SSE)         │
-│                                         │
-├─────────────────────────────────────────┤
-│  EXPORT: Download as JSON/CSV           │
-└─────────────────────────────────────────┘
-```
+<img src="/dashboard/assets/diagrams/diagram-18-console-panel-structure.svg" alt="Standard console panel structure showing header, controls, filters, data area, and export section." width="940" style="max-width: 100%; height: auto;" />
 
 ### Checkpoint
 

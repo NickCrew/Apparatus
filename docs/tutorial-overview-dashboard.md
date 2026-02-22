@@ -45,48 +45,7 @@ Think of it as your **24/7 monitoring console** — a single pane of glass to un
 
 ### Main Sections
 
-```
-┌─ OVERVIEW DASHBOARD ──────────────────────────────┐
-│                                                    │
-│ [System Health]  [Real-Time Metrics]  [Status]   │
-│ ┌────────────────────────────────────────────────┐│
-│ │  PRESSURE GAUGE: 🟢 STABLE                     ││
-│ │  Uptime: 3h 45m | Memory: 285 MB | Lag: 12ms  ││
-│ └────────────────────────────────────────────────┘│
-│                                                    │
-│ [KEY METRICS]                                      │
-│ ┌──────────────┬──────────────┬──────────────┐   │
-│ │ Throughput   │ Error Rate   │ Latency      │   │
-│ │ 145 RPS      │ 2.3%         │ avg 87ms     │   │
-│ │ ↑ Normal     │ ↓ Decreasing │ ↑ Rising     │   │
-│ └──────────────┴──────────────┴──────────────┘   │
-│                                                    │
-│ [PROTOCOL ACTIVITY]                               │
-│ ┌────────────────────────────────────────────────┐│
-│ │ HTTP   ████████████ 120 active                 ││
-│ │ HTTPS  ███ 35 active                           ││
-│ │ gRPC   ██ 12 active                            ││
-│ │ WebSocket █ 8 active                           ││
-│ └────────────────────────────────────────────────┘│
-│                                                    │
-│ [INCIDENT FEED]                                   │
-│ ┌────────────────────────────────────────────────┐│
-│ │ 14:32 🔴 [CRITICAL] Defense block triggered   ││
-│ │       192.168.1.50 (unknown_external)        ││
-│ │       412 XSS attempts in 30s                 ││
-│ │                                                ││
-│ │ 14:31 🟡 [WARNING] High latency detected       ││
-│ │       Avg response time: 850ms (>350ms)     ││
-│ │                                                ││
-│ │ 14:30 🟢 [INFO] Traffic normal                 ││
-│ │       145 requests/sec, 2.3% error rate      ││
-│ │                                                ││
-│ │ 14:25 🔴 [CRITICAL] Chaos event detected      ││
-│ │       CPU spike active (5000ms duration)     ││
-│ └────────────────────────────────────────────────┘│
-│                                                    │
-└────────────────────────────────────────────────────┘
-```
+<img src="/dashboard/assets/diagrams/diagram-15-overview-sections.svg" alt="Overview dashboard section map showing pressure gauge, key metrics, protocol activity, and incident feed." width="940" style="max-width: 100%; height: auto;" />
 
 ### Try It: Open the Overview
 

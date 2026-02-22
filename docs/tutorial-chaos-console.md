@@ -95,32 +95,7 @@ By the end, you'll be able to:
 
 ### The Chaos Console Layout
 
-```
-┌─ CHAOS CONSOLE ──────────────────────────────┐
-│                                               │
-│ ⚠️  WARNING: These tools cause system stress │
-│                                               │
-│ [CPU SPIKE]                                  │
-│ Duration: [5000]ms (250-120000)             │
-│ [Trigger 5s Spike] [Trigger 15s Spike]      │
-│ Status: ○ idle                              │
-│                                               │
-│ [MEMORY SPIKE]                               │
-│ Action: [allocate ▼]  Amount: [256]MB      │
-│ [Allocate] [Clear All]                      │
-│ Currently Allocated: 0 MB                    │
-│                                               │
-│ [PROCESS CRASH]                              │
-│ ⚠️  Will restart with supervisor             │
-│ [Trigger Graceful Crash]                    │
-│                                               │
-│ [RECENT ACTIONS]                             │
-│ - 14:32 CPU spike 5s triggered              │
-│ - 14:31 Memory 256MB allocated              │
-│ - 14:28 Memory cleared                      │
-│                                               │
-└───────────────────────────────────────────────┘
-```
+<img src="/dashboard/assets/diagrams/diagram-14-chaos-console-layout.svg" alt="Chaos console layout showing safety warning, CPU controls, memory controls, crash controls, and recent action history." width="940" style="max-width: 100%; height: auto;" />
 
 ### Checkpoint
 
