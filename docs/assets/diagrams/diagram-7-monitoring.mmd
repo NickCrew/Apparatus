@@ -1,0 +1,20 @@
+graph TD
+    Apparatus["🖥️ APPARATUS SERVER<br/>Event Generation"]
+
+    Apparatus -->|Attacks, Blocks,<br/>Findings| Events["📤 EVENT GENERATION"]
+
+    Events --> SSE["📡 SSE Stream<br/>(Real-time)"]
+    Events --> Prometheus["📊 Prometheus Metrics<br/>(Counters & Histograms)"]
+    Events --> Logs["📝 Log Files<br/>(Archive)"]
+
+    SSE --> Browser["🌐 Browser Dashboard<br/>Real-time visualization"]
+    Prometheus --> Grafana["📈 Grafana Dashboard<br/>Historical trends"]
+    Logs --> ELK["🔍 ELK/Splunk<br/>Log analysis"]
+
+    style Apparatus fill:#fff9c4
+    style SSE fill:#c8e6c9
+    style Prometheus fill:#b3e5fc
+    style Logs fill:#f8bbd0
+    style Browser fill:#c8e6c9
+    style Grafana fill:#b3e5fc
+    style ELK fill:#f8bbd0

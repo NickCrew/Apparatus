@@ -50,20 +50,7 @@ By the end, you'll have:
 
 ### Apparatus Monitoring Architecture
 
-```
-Apparatus Server
-     ↓
-[Event Generation]
-(attacks, blocks, findings)
-     ↓
-┌────────────┬──────────┬──────────┐
-│   SSE      │ Prometheus│ Log Files│
-│ (Real-time)│(Metrics)  │(Archive) │
-└────────────┴──────────┴──────────┘
-     ↓           ↓           ↓
-  Browser      Grafana    Splunk
-  Dashboard   Dashboard   ELK Stack
-```
+![Monitoring Architecture](/dashboard/assets/diagrams/diagram-7-monitoring.svg)
 
 ### Metrics Apparatus Tracks
 

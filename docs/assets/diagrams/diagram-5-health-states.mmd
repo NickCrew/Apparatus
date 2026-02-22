@@ -1,0 +1,11 @@
+stateDiagram-v2
+    [*] --> Healthy
+
+    Healthy: 🟢 HEALTHY<br/>Event loop lag < 50ms<br/>All requests processed normally
+    Degraded: 🟡 DEGRADED<br/>Event loop lag 50-200ms<br/>Heavy routes shed traffic
+    Critical: 🔴 CRITICAL<br/>Event loop lag > 200ms<br/>All non-essential routes rejected
+
+    Healthy --> Degraded: lag exceeds 50ms
+    Degraded --> Critical: lag exceeds 200ms
+    Degraded --> Healthy: lag drops below 50ms
+    Critical --> Degraded: lag drops below 200ms

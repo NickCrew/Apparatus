@@ -33,7 +33,7 @@ import { tarpitMiddleware, tarpitListHandler, tarpitReleaseHandler, tarpitTrapHa
 import { blackholeAddHandler, blackholeListHandler, blackholeMiddleware, blackholeReleaseHandler } from "./blackhole.js";
 import { selfHealingMiddleware, getHealthStatus } from "./self-healing.js";
 import { deceptionHandler, deceptionHistoryHandler, deceptionClearHandler } from "./deception.js";
-import { redTeamValidateHandler } from "./redteam.js";
+import { redTeamFuzzerRunHandler, redTeamValidateHandler } from "./redteam.js";
 import { activeShieldMiddleware, sentinelHandler } from "./sentinel.js";
 import {
     ghostCreateHandler,
@@ -346,16 +346,31 @@ export function createApp(): Express {
 
     // Visual Dashboard - React App
     const dashboardPath = path.join(__dirname, "dist-dashboard");
-    app.use("/dashboard", express.static(dashboardPath));
+
+    // Serve static files with SVG MIME type support
+    app.use("/dashboard", express.static(dashboardPath, {
+        setHeaders: (res, path) => {
+            if (path.endsWith('.svg')) {
+                res.setHeader('Content-Type', 'image/svg+xml');
+            }
+        }
+    }));
+
     app.get("/autopilot", (_req, res) => res.redirect("/dashboard/autopilot"));
-    
+
     // SPA Fallback for Dashboard
     app.get("/dashboard/*", (_req, res) => {
         res.sendFile(path.join(dashboardPath, "index.html"));
     });
-    
+
     // Serve Static Assets
-    app.use("/assets", express.static(path.join(process.cwd(), "assets")));
+    app.use("/assets", express.static(path.join(process.cwd(), "assets"), {
+        setHeaders: (res, path) => {
+            if (path.endsWith('.svg')) {
+                res.setHeader('Content-Type', 'image/svg+xml');
+            }
+        }
+    }));
 
     // Debugging Tools
     app.get("/debug/jwt", jwtDebugHandler);
@@ -401,7 +416,8 @@ export function createApp(): Express {
     app.get("/cluster/members", (_req, res) => res.json(getClusterMembers()));
 
     // Advanced Defense & Offense
-    app.get("/redteam/validate", redTeamValidateHandler);
+    app.get("/redteam/validate", securityGate, redTeamValidateHandler);
+    app.post("/api/redteam/fuzzer/run", securityGate, redTeamFuzzerRunHandler);
     app.get("/api/redteam/autopilot/config", securityGate, autopilotConfigHandler);
     app.post("/api/redteam/autopilot/start", securityGate, autopilotStartHandler);
     app.post("/api/redteam/autopilot/stop", securityGate, autopilotStopHandler);

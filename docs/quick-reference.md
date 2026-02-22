@@ -1,5 +1,8 @@
 # Quick Reference Guide
 
+> 📚 **New to Apparatus?** Start with the [Documentation Navigator](NAVIGATOR.md) to find what you need.
+> 💡 **Visual Learner?** Check out [Visual Diagrams](diagrams.md) for system architecture flowcharts.
+
 ## Starting Everything
 
 ### Full Lab (Apparatus + VulnLab)

@@ -1,0 +1,15 @@
+graph TB
+    subgraph network["🐳 Docker Network: security-lab (172.25.0.0/16)"]
+        apparatus["🖥️ Apparatus<br/>Port 8090, 8443, 50051"]
+        vulnweb["🎯 VulnWeb<br/>Port 3000"]
+        vulnapi["🎯 VulnAPI<br/>Port 5000"]
+
+        apparatus -->|http://vuln-web:3000| vulnweb
+        apparatus -->|http://vuln-api:5000| vulnapi
+        vulnweb -->|http://vuln-api:5000| vulnapi
+    end
+
+    style network fill:#e1f5ff
+    style apparatus fill:#fff9c4
+    style vulnweb fill:#f8bbd0
+    style vulnapi fill:#f8bbd0

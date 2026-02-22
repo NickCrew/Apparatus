@@ -1,0 +1,15 @@
+flowchart TD
+    User["🔐 Security Tester<br/>(Human or AI Agent)"]
+
+    User -->|HTTP/gRPC/WebSocket| Apparatus["🖥️ APPARATUS TESTING PLATFORM"]
+
+    Apparatus --> Servers["📡 11+ Protocol Servers<br/>HTTP/1.1, HTTP/2, gRPC, WS, etc."]
+    Servers --> Middleware["🔧 Middleware Stack<br/>MTD → Self-Healing → Deception → Tarpit → Metrics → WAF"]
+    Middleware --> Handlers["⚙️ Feature Handlers<br/>Red Team Tools · Chaos Engineering<br/>Network Tools · Security Testing<br/>Real-time Broadcast"]
+    Handlers --> Dashboards["📊 Dashboards<br/>Web Dashboard · Terminal UI · Metrics"]
+
+    Dashboards --> |Results| User
+
+    Apparatus --> VulnWeb["🎯 VulnWeb<br/>Port 3000"]
+    Apparatus --> VulnAPI["🎯 VulnAPI<br/>Port 5000"]
+    Apparatus --> External["🌐 External<br/>Targets"]

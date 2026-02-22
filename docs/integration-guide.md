@@ -2,6 +2,8 @@
 
 This guide explains how Apparatus and VulnLab work together as a complete security testing ecosystem.
 
+> 💡 **Visual Reference:** See [Visual Diagrams](diagrams.md#3-docker-compose-network-topology) for the network topology.
+
 ## Overview
 
 **Apparatus** and **VulnLab** are two separate monorepos designed to work together:
@@ -36,23 +38,7 @@ Services will be available at:
 
 ### Docker Compose Network
 
-```
-┌─────────────────────────────────┐
-│   Docker Network (security-lab) │
-├─────────────────────────────────┤
-│                                 │
-│  ┌─────────┐  ┌─────────────┐  │
-│  │Apparatus├─→│  VulnWeb    │  │
-│  └─────────┘  └──────┬──────┘  │
-│       │               │         │
-│       └──────┬────────┘         │
-│              │                  │
-│         ┌────▼─────┐            │
-│         │ VulnAPI  │            │
-│         └──────────┘            │
-│                                 │
-└─────────────────────────────────┘
-```
+![Docker Compose Network](/dashboard/assets/diagrams/diagram-3-network.svg)
 
 All containers run on isolated network `security-lab`:
 - **Apparatus** can reach VulnWeb at `http://vuln-web:3000`

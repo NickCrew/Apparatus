@@ -1,0 +1,26 @@
+graph LR
+    Apparatus["🖥️ APPARATUS"]
+
+    Apparatus --> HTTP1["HTTP/1.1 Server<br/>:8090"]
+    Apparatus --> HTTP2["HTTP/2 TLS Server<br/>:8443"]
+    Apparatus --> h2c["HTTP/2 Cleartext<br/>:8091"]
+    Apparatus --> gRPC["gRPC Server<br/>:50051"]
+    Apparatus --> WS["WebSocket<br/>/ws on :8090"]
+    Apparatus --> Redis["Redis Mock<br/>:6379"]
+    Apparatus --> MQTT["MQTT Server<br/>:1883"]
+    Apparatus --> SMTP["SMTP Server<br/>:2525"]
+    Apparatus --> TCP["TCP Echo<br/>:9000"]
+    Apparatus --> UDP["UDP Echo<br/>:9001"]
+    Apparatus --> Syslog["Syslog Sink<br/>:5140, :5514"]
+
+    style HTTP1 fill:#bbdefb
+    style HTTP2 fill:#bbdefb
+    style h2c fill:#bbdefb
+    style gRPC fill:#c5e1a5
+    style WS fill:#f8bbd0
+    style Redis fill:#ffccbc
+    style MQTT fill:#ffccbc
+    style SMTP fill:#ffccbc
+    style TCP fill:#ffe0b2
+    style UDP fill:#ffe0b2
+    style Syslog fill:#e1bee7

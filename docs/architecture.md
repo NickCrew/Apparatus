@@ -1,5 +1,7 @@
 # Architecture Guide
 
+> 💡 **Visual Learners:** See [diagrams.md](diagrams.md) for Mermaid flowcharts and interactive versions of all architecture diagrams below.
+
 ## Repository Structure
 
 Apparatus is designed to work alongside VulnLab as a complete security testing ecosystem:
@@ -51,123 +53,27 @@ Apparatus is designed to work alongside VulnLab as a complete security testing e
 
 ### High-Level Data Flow
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Security Tester                          │
-│                  (Human or AI Agent)                        │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-                     │ HTTP/gRPC/WebSocket
-                     ▼
-    ┌────────────────────────────────────────┐
-    │    APPARATUS TESTING PLATFORM          │
-    │                                        │
-    │  ┌──────────────────────────────────┐  │
-    │  │   11+ Protocol Servers           │  │
-    │  │ HTTP/1.1, HTTP/2, gRPC, WS, etc │  │
-    │  └──────────┬───────────────────────┘  │
-    │             │                          │
-    │  ┌──────────▼───────────────────────┐  │
-    │  │   Middleware Stack               │  │
-    │  │ 1. MTD (polymorphic routing)     │  │
-    │  │ 2. Self-healing (load shedding)  │  │
-    │  │ 3. Deception (honeypot)          │  │
-    │  │ 4. Tarpit (slow trap)            │  │
-    │  │ 5. Metrics collection            │  │
-    │  │ 6. Body parsing & WAF            │  │
-    │  └──────────┬───────────────────────┘  │
-    │             │                          │
-    │  ┌──────────▼───────────────────────┐  │
-    │  │   Feature Handlers               │  │
-    │  │ - Red Team Tools                 │  │
-    │  │ - Chaos Engineering              │  │
-    │  │ - Network Tools                  │  │
-    │  │ - Security Testing               │  │
-    │  │ - Real-time Broadcast (SSE)      │  │
-    │  └──────────┬───────────────────────┘  │
-    │             │                          │
-    │  ┌──────────▼───────────────────────┐  │
-    │  │   Dashboards                     │  │
-    │  │ - Web Dashboard (React/Vite)     │  │
-    │  │ - Terminal UI (Blessed)          │  │
-    │  │ - Metrics (Prometheus)           │  │
-    │  └──────────────────────────────────┘  │
-    └────────────────┬───────────────────────┘
-                     │
-         ┌───────────┼───────────┐
-         │           │           │
-         ▼           ▼           ▼
-    ┌─────────┐ ┌─────────┐ ┌──────────┐
-    │ VulnWeb │ │ VulnAPI │ │ External │
-    │         │ │         │ │ Targets  │
-    │ (3000)  │ │ (5000)  │ │          │
-    └─────────┘ └─────────┘ └──────────┘
-```
+**Visual diagram:** [See diagram #1 in diagrams.md](diagrams.md#1-high-level-data-flow)
+
+Security testers send requests through multiple protocol servers into the Apparatus platform, which processes them through a middleware stack before executing feature handlers and returning results via dashboards. The platform can target VulnWeb, VulnAPI, or external systems.
 
 ### Request Flow Through Middleware
 
-```
-Incoming Request
-       │
-       ▼
-┌─────────────────────────────┐
-│ 1. MTD Check                │ ← Verify polymorphic prefix
-└──────────┬──────────────────┘
-           │
-           ▼
-┌─────────────────────────────┐
-│ 2. Self-Healing Monitor     │ ← Measure event loop lag
-└──────────┬──────────────────┘
-           │
-           ▼
-┌─────────────────────────────┐
-│ 3. Deception Handler        │ ← Check honeypot paths
-│    /.env, /admin, /console  │
-└──────────┬──────────────────┘
-           │
-           ▼
-┌─────────────────────────────┐
-│ 4. Tarpit Middleware        │ ← Trap suspicious requests
-└──────────┬──────────────────┘
-           │
-           ▼
-┌─────────────────────────────┐
-│ 5. Metrics Timer Start      │ ← Begin latency measurement
-└──────────┬──────────────────┘
-           │
-           ▼
-┌─────────────────────────────┐
-│ 6. Body Parsing             │ ← Parse JSON/form/raw
-└──────────┬──────────────────┘
-           │
-           ▼
-┌─────────────────────────────┐
-│ 7. Active Shield (WAF)      │ ← Apply blocking rules
-└──────────┬──────────────────┘
-           │
-           ▼
-┌─────────────────────────────┐
-│ 8. Route Handler            │ ← Execute endpoint logic
-└──────────┬──────────────────┘
-           │
-           ▼
-┌─────────────────────────────┐
-│ 9. Response Generation      │
-└──────────┬──────────────────┘
-           │
-           ▼
-┌─────────────────────────────┐
-│ 10. Metrics Timer End       │ ← Record latency & status
-└──────────┬──────────────────┘
-           │
-           ▼
-┌─────────────────────────────┐
-│ 11. SSE Broadcast           │ ← Push to dashboard clients
-└──────────┬──────────────────┘
-           │
-           ▼
-        Response to Client
-```
+**Visual diagram:** [See diagram #2 in diagrams.md](diagrams.md#2-request-flow-through-middleware)
+
+Each request flows through **11 middleware stages in order:**
+
+1. **MTD Check** — Verify polymorphic prefix
+2. **Self-Healing Monitor** — Measure event loop lag
+3. **Deception Handler** — Check honeypot paths (/.env, /admin, /console)
+4. **Tarpit Middleware** — Trap suspicious requests
+5. **Metrics Timer Start** — Begin latency measurement
+6. **Body Parsing** — Parse JSON/form/raw
+7. **Active Shield (WAF)** — Apply blocking rules
+8. **Route Handler** — Execute endpoint logic
+9. **Response Generation** — Generate response
+10. **Metrics Timer End** — Record latency & status
+11. **SSE Broadcast** — Push to dashboard clients
 
 ---
 
@@ -346,31 +252,15 @@ const members = new Map<string, number>();
 
 ## Network Topology in Docker Compose
 
-```
-┌─────────────────────────────────────────┐
-│        Docker Network: security-lab     │
-│         (172.25.0.0/16)                 │
-├─────────────────────────────────────────┤
-│                                         │
-│  ┌───────────────┐  ┌──────────────┐   │
-│  │  Apparatus    │  │  VulnWeb     │   │
-│  │  Port 8090    │─→│  Port 3000   │   │
-│  │  Port 8443    │  │              │   │
-│  │  Port 50051   │  └──────┬───────┘   │
-│  └───────────────┘         │           │
-│                            │           │
-│                   ┌────────▼────────┐  │
-│                   │   VulnAPI       │  │
-│                   │   Port 5000     │  │
-│                   └─────────────────┘  │
-│                                         │
-│  Host Port Mapping:                     │
-│  localhost:8090  → apparatus:8090       │
-│  localhost:3000  → vuln-web:3000        │
-│  localhost:5000  → vuln-api:5000        │
-│                                         │
-└─────────────────────────────────────────┘
-```
+**Visual diagram:** [See diagram #3 in diagrams.md](diagrams.md#3-docker-compose-network-topology)
+
+All containers run on isolated network `security-lab` (172.25.0.0/16):
+
+| Component | Port(s) | Access |
+|-----------|---------|--------|
+| **Apparatus** | 8090, 8443, 50051 | Host: localhost:8090 |
+| **VulnWeb** | 3000 | Host: localhost:3000, Container: http://vuln-web:3000 |
+| **VulnAPI** | 5000 | Host: localhost:5000, Container: http://vuln-api:5000 |
 
 Services communicate via hostname (not localhost):
 - Apparatus → VulnWeb: `http://vuln-web:3000`
@@ -559,56 +449,28 @@ Potential enhancements:
 ## Reference Diagrams
 
 ### Scenario Execution Timeline
-```
-T0: POST /scenarios/{id}/run
-    └─ Return 202 + executionId
 
-T0+ε: Background thread starts
-    ├─ Load scenario steps
-    ├─ For each step:
-    │  ├─ Update status: currentStepId=X
-    │  ├─ Execute tool
-    │  ├─ Wait delayMs
-    │  └─ Broadcast progress via SSE
-    └─ Update status: completed/failed
+**Visual diagram:** [See diagram #5 in diagrams.md](diagrams.md#5-system-health-states)
 
-Tn: Client polls GET /scenarios/{id}/status?executionId=X
-    └─ Returns: status, currentStepId, error, finishedAt
-```
+**Execution flow:**
+1. **T0:** Client sends `POST /scenarios/{id}/run` → receives 202 Accepted with executionId
+2. **T0+ε:** Background thread loads and executes scenario steps asynchronously
+   - For each step: update status, execute tool, wait delayMs, broadcast SSE events
+   - Updates status: completed or failed
+3. **Tn:** Client polls `GET /scenarios/{id}/status?executionId=X` to get current status, step ID, errors, and finish time
 
 ### Red Team Autopilot Loop
-```
-Start Session
-    ↓
-┌─→ Evaluate Target State
-│   ├─ Send probe requests
-│   ├─ Analyze responses
-│   ├─ Assess system health
-│   └─ Identify weak points
-│   ↓
-├─→ Select Tool
-│   ├─ Consider previous findings
-│   ├─ Choose next action
-│   └─ With probability weighting
-│   ↓
-├─→ Execute Tool
-│   ├─ CPU spike / memory spike
-│   ├─ Cluster attack / MTD rotation
-│   ├─ Record metrics
-│   └─ Broadcast results
-│   ↓
-├─→ Wait Interval
-│   └─ configurable delay
-│   ↓
-├─→ Check Stop Signal
-│   └─ Max iterations reached?
-│   ↓
-└─ Continue? (Yes) ──────┘
-                │ (No)
-                ↓
-         Session Complete
-         Generate Report
-```
+
+**Visual diagram:** [See diagram #4 in diagrams.md](diagrams.md#4-red-team-autopilot-loop)
+
+**Autonomous agent loop:**
+1. **Evaluate Target State** — Send probes, analyze responses, assess health, identify weak points
+2. **Select Tool** — Consider previous findings, choose next action with probability weighting
+3. **Execute Tool** — CPU spike, memory spike, cluster attack, MTD rotation, etc.
+4. **Record & Broadcast** — Log metrics and push results via SSE to dashboards
+5. **Wait Interval** — Configurable delay between iterations
+6. **Check Stop Signal** — Has max iterations been reached?
+7. **Loop or Complete** — Continue (go back to step 1) or generate report and finish session
 
 ---
 

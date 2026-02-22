@@ -1,0 +1,198 @@
+# Apparatus Visual Architecture Diagrams
+
+This document contains **11 SVG diagrams** for all key architectural flows in Apparatus. These interactive diagrams supplement the text descriptions in the [Architecture Guide](architecture.md) and tutorials.
+
+## 📑 Quick Navigation
+
+| # | Diagram | Topic | Format |
+|---|---------|-------|--------|
+| 1 | **High-Level Data Flow** | How requests flow through platform | [→](#1-high-level-data-flow) |
+| 2 | **Request Flow Through Middleware** | 11-stage processing pipeline | [→](#2-request-flow-through-middleware) |
+| 3 | **Docker Compose Network** | Container networking topology | [→](#3-docker-compose-network-topology) |
+| 4 | **Red Team Autopilot Loop** | AI agent decision loop | [→](#4-red-team-autopilot-loop) |
+| 5 | **System Health States** | Self-healing state machine | [→](#5-system-health-states) |
+| 6 | **Protocol Servers** | All 11+ independent servers | [→](#6-protocol-server-architecture) |
+| 7 | **Monitoring Pillars** | Logs, metrics, traces | [→](#7-monitoring-architecture-logs-metrics-traces) |
+| 8 | **Dashboard Layout** | UI structure & navigation | [→](#8-dashboard-layout) |
+| 9 | **Middleware Dependencies** | Ordering and relationships | [→](#9-middleware-stack-dependencies) |
+| 10 | **Feature Adoption** | Learning path progression | [→](#10-feature-adoption-timeline) |
+| 11 | **Interface Comparison** | Web vs CLI vs TUI vs API | [→](#11-ttyconsole-feature-map) |
+
+---
+
+## 1. High-Level Data Flow
+
+Shows the flow from security testers through the Apparatus platform to target applications.
+
+![High-Level Data Flow](/dashboard/assets/diagrams/diagram-1-data-flow.svg)
+
+**Key Points:**
+- All requests flow through the middleware stack
+- Multiple protocol servers handle different client types
+- Results feed back to dashboards for real-time monitoring
+- Platform can target internal vulnerable apps or external systems
+
+---
+
+## 2. Request Flow Through Middleware
+
+Detailed sequential flow of how each request is processed through the 11-stage middleware stack.
+
+![Request Flow Through Middleware](/dashboard/assets/diagrams/diagram-2-middleware-flow.svg)
+
+**Critical Ordering:**
+- MTD must run first to prevent unauthorized access
+- Self-healing can reject traffic early if system is overloaded
+- Deception traps honeypot attempts before reaching real handlers
+- Tarpit holds attackers without consuming compute resources
+- Metrics wrap the entire flow for accurate timing
+- WAF applies before route handlers for early rejection
+- SSE last: broadcasts all events to connected clients
+
+---
+
+## 3. Docker Compose Network Topology
+
+Network architecture showing how Apparatus, VulnWeb, and VulnAPI communicate.
+
+![Docker Compose Network Topology](/dashboard/assets/diagrams/diagram-3-network.svg)
+
+**Network Details:**
+- All containers on isolated `security-lab` network
+- Containers use hostnames (not localhost) for inter-container communication
+- Host accesses via port mapping (localhost:PORT)
+- VulnWeb can attack VulnAPI to simulate real compromise chains
+
+---
+
+## 4. Red Team Autopilot Loop
+
+Autonomous agent loop showing how the AI red team continuously probes and attacks the target.
+
+![Red Team Autopilot Loop](/dashboard/assets/diagrams/diagram-4-autopilot-loop.svg)
+
+**Agent Behavior:**
+- Continuously probes target to understand current state
+- Makes intelligent tool selections based on previous findings
+- Uses probability weighting to avoid predictable patterns
+- Broadcasts results for real-time dashboard updates
+- Respects configured iteration limits and timeout intervals
+
+---
+
+## 5. System Health States
+
+State machine for self-healing health monitoring.
+
+![System Health States](/dashboard/assets/diagrams/diagram-5-health-states.svg)
+
+**Health States:**
+- 🟢 **Healthy** — Event loop lag < 50ms, all requests processed normally
+- 🟡 **Degraded** — Event loop lag 50-200ms, heavy routes shed traffic
+- 🔴 **Critical** — Event loop lag > 200ms, non-essential routes rejected
+
+---
+
+## 6. Protocol Server Architecture
+
+Independent protocol servers handling different client types.
+
+![Protocol Server Architecture](/dashboard/assets/diagrams/diagram-6-protocol-servers.svg)
+
+**Server Isolation:**
+- Each server is independent and isolated
+- Failure of one protocol doesn't affect others
+- Shared middleware stack via Express for HTTP-based protocols
+- Custom implementations for non-HTTP protocols
+
+---
+
+## 7. Monitoring Architecture: Logs, Metrics, Traces
+
+Three pillars of observability showing how Apparatus generates and exports telemetry.
+
+![Monitoring Architecture](/dashboard/assets/diagrams/diagram-7-monitoring.svg)
+
+**Monitoring Pillars:**
+- **Logs:** What happened (events, timestamps, details)
+- **Metrics:** How much (counts, rates, timing, resource usage)
+- **Traces:** How it happened (flow, dependencies, causality)
+
+**Exported Metrics Include:**
+- Request Rate (RPS) and Response Times
+- Error Rates and Status Codes
+- Vulnerabilities Found
+- WAF Blocks and Tarpit Traps
+- Event Loop Lag and Memory Usage
+
+---
+
+## 8. Dashboard Layout
+
+Visual structure of the web dashboard UI showing sidebar, header, and main content area.
+
+![Dashboard Layout](/dashboard/assets/diagrams/diagram-8-dashboard-layout.svg)
+
+**Key Features:**
+- Left sidebar for quick console navigation
+- Top header shows system health (green = healthy, yellow = degraded, red = critical)
+- Main area updates via SSE (no polling needed)
+- Command palette (Cmd+K / Ctrl+K) for quick access
+
+---
+
+## 9. Middleware Stack Dependencies
+
+Ordering and relationships between middleware components.
+
+![Middleware Stack Dependencies](/dashboard/assets/diagrams/diagram-9-middleware-deps.svg)
+
+**Ordering Rationale:**
+- MTD first: prevents unauthorized access before any processing
+- Self-healing early: can shed traffic before resource-intensive checks
+- Deception next: traps honeypot attempts early, broadcasts to dashboard
+- Tarpit after: doesn't consume CPU while holding connections
+- Metrics wraps: accurate timing across all layers
+- WAF before handler: blocks malicious requests early
+- SSE last: broadcasts all events to connected clients
+
+---
+
+## 10. Feature Adoption Timeline
+
+How to progressively learn and adopt Apparatus features.
+
+![Feature Adoption Timeline](/dashboard/assets/diagrams/diagram-10-feature-adoption.svg)
+
+**Learning Path:**
+- **Level 1 (30 min):** Dashboard basics, start Apparatus, view metrics
+- **Level 2 (1 hour):** Basic autopilot, view results, export findings
+- **Level 3 (2 hours):** Build scenarios, multi-step tests, run campaigns
+- **Level 4 (Variable):** Custom tools, CI/CD integration, scale testing
+
+---
+
+## 11. TTY/Console Feature Map
+
+Which features work best from different interfaces.
+
+![Interface Comparison](/dashboard/assets/diagrams/diagram-11-interface-comparison.svg)
+
+**Interface Options:**
+- **Web Dashboard** — Best for: visual learners, real-time monitoring, point-and-click
+- **CLI** — Best for: scripting, CI/CD, headless operation, automation
+- **Terminal UI** — Best for: terminal-only environments, no browser needed
+- **HTTP API** — Best for: programmatic access, custom integrations, full control
+
+---
+
+## Related Documentation
+
+- **[Architecture Guide](architecture.md)** - Detailed technical architecture
+- **[Quick Reference](quick-reference.md)** - Common commands and workflows
+- **[Integration Guide](integration-guide.md)** - How Apparatus works with VulnLab
+- **[Features](features.md)** - Complete feature catalog
+
+---
+
+**Last Updated:** 2026-02-22

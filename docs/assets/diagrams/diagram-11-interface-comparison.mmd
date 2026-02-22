@@ -1,0 +1,17 @@
+graph TB
+    Apparatus["🖥️ APPARATUS"]
+
+    Apparatus --> Web["🌐 WEB DASHBOARD"]
+    Apparatus --> CLI["💻 CLI"]
+    Apparatus --> TUI["📺 TERMINAL UI"]
+    Apparatus --> API["🔌 HTTP API"]
+
+    Web --> WebF["✓ Real-time SSE<br/>✓ Point-and-click<br/>✓ Visual graphs"]
+    CLI --> CLIF["✓ Scripting<br/>✓ CI/CD pipelines<br/>✓ JSON output"]
+    TUI --> TUIF["✓ Terminal only<br/>✓ Real-time updates<br/>✓ ASCII graphs"]
+    API --> APIF["✓ Most flexible<br/>✓ Programmatic<br/>✓ Full control"]
+
+    style Web fill:#c8e6c9
+    style CLI fill:#ffe0b2
+    style TUI fill:#f8bbd0
+    style API fill:#b3e5fc
