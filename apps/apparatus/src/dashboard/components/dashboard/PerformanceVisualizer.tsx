@@ -19,11 +19,20 @@ export function PerformanceVisualizer() {
   const { baseUrl } = useApparatus();
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
+  const eventsRef = useRef(events);
   const [history, setHistory] = useState<MetricHistory>({
     rps: new Array(MAX_HISTORY).fill(0),
     latency: new Array(MAX_HISTORY).fill(0),
     errors: new Array(MAX_HISTORY).fill(0),
   });
+
+  const currentRps = history.rps[history.rps.length - 1];
+  
+  // Kinetic UI: Calculate skew and slant based on load
+  // Max skew of -1.5deg at 100 RPS
+  const skewAngle = Math.max(currentRps / 100 * -1.5, -1.5);
+  // Max slant of -15 at 100 RPS
+  const slantValue = Math.max(currentRps / 100 * -15, -15);
 
   // Fetch initial demo status
   useEffect(() => {
@@ -46,13 +55,17 @@ export function PerformanceVisualizer() {
     }
   }, [baseUrl]);
 
+  useEffect(() => {
+    eventsRef.current = events;
+  }, [events]);
+
   // Update history every second
   useEffect(() => {
     const timer = setInterval(() => {
       const now = Date.now();
       const oneSecondAgo = now - 1000;
       
-      const lastSecondEvents = events.filter(e => {
+      const lastSecondEvents = eventsRef.current.filter(e => {
         const ts = new Date(e.timestamp).getTime();
         return ts >= oneSecondAgo && ts < now;
       });
@@ -72,13 +85,22 @@ export function PerformanceVisualizer() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [events]);
+  }, []);
 
   return (
-    <Card variant="panel" className="flex flex-col">
+    <Card 
+      variant="panel" 
+      glow="info"
+      kinetic={true} 
+      className="flex flex-col"
+      style={{ 
+        '--ui-skew': `${skewAngle}deg`,
+        '--ui-slant': slantValue
+      } as React.CSSProperties}
+    >
       <CardHeader className="flex-none border-b border-neutral-800/30 pb-2 mb-0 bg-neutral-900/30">
         <div className="flex justify-between items-center">
-          <CardTitle className="flex items-center gap-2 text-sm">
+          <CardTitle className="flex items-center gap-2 text-sm" style={{ fontVariationSettings: `'slnt' var(--ui-slant)` } as any}>
             <Activity className="h-3.5 w-3.5 text-primary-500/70" />
             System Performance Metrics
           </CardTitle>

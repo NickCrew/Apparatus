@@ -54,7 +54,7 @@ export function ScenarioConsole() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500 h-[calc(100vh-140px)] flex flex-col">
       <div>
-        <h1 className="text-2xl font-bold text-neutral-100 font-mono uppercase">Scenario Engine</h1>
+        <h1 className="text-2xl font-bold text-neutral-100 font-mono">Scenario Engine</h1>
         <p className="text-neutral-400 text-sm mt-1">Automated attack sequencing and replay.</p>
         {error && <div className="mt-2 text-danger-400 text-xs font-mono bg-danger-900/20 p-2 rounded border border-danger-900/50">{error}</div>}
         {success && <div className="mt-2 text-success-400 text-xs font-mono bg-success-900/20 p-2 rounded border border-success-900/50">{success}</div>}
@@ -62,9 +62,9 @@ export function ScenarioConsole() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
         {/* Sidebar List */}
-        <Card variant="panel" className="flex flex-col">
+        <Card variant="panel" glow="primary" className="flex flex-col">
             <CardHeader className="flex-none border-b border-neutral-800 pb-3">
-                <CardTitle className="text-sm font-mono uppercase">Library</CardTitle>
+                <CardTitle className="text-sm font-mono">Library</CardTitle>
             </CardHeader>
             <CardContent className="flex-1 overflow-y-auto p-0">
                 <div className="divide-y divide-neutral-800/50">
@@ -96,7 +96,7 @@ export function ScenarioConsole() {
         </Card>
 
         {/* Editor */}
-        <Card variant="glass" className="lg:col-span-2 flex flex-col">
+        <Card variant="glass" glow="primary" className="lg:col-span-2 flex flex-col">
             <CardHeader className="flex-none border-b border-white/5 pb-3 flex flex-row justify-between items-center">
                 <CardTitle className="flex items-center gap-2">
                     <FileJson className="h-4 w-4 text-primary-500" />

@@ -63,7 +63,7 @@ export function WebhooksConsole() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
         {/* Request List */}
-        <Card variant="panel" className="flex flex-col h-full border-l-4 border-l-primary-500">
+        <Card variant="panel" glow="info" className="flex flex-col h-full">
             <CardHeader className="flex-none border-b border-neutral-800 pb-3">
                 <div className="flex justify-between items-center">
                     <CardTitle className="text-sm font-mono uppercase">Captured Requests</CardTitle>
@@ -114,7 +114,7 @@ export function WebhooksConsole() {
         </Card>
 
         {/* Request Detail */}
-        <Card variant="glass" className="lg:col-span-2 h-full flex flex-col">
+        <Card variant="glass" glow="info" className="lg:col-span-2 h-full flex flex-col">
             <CardHeader className="flex-none border-b border-white/5 pb-3">
                 <CardTitle className="text-sm font-mono uppercase">Request Payload</CardTitle>
             </CardHeader>

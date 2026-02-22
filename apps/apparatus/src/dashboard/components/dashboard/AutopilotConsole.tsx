@@ -90,7 +90,7 @@ export function AutopilotConsole() {
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-100 font-mono uppercase flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-neutral-100 font-mono flex items-center gap-2">
             <Bot className="h-6 w-6 text-primary-400" />
             Autopilot Console
           </h1>
@@ -101,7 +101,7 @@ export function AutopilotConsole() {
           <Badge variant={statusVariant(headerSummary.status)} dot>
             {headerSummary.status}
           </Badge>
-          <Badge variant="neutral">ITERATION {headerSummary.step}</Badge>
+          <Badge variant="neutral">Iteration {headerSummary.step}</Badge>
         </div>
       </div>
 
@@ -111,7 +111,7 @@ export function AutopilotConsole() {
         </div>
       )}
 
-      <Card variant="glass">
+      <Card variant="glass" glow="danger">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ShieldAlert className="h-4 w-4 text-primary-400" />
@@ -122,7 +122,7 @@ export function AutopilotConsole() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
             <div className="lg:col-span-3">
-              <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">Objective</label>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Objective</label>
               <input
                 value={objective}
                 onChange={(event) => setObjective(event.target.value)}
@@ -132,7 +132,7 @@ export function AutopilotConsole() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">Max Iterations</label>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Max Iterations</label>
               <input
                 type="number"
                 min={1}
@@ -144,7 +144,7 @@ export function AutopilotConsole() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-mono uppercase text-neutral-500 mb-1">Interval (ms)</label>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Interval (ms)</label>
               <input
                 type="number"
                 min={0}
@@ -156,7 +156,7 @@ export function AutopilotConsole() {
             </div>
 
             <div className="flex items-end">
-              <label className="flex items-center gap-2 h-10 px-3 border border-neutral-800/70 rounded-[3px] bg-neutral-900/60 w-full text-xs font-mono uppercase text-neutral-300">
+              <label className="flex items-center gap-2 h-10 px-3 border border-neutral-800/70 rounded-[3px] bg-neutral-900/60 w-full text-xs font-mono text-neutral-300">
                 <input
                   type="checkbox"
                   checked={forbidCrash}
@@ -168,7 +168,7 @@ export function AutopilotConsole() {
           </div>
 
           <div>
-            <div className="text-[11px] font-mono uppercase text-neutral-500 mb-2">Scope Limits</div>
+            <div className="text-[11px] font-mono text-neutral-500 mb-2">Scope Limits</div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
               {TOOL_OPTIONS.map((tool) => {
                 const checked = allowedTools.includes(tool.id);
@@ -230,7 +230,7 @@ export function AutopilotConsole() {
       </Card>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-        <Card variant="panel" className="xl:col-span-2">
+        <Card variant="panel" glow="primary" className="xl:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Activity className="h-4 w-4 text-primary-400" />
@@ -248,17 +248,17 @@ export function AutopilotConsole() {
               )}
 
               {thoughts.map((entry) => (
-                <div key={entry.id} className="text-xs font-mono text-neutral-300 leading-relaxed">
+                <div key={entry.id} className="text-xs font-mono text-neutral-300 leading-relaxed group">
                   <span className="text-neutral-600">[{new Date(entry.at).toLocaleTimeString()}]</span>{' '}
-                  <span className="text-primary-400">{PHASE_LABELS[entry.phase] || entry.phase.toUpperCase()}</span>{' '}
-                  <span>{entry.message}</span>
+                  <span className="text-primary-400 font-bold">{PHASE_LABELS[entry.phase] || entry.phase.toUpperCase()}</span>{' '}
+                  <span className="rec-casual rec-slant text-neutral-200 group-hover:text-primary transition-colors">{entry.message}</span>
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
 
-        <Card variant="panel">
+        <Card variant="panel" glow="primary">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Gauge className="h-4 w-4 text-warning-400" />
@@ -295,17 +295,17 @@ export function AutopilotConsole() {
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div className="p-3 rounded-[3px] border border-neutral-800/70 bg-neutral-900/50">
-            <div className="text-[11px] uppercase text-neutral-500 font-mono">Status</div>
-            <div className="mt-1 text-lg font-display text-neutral-100 uppercase">{session?.state || 'idle'}</div>
+            <div className="text-[11px] text-neutral-500 font-mono">Status</div>
+            <div className="mt-1 text-lg font-display text-neutral-100">{session?.state || 'idle'}</div>
           </div>
           <div className="p-3 rounded-[3px] border border-neutral-800/70 bg-neutral-900/50">
-            <div className="text-[11px] uppercase text-neutral-500 font-mono">Breaking Point</div>
+            <div className="text-[11px] text-neutral-500 font-mono">Breaking Point</div>
             <div className="mt-1 text-lg font-display text-neutral-100">
               {session?.summary?.breakingPointRps ? `${session.summary.breakingPointRps.toFixed(1)} RPS` : 'Not found'}
             </div>
           </div>
           <div className="p-3 rounded-[3px] border border-neutral-800/70 bg-neutral-900/50">
-            <div className="text-[11px] uppercase text-neutral-500 font-mono">Last Verification</div>
+            <div className="text-[11px] text-neutral-500 font-mono">Last Verification</div>
             <div className="mt-1 text-sm font-mono text-neutral-200">
               {latestReport?.verification.notes || session?.summary?.failureReason || 'No verification events yet.'}
             </div>

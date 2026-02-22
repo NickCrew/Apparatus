@@ -39,7 +39,7 @@ export function DeceptionConsole() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Live Deception Feed */}
         <div className="lg:col-span-2 space-y-4">
-           <Card variant="panel" className="flex flex-col h-[600px]">
+           <Card variant="panel" glow="warning" className="flex flex-col h-[600px]">
               <CardHeader className="flex-none border-b border-neutral-800 pb-4">
                  <div className="flex justify-between items-center">
                     <CardTitle className="flex items-center gap-2">
@@ -106,7 +106,7 @@ export function DeceptionConsole() {
         {/* Right Sidebar: Tarpit & Inspector */}
         <div className="space-y-6">
             {/* Tarpit Status */}
-            <Card variant="panel" className="border-danger-900/30">
+            <Card variant="panel" glow="danger" className="border-danger-900/30">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-danger-400">
                         <ShieldAlert className="h-4 w-4" />
@@ -143,7 +143,7 @@ export function DeceptionConsole() {
             </Card>
 
             {/* Event Inspector */}
-            <Card variant="glass" className="flex flex-col min-h-[300px]">
+            <Card variant="glass" glow="warning" className="flex flex-col min-h-[300px]">
                 <CardHeader className="border-b border-white/5 pb-3">
                     <CardTitle className="text-xs">Event Inspector</CardTitle>
                 </CardHeader>

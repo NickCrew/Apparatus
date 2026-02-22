@@ -44,7 +44,7 @@ export function SettingsConsole() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div>
-        <h1 className="text-2xl font-bold text-neutral-100 font-mono uppercase">System Settings</h1>
+        <h1 className="text-2xl font-bold text-neutral-100 font-mono">System Settings</h1>
         <p className="text-neutral-400 text-sm mt-1">Dashboard configuration and connection preferences.</p>
       </div>
 
@@ -61,7 +61,7 @@ export function SettingsConsole() {
             <CardContent>
                 <form onSubmit={handleSave} className="space-y-4">
                     <div>
-                        <label className="text-xs font-mono text-neutral-400 uppercase">Base URL</label>
+                        <label className="text-xs font-mono text-neutral-400">Base URL</label>
                         <input 
                             type="url" 
                             value={urlInput}

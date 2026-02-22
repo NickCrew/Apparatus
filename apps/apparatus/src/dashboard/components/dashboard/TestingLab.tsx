@@ -26,7 +26,7 @@ export function TestingLab() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Configuration */}
         <div className="space-y-6">
-            <Card variant="glass">
+            <Card variant="glass" glow="primary">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <FlaskConical className="h-4 w-4 text-primary-500" />

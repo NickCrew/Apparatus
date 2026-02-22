@@ -32,7 +32,7 @@ export function MTDConsole() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Control Panel */}
         <div className="lg:col-span-2 space-y-6">
-           <Card variant="panel" className={cn("transition-colors", isActive ? "border-primary-900/50" : "border-neutral-800")}>
+           <Card variant="panel" glow="primary" className={cn("transition-colors", isActive ? "border-primary-900/50" : "border-neutral-800")}>
               <CardHeader>
                  <CardTitle className="flex items-center gap-2">
                     <Shield className={cn("h-4 w-4", isActive ? "text-primary-500" : "text-neutral-500")} />

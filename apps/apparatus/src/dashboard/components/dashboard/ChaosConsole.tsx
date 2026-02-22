@@ -15,7 +15,7 @@ export function ChaosConsole() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* CPU Spike */}
-        <Card variant="panel">
+        <Card variant="panel" glow="warning">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Cpu className="h-4 w-4 text-warning-500" />
@@ -36,7 +36,7 @@ export function ChaosConsole() {
         </Card>
 
         {/* Memory Leak */}
-        <Card variant="panel">
+        <Card variant="panel" glow="warning">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <HardDrive className="h-4 w-4 text-primary-500" />
@@ -60,7 +60,7 @@ export function ChaosConsole() {
         </Card>
 
         {/* Process Crash */}
-        <Card variant="panel" className="border-danger-900/50">
+        <Card variant="panel" glow="danger">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-danger-400">
               <AlertTriangle className="h-4 w-4" />

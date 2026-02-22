@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "./cn"
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-sm border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 font-mono uppercase tracking-wider",
+  "inline-flex items-center rounded-sm border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 font-mono tracking-wider",
   {
     variants: {
       variant: {
@@ -47,8 +47,8 @@ function Badge({ className, variant, size, dot, children, ...props }: BadgeProps
   return (
     <div className={cn(badgeVariants({ variant, size }), className)} {...props}>
       {dot && (
-        <span className={cn("mr-1.5 flex h-1.5 w-1.5 rounded-full", 
-            (variant === 'destructive' || variant === 'danger') ? 'bg-destructive animate-pulse' :
+        <span className={cn("mr-1.5 flex h-1.5 w-1.5 rounded-full transition-casual", 
+            (variant === 'destructive' || variant === 'danger') ? 'bg-danger animate-pulse' :
             variant === 'success' ? 'bg-green-500' :
             variant === 'warning' ? 'bg-yellow-500' :
             'bg-primary'

@@ -277,7 +277,7 @@ export function IdentityConsole() {
       )}
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <Card variant="glass">
+        <Card variant="glass" glow="primary">
           <CardHeader>
             <CardTitle>Token Builder</CardTitle>
             <CardDescription>Paste any JWT, edit header/payload JSON, then apply an attack mode.</CardDescription>
@@ -372,7 +372,7 @@ export function IdentityConsole() {
           </CardContent>
         </Card>
 
-        <Card variant="panel">
+        <Card variant="panel" glow="primary">
           <CardHeader>
             <CardTitle>Analysis & Verification</CardTitle>
             <CardDescription>Generated token output and backend verification response.</CardDescription>

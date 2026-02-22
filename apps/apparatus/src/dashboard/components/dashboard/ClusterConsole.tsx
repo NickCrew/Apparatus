@@ -83,7 +83,7 @@ export function ClusterConsole() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Network Map */}
         <div className="lg:col-span-2">
-           <Card variant="panel" className="h-[500px] flex flex-col">
+           <Card variant="panel" glow="info" className="h-[500px] flex flex-col">
               <CardHeader className="flex-none border-b border-neutral-800 pb-2 mb-0">
                  <CardTitle className="flex items-center gap-2">
                     <Globe className="h-4 w-4 text-info-500" />
@@ -104,7 +104,7 @@ export function ClusterConsole() {
 
         {/* Control Panel */}
         <div className="space-y-6">
-            <Card variant="glass">
+            <Card variant="glass" glow="primary">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <Activity className="h-4 w-4 text-primary-500" />

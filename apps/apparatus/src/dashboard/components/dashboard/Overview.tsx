@@ -23,10 +23,10 @@ export function Overview() {
       {/* Page Header */}
       <div className="flex items-end justify-between opacity-0 animate-terminal-in stagger-1">
         <div>
-          <h1 className="text-display-lg font-display text-neutral-100 uppercase tracking-tight">
+          <h1 className="text-display-lg font-display text-neutral-100 tracking-tight rec-casual">
             System Overview
           </h1>
-          <p className="text-[11px] font-mono text-neutral-500 uppercase tracking-widest mt-1">
+          <p className="text-[11px] font-mono text-neutral-500 tracking-widest mt-1">
             Real-time telemetry / Control status
           </p>
         </div>
@@ -46,6 +46,7 @@ export function Overview() {
           trend={{ value: 12, direction: 'up' }}
           icon={Activity}
           accent="primary"
+          className="rec-casual"
         />
         <StatCard
           label="ACTIVE_THREATS"
@@ -53,6 +54,7 @@ export function Overview() {
           trend={{ value: 5, direction: 'down' }}
           icon={Shield}
           accent="danger"
+          className="rec-casual"
         />
         <StatCard
           label="SYSTEM_LOAD"
@@ -60,6 +62,7 @@ export function Overview() {
           trend={{ value: 2, direction: 'up' }}
           icon={Cpu}
           accent="warning"
+          className="rec-casual"
         />
         <StatCard
           label="NETWORK_HEALTH"
@@ -67,13 +70,14 @@ export function Overview() {
           trend={{ value: 0, direction: 'neutral' }}
           icon={Globe}
           accent="success"
+          className="rec-casual"
         />
       </div>
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
-        {/* Left: Traffic + Modules (8 cols) */}
+        {/* Left: Performance + Modules (8 cols) */}
         <div className="lg:col-span-8 space-y-4">
           {/* Performance Dashboard */}
           <div className="opacity-0 animate-terminal-in stagger-3">
@@ -82,7 +86,7 @@ export function Overview() {
 
           {/* Module Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 opacity-0 animate-terminal-in stagger-5">
-            <Card variant="glass">
+            <Card variant="glass" glow="primary">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-[11px] font-mono tracking-widest uppercase">
                   <Shield className="h-3.5 w-3.5 text-primary/70" />
@@ -96,7 +100,7 @@ export function Overview() {
               </CardContent>
             </Card>
 
-            <Card variant="glass">
+            <Card variant="glass" glow="warning">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-[11px] font-mono tracking-widest uppercase">
                   <Zap className="h-3.5 w-3.5 text-warning/70" />
@@ -113,9 +117,9 @@ export function Overview() {
         </div>
 
         {/* Right: Logs + Actions (4 cols) */}
-        <div className="lg:col-span-4 space-y-4">
+        <div className="lg:col-span-4 space-y-4 flex flex-col">
           {/* Live Logs */}
-          <div className="opacity-0 animate-terminal-in stagger-4 h-full flex flex-col">
+          <div className="opacity-0 animate-terminal-in stagger-4 flex-1 flex flex-col">
             <Card variant="default" className="bg-black border-white/5 flex-1 flex flex-col min-h-0">
               <CardHeader className="pb-2">
                 <CardTitle className="text-[11px] font-mono tracking-widest uppercase">Telemetry Logs</CardTitle>
@@ -141,7 +145,7 @@ export function Overview() {
 
           {/* Quick Actions */}
           <div className="opacity-0 animate-terminal-in stagger-6">
-            <Card variant="panel" className="border-primary/20 bg-primary/[0.02]">
+            <Card variant="panel" glow="primary" className="border-primary/20 bg-primary/[0.02]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-[11px] font-mono tracking-widest uppercase">Manual Overrides</CardTitle>
               </CardHeader>
@@ -168,7 +172,7 @@ function ModuleRow({ label, status, variant, dot }: {
 }) {
   return (
     <div className="flex justify-between items-center py-1.5 px-2 bg-neutral-900/50 border border-neutral-700">
-      <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider">{label}</span>
+      <span className="text-[10px] font-mono text-neutral-400 tracking-wider">{label}</span>
       <Badge variant={variant} size="sm" dot={dot}>{status}</Badge>
     </div>
   );

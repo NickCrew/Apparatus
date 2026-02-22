@@ -24,10 +24,10 @@ const accentColors: Record<AccentColor, string> = {
 };
 
 const accentGlows: Record<AccentColor, string> = {
-  primary: 'shadow-[0_0_8px_rgba(0,240,255,0.3)]',
-  success: 'shadow-[0_0_8px_rgba(0,255,148,0.3)]',
-  warning: 'shadow-[0_0_8px_rgba(255,184,0,0.3)]',
-  danger: 'shadow-[0_0_8px_rgba(255,0,85,0.3)]',
+  primary: 'shadow-glow-primary',
+  success: 'shadow-glow-success',
+  warning: 'shadow-glow-warning',
+  danger: 'shadow-glow-danger',
 };
 
 const iconColors: Record<AccentColor, string> = {
@@ -69,7 +69,7 @@ export function StatCard({
       <div className="p-4 pl-5">
         <div className="flex justify-between items-start">
           <div className="space-y-2">
-            <span className="text-label font-display text-neutral-600 uppercase block">
+            <span className="text-label font-display text-neutral-600 block rec-casual">
               {label}
             </span>
             <div className="text-display-md font-display text-neutral-100">

@@ -30,14 +30,14 @@ export function DefenseConsole() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div>
-        <h1 className="text-2xl font-bold text-neutral-100 font-mono uppercase">Active Defense</h1>
+        <h1 className="text-2xl font-bold text-neutral-100 font-mono">Active Defense</h1>
         <p className="text-neutral-400 text-sm mt-1">Configure WAF rules and traffic filtering.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Rules List */}
         <div className="lg:col-span-2 space-y-4">
-           <Card variant="panel">
+           <Card variant="panel" glow="primary">
               <CardHeader className="flex flex-row items-center justify-between">
                  <div>
                     <CardTitle className="flex items-center gap-2">
@@ -65,7 +65,7 @@ export function DefenseConsole() {
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <Badge variant={rule.action === 'block' ? 'danger' : 'warning'} size="sm">
-                                        {rule.action.toUpperCase()}
+                                        {rule.action}
                                     </Badge>
                                     <Button variant="ghost" size="icon" className="h-6 w-6 text-neutral-500 hover:text-danger-400" onClick={() => deleteRule(rule.id)}>
                                         <Trash2 className="h-3 w-3" />
@@ -81,14 +81,14 @@ export function DefenseConsole() {
 
         {/* Add Rule Form */}
         <div>
-            <Card variant="glass">
+            <Card variant="glass" glow="primary">
                 <CardHeader>
                     <CardTitle>Add Block Rule</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleAdd} className="space-y-3">
                         <div>
-                            <label htmlFor="regex-pattern" className="text-xs font-mono text-neutral-400 uppercase">Regex Pattern</label>
+                            <label htmlFor="regex-pattern" className="text-xs font-mono text-neutral-400">Regex Pattern</label>
                             <input 
                                 id="regex-pattern"
                                 type="text" 
@@ -109,7 +109,7 @@ export function DefenseConsole() {
                     </form>
 
                     <div className="mt-6 pt-6 border-t border-neutral-800">
-                        <h4 className="text-xs font-mono text-neutral-400 uppercase mb-3">Quick Presets</h4>
+                        <h4 className="text-xs font-mono text-neutral-400 mb-3">Quick Presets</h4>
                         <div className="space-y-2">
                             <Button variant="secondary" size="sm" className="w-full justify-start font-mono text-xs" onClick={() => addRule('(?i)(union|select|insert|delete|update)', 'block')}>
                                 SQL Injection

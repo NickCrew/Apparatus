@@ -43,7 +43,7 @@ export function DrillConsole() {
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-100 font-mono uppercase flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-neutral-100 font-mono flex items-center gap-2">
             <ShieldAlert className="h-5 w-5 text-danger-400" />
             Breach Protocol
           </h1>
@@ -52,7 +52,7 @@ export function DrillConsole() {
 
         {activeRun && (
           <Badge variant={statusVariant(activeRun.status)}>
-            {activeRun.status.toUpperCase()}
+            {activeRun.status}
           </Badge>
         )}
       </div>
@@ -66,7 +66,7 @@ export function DrillConsole() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card variant="panel" className="lg:col-span-1">
           <CardHeader>
-            <CardTitle className="text-sm font-mono uppercase">Lobby</CardTitle>
+            <CardTitle className="text-sm font-mono">Lobby</CardTitle>
             <CardDescription>Select and start a drill scenario</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -105,10 +105,10 @@ export function DrillConsole() {
           </CardContent>
         </Card>
 
-        <Card variant="glass" className="lg:col-span-2">
+        <Card variant="glass" glow="danger" className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center justify-between gap-2">
-              <span className="font-mono uppercase text-sm">Incident Console</span>
+              <span className="font-mono text-sm">Incident Console</span>
               {activeRun ? (
                 <span className="text-xs font-mono text-neutral-400 flex items-center gap-1">
                   <Clock3 className="h-3.5 w-3.5" />
@@ -131,26 +131,26 @@ export function DrillConsole() {
               <>
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                   <div className="rounded border border-neutral-800 bg-neutral-900/40 p-3">
-                    <div className="text-[11px] uppercase tracking-wide text-neutral-500">CPU</div>
+                    <div className="text-[11px] tracking-wide text-neutral-500">CPU</div>
                     <div className="mt-1 text-lg font-mono text-neutral-200">
                       {activeRun.lastSnapshot ? `${activeRun.lastSnapshot.cpuPercent.toFixed(2)}%` : '—'}
                     </div>
                   </div>
                   <div className="rounded border border-neutral-800 bg-neutral-900/40 p-3">
-                    <div className="text-[11px] uppercase tracking-wide text-neutral-500">Error Rate</div>
+                    <div className="text-[11px] tracking-wide text-neutral-500">Error Rate</div>
                     <div className="mt-1 text-lg font-mono text-neutral-200">
                       {activeRun.lastSnapshot ? `${(activeRun.lastSnapshot.errorRate * 100).toFixed(2)}%` : '—'}
                     </div>
                   </div>
                   <div className="rounded border border-neutral-800 bg-neutral-900/40 p-3">
-                    <div className="text-[11px] uppercase tracking-wide text-neutral-500">Blocked SQLi</div>
+                    <div className="text-[11px] tracking-wide text-neutral-500">Blocked SQLi</div>
                     <div className="mt-1 text-lg font-mono text-neutral-200">
                       {activeRun.lastSnapshot ? `${(activeRun.lastSnapshot.blockedSqliRatio * 100).toFixed(2)}%` : '—'}
                     </div>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-2 text-[11px] font-mono uppercase tracking-wide text-neutral-400">
+                <div className="flex flex-wrap gap-2 text-[11px] font-mono tracking-wide text-neutral-400">
                   <span className="rounded border border-neutral-800 bg-neutral-900/40 px-2 py-1">
                     Ghost: {activeRun.lastSnapshot?.ghostTrafficActive ? 'Active' : 'Idle'}
                   </span>

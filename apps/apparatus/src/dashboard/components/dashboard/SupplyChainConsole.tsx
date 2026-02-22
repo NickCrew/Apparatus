@@ -75,7 +75,7 @@ export function SupplyChainConsole() {
         </div>
 
         {/* Details Sidebar */}
-        <Card variant="glass" className="h-full flex flex-col">
+        <Card variant="glass" glow="danger" className="h-full flex flex-col">
             <CardHeader className="flex-none border-b border-white/5 pb-3">
                 <CardTitle className="text-sm font-mono uppercase">Impact Analysis</CardTitle>
             </CardHeader>

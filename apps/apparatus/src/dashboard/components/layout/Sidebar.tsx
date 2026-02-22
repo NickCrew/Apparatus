@@ -20,6 +20,7 @@ import {
   Ghost,
   Server,
   BookOpen,
+  ListTree,
 } from 'lucide-react';
 import { cn } from '../ui/cn';
 import { useApparatus } from '../../providers/ApparatusProvider';
@@ -28,6 +29,7 @@ const NAV_ITEMS = [
   { path: '/', label: 'Overview', icon: LayoutDashboard },
   { path: '/docs', label: 'Docs Hub', icon: BookOpen },
   { path: '/traffic', label: 'Traffic', icon: Activity },
+  { path: '/timeline', label: 'Timeline', icon: ListTree },
   { path: '/defense', label: 'Defense', icon: Shield },
   { path: '/deception', label: 'Deception', icon: FileWarning },
   { path: '/chaos', label: 'Chaos', icon: Zap },
@@ -62,7 +64,7 @@ export function Sidebar() {
           <div className="w-7 h-7 rounded-[3px] bg-primary-500/8 border border-primary-500/40 flex items-center justify-center shadow-glow-primary">
             <span className="text-primary-400 font-bold font-display text-sm leading-none">A</span>
           </div>
-          <span className="text-base font-display font-semibold text-neutral-200 tracking-wide uppercase">
+          <span className="text-base font-display font-semibold text-neutral-200 tracking-wide">
             Apparatus
           </span>
         </div>
@@ -70,7 +72,7 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-4 px-2" aria-label="Main navigation">
-        <div className="px-3 mb-3 text-label font-display text-neutral-600 uppercase">
+        <div className="px-3 mb-3 text-label font-display text-neutral-600">
           Modules
         </div>
         <ul className="space-y-px">
@@ -100,7 +102,7 @@ export function Sidebar() {
                       "h-[15px] w-[15px] flex-shrink-0",
                       isActive ? "text-primary-400" : "text-neutral-600"
                     )} strokeWidth={1.75} />
-                    <span className="font-sans">{label}</span>
+                    <span className="font-sans rec-tech">{label}</span>
                   </>
                 )}
               </NavLink>
@@ -116,7 +118,7 @@ export function Sidebar() {
           <button
             onClick={() => setShowKeyboardHints(!showKeyboardHints)}
             aria-expanded={showKeyboardHints}
-            className="w-full flex items-center justify-between text-[11px] font-display text-neutral-600 hover:text-neutral-400 uppercase transition-colors"
+            className="w-full flex items-center justify-between text-[11px] font-display text-neutral-600 hover:text-neutral-400 transition-colors"
           >
             <span>Keyboard</span>
             {showKeyboardHints ? (
@@ -147,16 +149,16 @@ export function Sidebar() {
         {/* System Status */}
         <div className="px-4 py-3 border-t border-neutral-800/40">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-label font-display text-neutral-600 uppercase">Status</span>
+            <span className="text-label font-display text-neutral-600 rec-casual">Status</span>
             <span className={cn(
-              "text-[10px] font-mono flex items-center gap-1.5",
+              "text-[10px] font-mono flex items-center gap-1.5 rec-casual",
               isHealthy ? "text-success-500" : "text-danger-400"
             )}>
               <span className={cn(
                 "w-1.5 h-1.5 rounded-full",
                 isHealthy ? "bg-success-500 animate-pulse-fast" : "bg-danger-500"
               )} />
-              {isHealthy ? 'ONLINE' : health.status.toUpperCase()}
+              {isHealthy ? 'Online' : health.status}
             </span>
           </div>
           <div className="w-full h-[3px] bg-neutral-900 rounded-full overflow-hidden">
