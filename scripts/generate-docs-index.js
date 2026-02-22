@@ -37,6 +37,9 @@ const categoryMap = {
   'tutorial-attacker-fingerprinting.md': 'Tutorials',
   'tutorial-overview-dashboard.md': 'Tutorials',
   'tutorial-scenario-builder.md': 'Tutorials',
+  'tutorial-chaos-console.md': 'Tutorials',
+  'tutorial-advanced-red-team.md': 'Tutorials',
+  'tutorial-performance-tuning.md': 'Tutorials',
   // DOCUMENTATION_ROADMAP.md - internal/developer only, excluded from user-facing docs
 };
 

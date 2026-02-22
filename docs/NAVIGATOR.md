@@ -24,6 +24,9 @@ Welcome! This guide helps you find the right documentation for your needs.
 - **[Tutorial: Attacker Fingerprinting](tutorial-attacker-fingerprinting.md)** — Real-time threat monitoring & response
 - **[Tutorial: Overview Dashboard](tutorial-overview-dashboard.md)** — Real-time metrics and incident monitoring
 - **[Tutorial: Scenario Builder](tutorial-scenario-builder.md)** — Multi-step automated testing sequences
+- **[Tutorial: Chaos Console](tutorial-chaos-console.md)** — Safe fault injection and resilience testing
+- **[Tutorial: Advanced Red Team](tutorial-advanced-red-team.md)** — Multi-target campaigns and complex strategies
+- **[Tutorial: Performance Tuning](tutorial-performance-tuning.md)** — Optimizing for scale and load
 
 ### Reference & Architecture
 - **[Architecture Guide](architecture.md)** — System design, component details, performance
@@ -79,6 +82,15 @@ Welcome! This guide helps you find the right documentation for your needs.
 #### Build and Run Multi-Step Tests
 → **[Tutorial: Scenario Builder](tutorial-scenario-builder.md)**
 
+#### Test Resilience with Chaos
+→ **[Tutorial: Chaos Console](tutorial-chaos-console.md)**
+
+#### Plan Advanced Attack Campaigns
+→ **[Tutorial: Advanced Red Team](tutorial-advanced-red-team.md)**
+
+#### Optimize for Performance & Load
+→ **[Tutorial: Performance Tuning](tutorial-performance-tuning.md)**
+
 #### Troubleshoot Issues
 → **[Quick Reference](quick-reference.md)** → Troubleshooting section
 
@@ -112,6 +124,9 @@ docs/
 ├── tutorial-attacker-fingerprinting.md .... Real-time threat monitoring
 ├── tutorial-overview-dashboard.md ......... System health & incident monitoring
 ├── tutorial-scenario-builder.md ........... Multi-step automation sequences
+├── tutorial-chaos-console.md .............. Fault injection & resilience testing
+├── tutorial-advanced-red-team.md .......... Multi-target campaigns & strategies
+├── tutorial-performance-tuning.md ......... Optimization for scale & load
 │
 └── DOCUMENTATION_ROADMAP.md .............. Future documentation plans
 ```
@@ -230,6 +245,9 @@ docs/
 | tutorial-attacker-fingerprinting.md | Threat monitoring & response | SOC/Incident response | ✅ New |
 | tutorial-overview-dashboard.md | System health & incidents | All users | ✅ New |
 | tutorial-scenario-builder.md | Multi-step automation | Advanced users | ✅ New |
+| tutorial-chaos-console.md | Fault injection & resilience | DevOps/SRE | ✅ New |
+| tutorial-advanced-red-team.md | Multi-target campaigns | Red teamers | ✅ New |
+| tutorial-performance-tuning.md | Optimization & scaling | Operators | ✅ New |
 
 ---
 
