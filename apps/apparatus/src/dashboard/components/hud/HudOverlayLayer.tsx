@@ -155,6 +155,18 @@ export function HudOverlayLayer() {
     setHudHidden(loadHudHidden());
   }, []);
 
+  // Listen for HUD visibility changes (e.g., from Sidebar toggle)
+  useEffect(() => {
+    const handleHudVisibilityChange = (event: Event) => {
+      if (event instanceof CustomEvent) {
+        setHudHidden(event.detail.hidden);
+      }
+    };
+
+    window.addEventListener('hud-visibility-changed', handleHudVisibilityChange);
+    return () => window.removeEventListener('hud-visibility-changed', handleHudVisibilityChange);
+  }, []);
+
   useEffect(() => {
     preferencesRef.current = preferences;
   }, [preferences]);
@@ -296,23 +308,8 @@ export function HudOverlayLayer() {
   if (!mounted || !preferences) return null;
 
   if (hudHidden) {
-    return createPortal(
-      <div className="fixed inset-0 z-[9000] pointer-events-none select-none" role="complementary" aria-label="HUD overlay">
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 pointer-events-auto">
-          <button
-            type="button"
-            onClick={() => setHudHidden(false)}
-            aria-expanded="false"
-            aria-label="Show HUD widgets"
-            className="inline-flex items-center gap-1.5 rounded-sm bg-neutral-950/75 px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest text-neutral-200 backdrop-blur-sm hover:text-primary transition-colors"
-          >
-            <Eye className="h-3.5 w-3.5" />
-            Show HUD
-          </button>
-        </div>
-      </div>,
-      document.body
-    );
+    // HUD is hidden - show controls are in the sidebar, nothing to render here
+    return null;
   }
 
   return createPortal(

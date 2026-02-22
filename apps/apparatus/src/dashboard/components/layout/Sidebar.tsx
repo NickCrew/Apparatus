@@ -71,8 +71,8 @@ export function Sidebar() {
     try {
       localStorage.setItem('apparatus-dashboard-hud:hidden', newState ? '1' : '0');
       setHudHidden(newState);
-      // Trigger a reload of the page to show/hide HUD widgets
-      window.location.reload();
+      // Dispatch custom event to notify HudOverlayLayer
+      window.dispatchEvent(new CustomEvent('hud-visibility-changed', { detail: { hidden: newState } }));
     } catch {
       // localStorage unavailable
     }
