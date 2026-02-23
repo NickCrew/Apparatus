@@ -64,6 +64,7 @@ describe('RedTeam Planner Payload', () => {
     expect(payload.memory?.recentAssets).toHaveLength(0);
     expect(payload.memory?.recentObservations).toHaveLength(0);
     expect(payload.memory?.recentRelations).toHaveLength(0);
+    expect(payload.recentDefenseFeedback).toBeNull();
     expect(shouldPauseForBreakSignalsForTests(memory)).toBe(false);
   });
 
@@ -122,6 +123,17 @@ describe('RedTeam Planner Payload', () => {
       snapshot: makeSnapshot(),
       iteration: 2,
       memory,
+      recentDefenseFeedback: {
+        capturedAt: new Date().toISOString(),
+        targetPath: '/checkout',
+        statusCode: 429,
+        bodySnippet: 'rate limit exceeded',
+        latencyMs: 1250,
+        signal: 'rate_limited',
+        reason: 'Received HTTP 429 from objective endpoint.',
+        basedOnTool: 'cluster.attack',
+        toolFailed: false,
+      },
     });
 
     expect(payload.memory?.totals.assets).toBeGreaterThanOrEqual(2);
@@ -129,6 +141,8 @@ describe('RedTeam Planner Payload', () => {
     expect(payload.memory?.totals.observations).toBeGreaterThanOrEqual(1);
     expect(payload.memory?.recentObservations[0]?.summary.length).toBeLessThanOrEqual(160);
     expect(payload.memory?.objectiveProgress.breakSignals).toContain('new-5xx-errors:3');
+    expect(payload.recentDefenseFeedback?.signal).toBe('rate_limited');
+    expect(payload.recentDefenseFeedback?.statusCode).toBe(429);
     expect(shouldPauseForBreakSignalsForTests(memory)).toBe(true);
   });
 });

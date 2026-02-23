@@ -20,7 +20,7 @@ let baseUrl = '';
 
 describe('AI Autopilot', () => {
   beforeAll(async () => {
-    server = app.listen(0);
+    server = app.listen(0, '127.0.0.1');
     await new Promise<void>((resolve) => server?.once('listening', () => resolve()));
     const address = server.address() as AddressInfo;
     baseUrl = `http://127.0.0.1:${address.port}`;
@@ -52,7 +52,7 @@ describe('AI Autopilot', () => {
   });
 
   it('should start mission and expose status', async () => {
-    const startRes = await request(app)
+    const startRes = await request(baseUrl)
       .post('/api/redteam/autopilot/start')
       .send({
         objective: 'Find the breaking point of /checkout API',
@@ -72,7 +72,7 @@ describe('AI Autopilot', () => {
 
     let finalStatus: any = null;
     for (let i = 0; i < 40; i++) {
-      const statusRes = await request(app)
+      const statusRes = await request(baseUrl)
         .get('/api/redteam/autopilot/status')
         .query({ sessionId: startRes.body.sessionId });
 
@@ -91,7 +91,7 @@ describe('AI Autopilot', () => {
   });
 
   it('should hard-stop via kill switch', async () => {
-    const startRes = await request(app)
+    const startRes = await request(baseUrl)
       .post('/api/redteam/autopilot/start')
       .send({
         objective: 'Find breakpoints',
@@ -114,5 +114,53 @@ describe('AI Autopilot', () => {
     expect(killRes.body.killResult).toHaveProperty('cpuStopped');
     expect(killRes.body.killResult).toHaveProperty('memoryCleared');
     expect(killRes.body.killResult).toHaveProperty('cluster');
+  });
+
+  it('should log evasion policy maneuvers when defense signals are detected', async () => {
+    const startRes = await request(baseUrl)
+      .post('/api/redteam/autopilot/start')
+      .send({
+        objective: 'Probe /ratelimit for defense behavior',
+        maxIterations: 12,
+        intervalMs: 0,
+        targetBaseUrl: baseUrl,
+        scope: {
+          allowedTools: ['delay'],
+          forbidCrash: true,
+        },
+      });
+
+    expect(startRes.status).toBe(200);
+
+    let finalStatus: any = null;
+    for (let i = 0; i < 240; i++) {
+      const statusRes = await request(baseUrl)
+        .get('/api/redteam/autopilot/status')
+        .query({ sessionId: startRes.body.sessionId });
+
+      expect(statusRes.status).toBe(200);
+      finalStatus = statusRes.body;
+      if (['completed', 'failed', 'stopped'].includes(statusRes.body.session.state)) break;
+      await new Promise((resolve) => setTimeout(resolve, 25));
+    }
+
+    expect(['completed', 'failed', 'stopped']).toContain(finalStatus.session.state);
+    expect(
+      finalStatus.session.thoughts.some((entry: { message: string }) =>
+        entry.message.includes('Evasion policy maneuver selected')
+      )
+    ).toBe(true);
+    expect(
+      finalStatus.session.actions.some((entry: { tool: string }) => entry.tool === 'delay')
+    ).toBe(true);
+    expect(
+      finalStatus.session.actions.some(
+        (entry: { maneuver?: { triggerSignal?: string; countermeasure?: string } }) =>
+          entry.maneuver?.triggerSignal === 'rate_limited' && entry.maneuver?.countermeasure === 'delay'
+      )
+    ).toBe(true);
+    expect(
+      finalStatus.session.actions.some((entry: { tool: string }) => entry.tool === 'mtd.rotate')
+    ).toBe(false);
   });
 });

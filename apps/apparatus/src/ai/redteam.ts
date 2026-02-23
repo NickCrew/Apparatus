@@ -35,6 +35,11 @@ interface Decision {
     tool: ToolAction | "none";
     params: Record<string, unknown>;
     rawModelOutput: string;
+    maneuver?: {
+        triggerSignal: DefenseSignalCode;
+        countermeasure: ToolAction | "none";
+        rationale: string;
+    };
 }
 
 interface SessionControl {
@@ -91,6 +96,28 @@ interface PlannerMemorySummary {
     };
 }
 
+type DefenseSignalCode =
+    | "none"
+    | "rate_limited"
+    | "waf_blocked"
+    | "mtd_hidden_route"
+    | "tarpit_suspected"
+    | "server_error"
+    | "probe_failed";
+
+export interface DefenseFeedback {
+    capturedAt: string;
+    targetPath: string;
+    statusCode?: number;
+    bodySnippet?: string;
+    latencyMs?: number;
+    probeError?: string;
+    signal: DefenseSignalCode;
+    reason: string;
+    basedOnTool: ToolAction | "none";
+    toolFailed: boolean;
+}
+
 const MEMORY_PROMPT_LIMITS = {
     assets: 8,
     observations: 8,
@@ -98,6 +125,14 @@ const MEMORY_PROMPT_LIMITS = {
     progressSignals: 8,
     textLength: 160,
 } as const;
+const DEFENSE_BODY_SNIPPET_MAX = 220;
+const DEFENSE_BODY_READ_MAX_BYTES = 4096;
+const TARPIT_LATENCY_THRESHOLD_MS = 1200;
+const UNDICI_TIMEOUT_ERROR_CODES = new Set([
+    "UND_ERR_HEADERS_TIMEOUT",
+    "UND_ERR_BODY_TIMEOUT",
+    "UND_ERR_CONNECT_TIMEOUT",
+]);
 
 let activeControl: SessionControl | null = null;
 let startingSession = false;
@@ -333,6 +368,36 @@ function truncateText(value: string, maxLength: number) {
     return `${value.slice(0, maxLength - 3)}...`;
 }
 
+async function readBodySnippet(
+    body: AsyncIterable<Uint8Array> & { destroy?: () => void },
+    maxBytes: number
+) {
+    const chunks: Buffer[] = [];
+    let totalBytes = 0;
+
+    try {
+        for await (const chunk of body) {
+            const asBuffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+            const remaining = maxBytes - totalBytes;
+            if (remaining <= 0) break;
+            if (asBuffer.length > remaining) {
+                chunks.push(asBuffer.subarray(0, remaining));
+                totalBytes += remaining;
+                break;
+            }
+            chunks.push(asBuffer);
+            totalBytes += asBuffer.length;
+            if (totalBytes >= maxBytes) break;
+        }
+    } finally {
+        if (typeof body.destroy === "function") {
+            body.destroy();
+        }
+    }
+
+    return Buffer.concat(chunks).toString("utf8");
+}
+
 function lastItems<T>(items: T[], max: number) {
     if (items.length <= max) return [...items];
     return items.slice(items.length - max);
@@ -372,7 +437,13 @@ function buildPlannerMemorySummary(sessionId: string): PlannerMemorySummary | nu
     };
 }
 
-function composePlannerPayload(control: SessionControl, snapshot: RuntimeSnapshot, iteration: number, memory: PlannerMemorySummary | null) {
+function composePlannerPayload(
+    control: SessionControl,
+    snapshot: RuntimeSnapshot,
+    iteration: number,
+    memory: PlannerMemorySummary | null,
+    recentDefenseFeedback: DefenseFeedback | null
+) {
     return {
         objective: control.objective,
         iteration,
@@ -382,6 +453,7 @@ function composePlannerPayload(control: SessionControl, snapshot: RuntimeSnapsho
             forbidCrashByDefault: !control.allowedTools.includes("chaos.crash"),
         },
         memory,
+        recentDefenseFeedback,
     };
 }
 
@@ -441,6 +513,7 @@ function captureActionMemory(args: {
             reason: args.decision.reason,
             params: args.decision.params,
             error: args.execution?.error,
+            maneuver: args.decision.maneuver,
         },
     });
 
@@ -491,6 +564,7 @@ function captureVerificationMemory(args: {
     objective: string;
     verification: VerificationSummary;
     after: RuntimeSnapshot;
+    defenseFeedback?: DefenseFeedback | null;
 }) {
     const objectivePath = pickTargetPath(args.objective);
     const objectiveAsset = upsertSessionAsset(args.sessionId, {
@@ -568,6 +642,179 @@ function captureVerificationMemory(args: {
     } else {
         addObjectiveProgressSignal(args.sessionId, "preconditionsMet", "no-break-detected");
     }
+
+    if (args.defenseFeedback) {
+        upsertSessionObservation(args.sessionId, {
+            kind: "objective-progress",
+            source: "defense-feedback",
+            summary: `Defense signal: ${args.defenseFeedback.signal}`,
+            details: {
+                iteration: args.iteration,
+                targetPath: args.defenseFeedback.targetPath,
+                signal: args.defenseFeedback.signal,
+                reason: args.defenseFeedback.reason,
+                statusCode: args.defenseFeedback.statusCode,
+                latencyMs: args.defenseFeedback.latencyMs,
+                basedOnTool: args.defenseFeedback.basedOnTool,
+                toolFailed: args.defenseFeedback.toolFailed,
+                probeError: args.defenseFeedback.probeError,
+            },
+        });
+
+        if (args.defenseFeedback.signal !== "none") {
+            const signalValue = `defense-signal:${args.defenseFeedback.signal}`;
+            addObjectiveProgressSignal(args.sessionId, "breakSignals", signalValue);
+
+            const defenseSignalAsset = upsertSessionAsset(args.sessionId, {
+                type: "indicator",
+                value: signalValue,
+                source: "defense-feedback",
+                confidence: 0.75,
+                metadata: {
+                    iteration: args.iteration,
+                    targetPath: args.defenseFeedback.targetPath,
+                    statusCode: args.defenseFeedback.statusCode,
+                    latencyMs: args.defenseFeedback.latencyMs,
+                },
+            });
+
+            if (objectiveAsset?.id && defenseSignalAsset?.id) {
+                upsertSessionRelation(args.sessionId, {
+                    type: "related_to",
+                    fromAssetId: objectiveAsset.id,
+                    toAssetId: defenseSignalAsset.id,
+                    source: "defense-feedback",
+                    confidence: 0.7,
+                    metadata: { iteration: args.iteration },
+                });
+            }
+        }
+    }
+}
+
+function buildPolicyPrefix(iteration: number) {
+    return `rt${iteration.toString(36)}${Date.now().toString(36).slice(-4)}`;
+}
+
+function selectPolicyDecision(
+    control: SessionControl,
+    recentDefenseFeedback: DefenseFeedback | null,
+    iteration: number
+): Decision | null {
+    if (!recentDefenseFeedback || recentDefenseFeedback.signal === "none") {
+        return null;
+    }
+
+    const blockSignal = recentDefenseFeedback.signal === "waf_blocked" || recentDefenseFeedback.signal === "mtd_hidden_route";
+    const canDelay = control.allowedTools.includes("delay");
+    const canRotateMtd = control.allowedTools.includes("mtd.rotate") && recentDefenseFeedback.basedOnTool !== "mtd.rotate";
+
+    if (recentDefenseFeedback.signal === "rate_limited") {
+        if (canDelay) {
+            const duration = clampNumber(Math.max(control.intervalMs, 500) + 500, 1500, 1500, 120000);
+            return {
+                thought: "Recent probe was rate-limited (429). Applying anti-rate-limit backoff before next maneuver.",
+                reason: "Rate limiting detected; slow down to evade throttling and preserve probe fidelity.",
+                tool: "delay",
+                params: { duration },
+                rawModelOutput: "policy:rate_limited",
+                maneuver: {
+                    triggerSignal: recentDefenseFeedback.signal,
+                    countermeasure: "delay",
+                    rationale: "Rate limiting detected; slow down to evade throttling and preserve probe fidelity.",
+                },
+            };
+        }
+        return {
+            thought: "Rate limiting detected but delay is unavailable in allowed tools.",
+            reason: "No safe backoff tool available for anti-rate-limit policy.",
+            tool: "none",
+            params: {},
+            rawModelOutput: "policy:rate_limited:none",
+            maneuver: {
+                triggerSignal: recentDefenseFeedback.signal,
+                countermeasure: "none",
+                rationale: "No safe backoff tool available for anti-rate-limit policy.",
+            },
+        };
+    }
+
+    if (blockSignal) {
+        if (canRotateMtd) {
+            return {
+                thought: "Defensive block detected on the current path. Rotating MTD prefix to pivot route strategy.",
+                reason: `Defense signal ${recentDefenseFeedback.signal} suggests route-targeted blocking.`,
+                tool: "mtd.rotate",
+                params: { prefix: buildPolicyPrefix(iteration) },
+                rawModelOutput: `policy:${recentDefenseFeedback.signal}:mtd_rotate`,
+                maneuver: {
+                    triggerSignal: recentDefenseFeedback.signal,
+                    countermeasure: "mtd.rotate",
+                    rationale: `Defense signal ${recentDefenseFeedback.signal} suggests route-targeted blocking.`,
+                },
+            };
+        }
+        if (canDelay) {
+            return {
+                thought: "Defensive block detected, but MTD rotation is unavailable. Cooling down before the next pivot.",
+                reason: `Defense signal ${recentDefenseFeedback.signal} detected with no rotate capability.`,
+                tool: "delay",
+                params: { duration: clampNumber(Math.max(control.intervalMs, 250), 900, 250, 120000) },
+                rawModelOutput: `policy:${recentDefenseFeedback.signal}:delay`,
+                maneuver: {
+                    triggerSignal: recentDefenseFeedback.signal,
+                    countermeasure: "delay",
+                    rationale: `Defense signal ${recentDefenseFeedback.signal} detected with no rotate capability.`,
+                },
+            };
+        }
+    }
+
+    if (recentDefenseFeedback.signal === "tarpit_suspected") {
+        if (canDelay) {
+            return {
+                thought: "Latency pattern suggests tarpit behavior. Reducing action tempo to avoid repeated stall traps.",
+                reason: "Tarpit suspected from elevated probe latency.",
+                tool: "delay",
+                params: { duration: clampNumber(Math.max(control.intervalMs, 500) + 250, 1200, 250, 120000) },
+                rawModelOutput: "policy:tarpit_suspected",
+                maneuver: {
+                    triggerSignal: recentDefenseFeedback.signal,
+                    countermeasure: "delay",
+                    rationale: "Tarpit suspected from elevated probe latency.",
+                },
+            };
+        }
+        return {
+            thought: "Tarpit suspected, but no delay tool is allowed. Skipping action this cycle.",
+            reason: "No safe anti-tarpit tool available.",
+            tool: "none",
+            params: {},
+            rawModelOutput: "policy:tarpit_suspected:none",
+            maneuver: {
+                triggerSignal: recentDefenseFeedback.signal,
+                countermeasure: "none",
+                rationale: "No safe anti-tarpit tool available.",
+            },
+        };
+    }
+
+    if (recentDefenseFeedback.signal === "probe_failed" && canDelay) {
+        return {
+            thought: "Defense probe failed in the previous cycle. Pausing briefly before retrying.",
+            reason: "Probe instability detected; short backoff to stabilize signal collection.",
+            tool: "delay",
+            params: { duration: clampNumber(Math.max(control.intervalMs, 250), 750, 250, 120000) },
+            rawModelOutput: "policy:probe_failed",
+            maneuver: {
+                triggerSignal: recentDefenseFeedback.signal,
+                countermeasure: "delay",
+                rationale: "Probe instability detected; short backoff to stabilize signal collection.",
+            },
+        };
+    }
+
+    return null;
 }
 
 function fallbackDecision(snapshot: RuntimeSnapshot, control: SessionControl, iteration: number): Decision {
@@ -633,6 +880,12 @@ function sanitizeDecision(candidate: Decision, control: SessionControl): Decisio
     }
 
     const nextParams = { ...candidate.params };
+    const nextManeuver = candidate.maneuver
+        ? {
+            ...candidate.maneuver,
+            countermeasure: nextTool,
+        }
+        : undefined;
 
     if (nextTool === "cluster.attack") {
         const fallbackTarget = buildUrl(control.baseUrl, pickTargetPath(control.objective));
@@ -649,45 +902,51 @@ function sanitizeDecision(candidate: Decision, control: SessionControl): Decisio
             }
         }
         const rate = clampNumber(nextParams.rate, 150, 1, 2000);
-        return { ...candidate, tool: nextTool, params: { target, rate } };
+        return { ...candidate, tool: nextTool, params: { target, rate }, maneuver: nextManeuver };
     }
 
     if (nextTool === "chaos.cpu") {
         const duration = clampNumber(nextParams.duration, 5000, 250, 120000);
-        return { ...candidate, tool: nextTool, params: { duration } };
+        return { ...candidate, tool: nextTool, params: { duration }, maneuver: nextManeuver };
     }
 
     if (nextTool === "chaos.memory") {
         const action = nextParams.action === "clear" ? "clear" : "allocate";
         const amount = clampNumber(nextParams.amount, 128, 1, 8192);
-        return { ...candidate, tool: nextTool, params: { action, amount } };
+        return { ...candidate, tool: nextTool, params: { action, amount }, maneuver: nextManeuver };
     }
 
     if (nextTool === "mtd.rotate") {
         const prefix = typeof nextParams.prefix === "string" ? nextParams.prefix : `rt${Date.now().toString(36).slice(-4)}`;
-        return { ...candidate, tool: nextTool, params: { prefix } };
+        return { ...candidate, tool: nextTool, params: { prefix }, maneuver: nextManeuver };
     }
 
     if (nextTool === "delay") {
         const duration = clampNumber(nextParams.duration, 1000, 10, 120000);
-        return { ...candidate, tool: nextTool, params: { duration } };
+        return { ...candidate, tool: nextTool, params: { duration }, maneuver: nextManeuver };
     }
 
     if (nextTool === "chaos.crash") {
         const delayMs = clampNumber(nextParams.delayMs, 1000, 100, 30000);
-        return { ...candidate, tool: nextTool, params: { delayMs } };
+        return { ...candidate, tool: nextTool, params: { delayMs }, maneuver: nextManeuver };
     }
 
-    return { ...candidate, tool: "none", params: {} };
+    return { ...candidate, tool: "none", params: {}, maneuver: nextManeuver };
 }
 
 async function decideNextAction(
     control: SessionControl,
     snapshot: RuntimeSnapshot,
     iteration: number,
-    memory: PlannerMemorySummary | null
+    memory: PlannerMemorySummary | null,
+    recentDefenseFeedback: DefenseFeedback | null
 ): Promise<Decision> {
     const fallback = fallbackDecision(snapshot, control, iteration);
+
+    const policyDecision = selectPolicyDecision(control, recentDefenseFeedback, iteration);
+    if (policyDecision) {
+        return sanitizeDecision(policyDecision, control);
+    }
 
     if (shouldPauseForBreakSignals(memory)) {
         return sanitizeDecision({
@@ -707,7 +966,7 @@ async function decideNextAction(
         "tool must be one of allowed tools or 'none'.",
     ].join(" ");
 
-    const userPrompt = JSON.stringify(composePlannerPayload(control, snapshot, iteration, memory));
+    const userPrompt = JSON.stringify(composePlannerPayload(control, snapshot, iteration, memory, recentDefenseFeedback));
 
     try {
         const response = await chat(`autopilot-${control.sessionId}`, systemPrompt, userPrompt);
@@ -760,6 +1019,126 @@ function summarizeVerification(base: {
     };
 }
 
+function classifyDefenseSignal(input: {
+    statusCode?: number;
+    latencyMs?: number;
+    probeError?: string;
+}): { signal: DefenseSignalCode; reason: string } {
+    if (input.probeError) {
+        return {
+            signal: "probe_failed",
+            reason: `Defense probe failed: ${input.probeError}`,
+        };
+    }
+
+    if (input.statusCode === 429) {
+        return {
+            signal: "rate_limited",
+            reason: "Received HTTP 429 from objective endpoint.",
+        };
+    }
+
+    if (input.statusCode === 404) {
+        return {
+            signal: "mtd_hidden_route",
+            reason: "Received HTTP 404 from objective endpoint (possible MTD route hiding; verify prior reachability).",
+        };
+    }
+
+    if (input.statusCode === 403 || input.statusCode === 406) {
+        return {
+            signal: "waf_blocked",
+            reason: `Received HTTP ${input.statusCode} from objective endpoint.`,
+        };
+    }
+
+    if (typeof input.statusCode === "number" && input.statusCode >= 500) {
+        return {
+            signal: "server_error",
+            reason: `Received HTTP ${input.statusCode} from objective endpoint.`,
+        };
+    }
+
+    if (typeof input.latencyMs === "number" && input.latencyMs >= TARPIT_LATENCY_THRESHOLD_MS) {
+        return {
+            signal: "tarpit_suspected",
+            reason: `Observed elevated latency (${input.latencyMs}ms).`,
+        };
+    }
+
+    return {
+        signal: "none",
+        reason: "No explicit defense signal detected in objective probe.",
+    };
+}
+
+async function captureDefenseFeedback(
+    control: SessionControl,
+    decision: Decision,
+    execution?: ToolExecutionResult
+): Promise<DefenseFeedback> {
+    const targetPath = pickTargetPath(control.objective);
+    const targetUrl = buildUrl(control.baseUrl, targetPath);
+    const probeStartedAt = Date.now();
+
+    try {
+        const response = await request(targetUrl, {
+            method: "GET",
+            headersTimeout: 2500,
+            bodyTimeout: 2500,
+        });
+
+        const latencyMs = Math.max(0, Date.now() - probeStartedAt);
+        const body = await readBodySnippet(response.body, DEFENSE_BODY_READ_MAX_BYTES);
+        const bodySnippet = truncateText(body.replace(/\s+/g, " ").trim(), DEFENSE_BODY_SNIPPET_MAX);
+        const classified = classifyDefenseSignal({
+            statusCode: response.statusCode,
+            latencyMs,
+        });
+
+        return {
+            capturedAt: new Date().toISOString(),
+            targetPath,
+            statusCode: response.statusCode,
+            bodySnippet: bodySnippet || undefined,
+            latencyMs,
+            signal: classified.signal,
+            reason: classified.reason,
+            basedOnTool: decision.tool,
+            toolFailed: Boolean(execution && !execution.ok),
+        };
+    } catch (error: any) {
+        const message = error?.message || "unknown error";
+        const elapsedMs = Math.max(0, Date.now() - probeStartedAt);
+        const lowerMessage = String(message).toLowerCase();
+        const errorCode = typeof error?.code === "string" ? error.code : "";
+        const isTimeout = UNDICI_TIMEOUT_ERROR_CODES.has(errorCode)
+            || lowerMessage.includes("timeout")
+            || lowerMessage.includes("timed out")
+            || lowerMessage.includes("abort");
+        const classified = isTimeout
+            ? (
+                elapsedMs >= TARPIT_LATENCY_THRESHOLD_MS
+                    ? classifyDefenseSignal({ latencyMs: elapsedMs })
+                    : {
+                        signal: "probe_failed" as DefenseSignalCode,
+                        reason: `Defense probe aborted before tarpit threshold (${elapsedMs}ms).`,
+                    }
+            )
+            : classifyDefenseSignal({ probeError: message });
+        return {
+            capturedAt: new Date().toISOString(),
+            targetPath,
+            probeError: message,
+            latencyMs: elapsedMs,
+            signal: classified.signal,
+            reason: classified.reason,
+            basedOnTool: decision.tool,
+            toolFailed: Boolean(execution && !execution.ok),
+        };
+    }
+}
+
 function parseAllowedTools(input: unknown, forbidCrash = true): ToolAction[] {
     const candidate = Array.isArray(input)
         ? input.filter((tool): tool is ToolAction => typeof tool === "string" && ALL_TOOLS.includes(tool as ToolAction))
@@ -781,6 +1160,7 @@ async function runMission(control: SessionControl) {
     addThought(control.sessionId, "system", `Tool scope: ${control.allowedTools.join(", ")}`);
 
     let previousSnapshot: RuntimeSnapshot | undefined;
+    let previousDefenseFeedback: DefenseFeedback | null = null;
 
     try {
         for (let iteration = 1; iteration <= control.maxIterations; iteration++) {
@@ -815,8 +1195,26 @@ async function runMission(control: SessionControl) {
                 `Telemetry: ${before.rps.toFixed(1)} RPS, ${before.avgLatencyMs.toFixed(1)}ms latency, ${(before.errorRate * 100).toFixed(2)}% errors.`
             );
             const memorySummary = buildPlannerMemorySummary(control.sessionId);
-            const decision = await decideNextAction(control, before, iteration, memorySummary);
+            const decision = await decideNextAction(control, before, iteration, memorySummary, previousDefenseFeedback);
             addThought(control.sessionId, "decide", decision.thought);
+            if (decision.maneuver) {
+                addThought(
+                    control.sessionId,
+                    "decide",
+                    `Evasion policy maneuver selected: signal=${decision.maneuver.triggerSignal}, countermeasure=${decision.maneuver.countermeasure}, rationale=${decision.maneuver.rationale}`
+                );
+                if (decision.maneuver.triggerSignal === "rate_limited") {
+                    const previousIntervalMs = control.intervalMs;
+                    control.intervalMs = clampNumber(Math.max(control.intervalMs, 500) + 500, control.intervalMs, 250, 30000);
+                    if (control.intervalMs !== previousIntervalMs) {
+                        addThought(
+                            control.sessionId,
+                            "decide",
+                            `Anti-rate-limit backoff applied: interval increased from ${previousIntervalMs}ms to ${control.intervalMs}ms.`
+                        );
+                    }
+                }
+            }
 
             if (control.stopRequested || control.killRequested) break;
 
@@ -836,6 +1234,7 @@ async function runMission(control: SessionControl) {
                     params: decision.params,
                     ok: execution.ok,
                     message: execution.message,
+                    maneuver: decision.maneuver,
                 });
 
                 if (!execution.ok) {
@@ -875,7 +1274,10 @@ async function runMission(control: SessionControl) {
                 },
             });
             previousSnapshot = after;
-            const healthAfter = await getHealthStatus(control.baseUrl);
+            const [healthAfter, defenseFeedback] = await Promise.all([
+                getHealthStatus(control.baseUrl),
+                captureDefenseFeedback(control, decision, execution),
+            ]);
             const verification = summarizeVerification({ before, after, healthAfter });
 
             addFinding(control.sessionId, {
@@ -888,11 +1290,16 @@ async function runMission(control: SessionControl) {
                     params: decision.params,
                     reason: decision.reason,
                     rawModelOutput: decision.rawModelOutput,
+                    maneuver: decision.maneuver,
                 },
                 verification,
             });
 
-            addThought(control.sessionId, "report", verification.notes);
+            addThought(
+                control.sessionId,
+                "report",
+                `${verification.notes} Defense signal: ${defenseFeedback.signal}.`
+            );
             safeCaptureMemory(control.sessionId, "verify", () => {
                 captureVerificationMemory({
                     sessionId: control.sessionId,
@@ -900,8 +1307,11 @@ async function runMission(control: SessionControl) {
                     objective: control.objective,
                     verification,
                     after,
+                    defenseFeedback,
                 });
             });
+
+            previousDefenseFeedback = defenseFeedback;
 
             if (verification.broken) {
                 setSessionState(control.sessionId, "completed", {
@@ -1134,6 +1544,11 @@ export function captureActionMemoryForTests(input: {
         reason: string;
         tool: ToolAction | "none";
         params: Record<string, unknown>;
+        maneuver?: {
+            triggerSignal: DefenseSignalCode;
+            countermeasure: ToolAction | "none";
+            rationale: string;
+        };
     };
     execution?: {
         ok: boolean;
@@ -1167,6 +1582,7 @@ export function captureVerificationMemoryForTests(input: {
         notes: string;
     };
     after: RuntimeSnapshot;
+    defenseFeedback?: DefenseFeedback | null;
 }) {
     captureVerificationMemory(input);
 }
@@ -1189,8 +1605,46 @@ export function composePlannerPayloadForTests(input: {
     snapshot: RuntimeSnapshot;
     iteration: number;
     memory: PlannerMemorySummary | null;
+    recentDefenseFeedback?: DefenseFeedback | null;
 }) {
-    return composePlannerPayload(input.control, input.snapshot, input.iteration, input.memory);
+    return composePlannerPayload(
+        input.control,
+        input.snapshot,
+        input.iteration,
+        input.memory,
+        input.recentDefenseFeedback || null
+    );
+}
+
+export function classifyDefenseSignalForTests(input: {
+    statusCode?: number;
+    latencyMs?: number;
+    probeError?: string;
+}) {
+    return classifyDefenseSignal(input);
+}
+
+export function selectPolicyDecisionForTests(input: {
+    recentDefenseFeedback: DefenseFeedback | null;
+    iteration: number;
+    context: {
+        allowedTools: ToolAction[];
+        baseUrl: string;
+        objective: string;
+        intervalMs?: number;
+    };
+}) {
+    const control: SessionControl = {
+        sessionId: "test-session",
+        stopRequested: false,
+        killRequested: false,
+        baseUrl: input.context.baseUrl,
+        objective: input.context.objective,
+        intervalMs: typeof input.context.intervalMs === "number" ? input.context.intervalMs : 1000,
+        maxIterations: 1,
+        allowedTools: input.context.allowedTools,
+    };
+    return selectPolicyDecision(control, input.recentDefenseFeedback, input.iteration);
 }
 
 export function shouldPauseForBreakSignalsForTests(memory: ReturnType<typeof buildPlannerMemorySummary>) {

@@ -108,6 +108,11 @@ export interface DecisionRecord {
     reason: string;
     params: Record<string, unknown>;
     rawModelOutput?: string;
+    maneuver?: {
+        triggerSignal: string;
+        countermeasure: ToolAction | "none";
+        rationale: string;
+    };
 }
 
 export interface VerificationRecord {
@@ -131,6 +136,11 @@ export interface ActionEntry {
     params: Record<string, unknown>;
     ok: boolean;
     message: string;
+    maneuver?: {
+        triggerSignal: string;
+        countermeasure: ToolAction | "none";
+        rationale: string;
+    };
 }
 
 export interface RedTeamFinding {
