@@ -21,7 +21,7 @@ Apparatus is a **comprehensive security testing platform** that simulates real-w
 
 Think of it as **OWASP WebGoat meets Chaos Monkey meets a full-featured security lab**—all in one platform.
 
-![Apparatus Dashboard](docs/assets/apparatus.png)
+![Apparatus Banner](docs/assets/apparatus-banner.png)
 
 ---
 
