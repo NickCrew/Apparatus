@@ -112,15 +112,65 @@ describe('RedTeam Memory Extraction', () => {
         notes: 'Observed 4 new 5xx errors after action.',
       },
       after: snapshot(420, 0.08),
+      defenseFeedback: {
+        capturedAt: new Date().toISOString(),
+        targetPath: '/checkout',
+        statusCode: 429,
+        bodySnippet: 'too many requests',
+        latencyMs: 1300,
+        signal: 'rate_limited',
+        reason: 'Received HTTP 429 from objective endpoint.',
+        basedOnTool: 'cluster.attack',
+        toolFailed: false,
+      },
     });
 
     const context = getSession(session.id)?.sessionContext;
     expect(context?.observations.some((entry) => entry.kind === 'verification')).toBe(true);
+    expect(
+      context?.observations.some(
+        (entry) => entry.kind === 'objective-progress' && entry.summary.includes('Defense signal: rate_limited')
+      )
+    ).toBe(true);
     expect(context?.objectiveProgress.breakSignals).toContain('service-health-check-failed');
     expect(context?.objectiveProgress.breakSignals).toContain('new-5xx-errors:4');
+    expect(context?.objectiveProgress.breakSignals).toContain('defense-signal:rate_limited');
     expect(context?.assets.some((entry) => entry.value === 'service-health-check-failed')).toBe(true);
     expect(context?.assets.some((entry) => entry.value === 'new-5xx-errors:4')).toBe(true);
+    expect(context?.assets.some((entry) => entry.value === 'defense-signal:rate_limited')).toBe(true);
     expect(context?.relations.some((entry) => entry.type === 'confirms')).toBe(true);
     expect(context?.relations.some((entry) => entry.type === 'escalates_to')).toBe(true);
+    expect(context?.relations.some((entry) => entry.type === 'related_to')).toBe(true);
+  });
+
+  it('does not add defense-signal markers when defense feedback is absent', () => {
+    const session = createSession({
+      objective: 'Find the breaking point of /checkout API',
+      targetBaseUrl: 'http://127.0.0.1:8090',
+      maxIterations: 5,
+      allowedTools: ['delay'],
+    });
+
+    captureVerificationMemoryForTests({
+      sessionId: session.id,
+      iteration: 1,
+      objective: session.objective,
+      verification: {
+        broken: false,
+        crashDetected: false,
+        newServerErrors: 0,
+        notes: 'No crash or new 5xx errors observed.',
+      },
+      after: snapshot(120, 0),
+    });
+
+    const context = getSession(session.id)?.sessionContext;
+    expect(context?.objectiveProgress.preconditionsMet).toContain('no-break-detected');
+    expect(context?.objectiveProgress.breakSignals.some((signal) => signal.startsWith('defense-signal:'))).toBe(false);
+    expect(
+      context?.observations.some(
+        (entry) => entry.kind === 'objective-progress' && entry.source === 'defense-feedback'
+      )
+    ).toBe(false);
   });
 });
