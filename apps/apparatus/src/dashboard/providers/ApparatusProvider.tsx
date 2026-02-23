@@ -22,6 +22,7 @@ interface ApparatusContextValue {
   setBaseUrl: (url: string) => void;
   health: HealthState;
   isConnected: boolean;
+  hasCompletedInitialHealthCheck: boolean;
 }
 
 const ApparatusContext = createContext<ApparatusContextValue | undefined>(undefined);
@@ -62,6 +63,7 @@ interface ApparatusProviderProps {
 export function ApparatusProvider({ children, defaultUrl }: ApparatusProviderProps) {
   const [baseUrl, setBaseUrlState] = useState<string>(() => defaultUrl ?? getStoredUrl());
   const [health, setHealth] = useState<HealthState>({ status: 'unknown' });
+  const [hasCompletedInitialHealthCheck, setHasCompletedInitialHealthCheck] = useState(false);
 
   // Create client when baseUrl changes (with validation)
   const client = useMemo(() => {
@@ -81,13 +83,18 @@ export function ApparatusProvider({ children, defaultUrl }: ApparatusProviderPro
 
   // Health check with proper cleanup
   useEffect(() => {
+    // Re-arm boot readiness whenever the client endpoint changes.
+    setHasCompletedInitialHealthCheck(false);
+
     if (!client) {
       setHealth({ status: 'unknown', message: 'No client configured' });
+      setHasCompletedInitialHealthCheck(true);
       return;
     }
 
     const abortController = new AbortController();
     let intervalId: ReturnType<typeof setInterval> | null = null;
+    let isInitialCheck = true; // Ensure readiness flips only once per effect lifecycle.
 
     const checkHealth = async () => {
       if (abortController.signal.aborted) return;
@@ -111,6 +118,11 @@ export function ApparatusProvider({ children, defaultUrl }: ApparatusProviderPro
           status: 'unhealthy',
           message: error instanceof Error ? error.message : 'Connection failed',
         });
+      } finally {
+        if (!abortController.signal.aborted && isInitialCheck) {
+          isInitialCheck = false;
+          setHasCompletedInitialHealthCheck(true);
+        }
       }
     };
 
@@ -135,8 +147,9 @@ export function ApparatusProvider({ children, defaultUrl }: ApparatusProviderPro
       setBaseUrl,
       health,
       isConnected,
+      hasCompletedInitialHealthCheck,
     }),
-    [client, baseUrl, setBaseUrl, health, isConnected]
+    [client, baseUrl, setBaseUrl, health, isConnected, hasCompletedInitialHealthCheck]
   );
 
   return (

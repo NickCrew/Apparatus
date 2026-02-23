@@ -31,6 +31,8 @@ import { DocViewer } from './components/layout/DocViewer';
 import { DocumentationHub } from './components/docs/DocumentationHub';
 import { HudOverlayLayer } from './components/hud/HudOverlayLayer';
 import { PageShell } from './components/ui/PageShell';
+import { CrtFilterDefs } from './components/layout/CrtFilterDefs';
+import { TerminalBootGate } from './components/layout/TerminalBootGate';
 import { useState, useEffect } from 'react';
 
 function Layout() {
@@ -59,31 +61,34 @@ function Layout() {
   }, []);
 
   return (
-    <div 
-      className="flex h-screen bg-neutral-950 text-neutral-100 font-sans antialiased selection:bg-primary-500/30 overflow-hidden"
-      style={{ '--ui-radius': uiRadius } as React.CSSProperties}
-    >
-      <CommandPalette />
-      <HelpSearchModal
-        open={helpModalOpen}
-        onOpenChange={setHelpModalOpen}
-        onSelectDoc={() => {
-          // openDoc is called through context in HelpSearchModal or here
-          // Component uses context directly, so we just close the modal
-          setHelpModalOpen(false);
-        }}
-      />
-      <DocViewer docId={selectedDocId} onClose={closeDoc} />
-      <Sidebar />
-      <div className="flex flex-col flex-1 min-w-0 relative">
-        <Header />
-        <MainContent>
-          <PageShell>
-            <Outlet />
-          </PageShell>
-        </MainContent>
+    <TerminalBootGate>
+      <div 
+        className="crt-shell flex h-screen bg-neutral-950 text-neutral-100 font-sans antialiased selection:bg-primary-500/30 overflow-hidden"
+        style={{ '--ui-radius': uiRadius } as React.CSSProperties}
+      >
+        <div aria-hidden className="crt-chromatic-layer" />
+        <CommandPalette />
+        <HelpSearchModal
+          open={helpModalOpen}
+          onOpenChange={setHelpModalOpen}
+          onSelectDoc={() => {
+            // openDoc is called through context in HelpSearchModal or here
+            // Component uses context directly, so we just close the modal
+            setHelpModalOpen(false);
+          }}
+        />
+        <DocViewer docId={selectedDocId} onClose={closeDoc} />
+        <Sidebar />
+        <div className="flex flex-col flex-1 min-w-0 relative">
+          <Header />
+          <MainContent>
+            <PageShell>
+              <Outlet />
+            </PageShell>
+          </MainContent>
+        </div>
       </div>
-    </div>
+    </TerminalBootGate>
   );
 }
 
@@ -93,6 +98,7 @@ export default function App() {
       <ThemeProvider>
         <ApparatusProvider>
           <DocViewerProvider>
+            <CrtFilterDefs />
             <HudOverlayLayer />
             <Routes>
               <Route path="docs" element={<PageShell><DocumentationHub /></PageShell>} />
