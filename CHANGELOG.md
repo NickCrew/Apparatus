@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented in this file.
 
-## [Unreleased] - 2026-02-21
+## [0.9.0] - 2026-02-23
 
 ### Added
 - Persistence foundations across core backend stores:

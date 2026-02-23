@@ -1,6 +1,6 @@
 {
   "name": "@apparatus/client",
-  "version": "0.1.0",
+  "version": "0.9.0",
   "description": "TypeScript API client for Apparatus",
   "type": "module",
   "main": "./dist/index.js",
