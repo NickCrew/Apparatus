@@ -42,5 +42,6 @@
       }
     }
   },
+  "implicitDependencies": ["client"],
   "tags": ["type:application", "scope:server"]
 }
