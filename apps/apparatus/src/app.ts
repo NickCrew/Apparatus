@@ -68,6 +68,7 @@ import {
     drillStatusHandler,
 } from "./drills.js";
 import { startDemoLoop, stopDemoLoop, getDemoConfig, updateDemoConfig, type DemoConfig } from "./demo-mode.js";
+import { startAttackSimulation, stopAttackSimulation, isSimulationRunning } from "./attack-sim.js";
 import { attackerProfileHandler, attackerRegistryHandler } from "./attacker-tracker.js";
 import { readdirSync } from "fs";
 import { readdir } from "fs/promises";
@@ -286,7 +287,7 @@ export function createApp(): Express {
 
     // Demo Mode & Integrations Control (Dashboard parity)
     app.get("/_sensor/demo", (_req, res) => {
-        res.json({ success: true, ...getDemoConfig() });
+        res.json({ success: true, ...getDemoConfig(), attack_sim: isSimulationRunning() });
     });
 
     app.all("/_sensor/demo/toggle", (_req, res) => {
@@ -296,7 +297,24 @@ export function createApp(): Express {
         } else {
             startDemoLoop();
         }
-        res.json({ success: true, ...getDemoConfig() });
+        res.json({ success: true, ...getDemoConfig(), attack_sim: isSimulationRunning() });
+    });
+
+    app.post("/_sensor/demo/attack-sim/toggle", securityGate, (req, res) => {
+        if (isSimulationRunning()) {
+            stopAttackSimulation();
+        } else {
+            const rawInterval = Number(req.body.intervalMs);
+            const intervalMs = Math.max(500, Math.min(30000, Number.isFinite(rawInterval) ? rawInterval : 2000));
+            
+            // Determine base URL dynamically (respecting the host header for container setups)
+            const protocol = req.protocol;
+            const host = req.get("host") || `localhost:${cfg.portHttp1}`;
+            const baseUrl = `${protocol}://${host}`;
+            
+            startAttackSimulation(baseUrl, intervalMs);
+        }
+        res.json({ success: true, attack_sim: isSimulationRunning() });
     });
 
     app.put("/_sensor/demo/config", (req, res) => {
