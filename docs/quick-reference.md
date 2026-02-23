@@ -5,7 +5,7 @@
 
 ## Starting Everything
 
-### Full Lab (Apparatus + VulnLab)
+### Full Lab (Apparatus + Chimera)
 
 ```bash
 cd apparatus
@@ -364,7 +364,7 @@ curl -X DELETE http://localhost:8090/history
 # Just Apparatus
 docker-compose up apparatus
 
-# Just VulnLab
+# Just Chimera
 docker-compose up vuln-web vuln-api
 ```
 
@@ -404,4 +404,4 @@ alias apparatus-status='curl http://localhost:8090/healthz && curl http://localh
 - **[View All Features](features.md)** - Complete feature catalog
 - **[API Reference](api.md)** - Detailed endpoint documentation
 - **[Architecture Guide](architecture.md)** - System design and flow
-- **[VulnLab Docs](../../VulnLab)** - Vulnerable application details
+- **[Chimera Docs](../../Chimera)** - Vulnerable application details

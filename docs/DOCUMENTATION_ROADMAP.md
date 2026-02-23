@@ -8,7 +8,7 @@
 |----------|-------|---------|--------|
 | `quick-reference.md` | 398 | Command snippets and quick starts | ✅ Complete |
 | `features.md` | 674 | Feature catalog (59+ features) | ✅ Complete |
-| `integration-guide.md` | 512 | Apparatus + VulnLab integration | ✅ Complete |
+| `integration-guide.md` | 512 | Apparatus + Chimera integration | ✅ Complete |
 | `architecture.md` | 621 | System design and data flow | ✅ Complete |
 
 ---

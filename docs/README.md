@@ -29,7 +29,7 @@ Or browse **[All Features](features.md)** (complete inventory)
 | Document | Purpose | Audience | Time |
 |----------|---------|----------|------|
 | **[Quick Reference](quick-reference.md)** | Commands, services, troubleshooting | Everyone | 5 min |
-| **[Integration Guide](integration-guide.md)** | How Apparatus + VulnLab work together | Testers, DevOps | 10 min |
+| **[Integration Guide](integration-guide.md)** | How Apparatus + Chimera work together | Testers, DevOps | 10 min |
 | **[Architecture Guide](architecture.md)** | System design, components, performance | Developers | 20 min |
 | **[Visual Diagrams](diagrams.md)** | 15 Mermaid flowcharts and network topology | Visual learners | 15 min |
 | **[Complete Features](features.md)** | All 58+ features organized by category | Reference | Varies |
@@ -132,7 +132,7 @@ All architecture diagrams are in **[diagrams.md](diagrams.md)** with 15 interact
 
 ### For First-Time Users
 1. Start with [Quick Reference](quick-reference.md) (5 min)
-2. Follow [Integration Guide](integration-guide.md) to understand Apparatus + VulnLab (10 min)
+2. Follow [Integration Guide](integration-guide.md) to understand Apparatus + Chimera (10 min)
 3. Open dashboard and explore (10 min)
 4. Pick a tutorial that interests you (30+ min)
 

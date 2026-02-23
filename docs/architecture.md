@@ -4,7 +4,7 @@
 
 ## Repository Structure
 
-Apparatus is designed to work alongside VulnLab as a complete security testing ecosystem:
+Apparatus is designed to work alongside Chimera as a complete security testing ecosystem:
 
 ```
 ~/Developer/
@@ -36,11 +36,11 @@ Apparatus is designed to work alongside VulnLab as a complete security testing e
 │   │   ├── quick-reference.md        # This quick start guide
 │   │   ├── architecture.md           # System design (this file)
 │   │   └── api.md                    # API endpoint reference
-│   ├── docker-compose.yml            # Orchestrates Apparatus + VulnLab
+│   ├── docker-compose.yml            # Orchestrates Apparatus + Chimera
 │   ├── README.md                     # Main documentation
 │   └── justfile                      # Task runner
 │
-└── VulnLab/                          # Separate monorepo (vulnerable apps)
+└── Chimera/                          # Separate monorepo (vulnerable apps)
     ├── apps/
     │   ├── vuln-web/                # Vulnerable web app (12 UIs, 450+ endpoints)
     │   └── vuln-api/                # Vulnerable REST API
