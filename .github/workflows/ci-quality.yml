@@ -1,0 +1,133 @@
+name: Quality Checks
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/ci-quality.yml
+      - apps/apparatus/**
+      - apps/cli/**
+      - libs/client/**
+      - package.json
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+      - nx.json
+      - tsconfig.base.json
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/ci-quality.yml
+      - apps/apparatus/**
+      - apps/cli/**
+      - libs/client/**
+      - package.json
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+      - nx.json
+      - tsconfig.base.json
+  workflow_dispatch:
+
+concurrency:
+  group: ci-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  conventional-filter:
+    runs-on: ubuntu-latest
+    outputs:
+      run_ci: ${{ steps.filter.outputs.run_ci }}
+
+    steps:
+      - name: Evaluate conventional commit filter
+        id: filter
+        shell: bash
+        run: |
+          set -euo pipefail
+          REGEX='^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z0-9._\/-]+\))?!?: .+'
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            CANDIDATE="${{ github.event.pull_request.title }}"
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            CANDIDATE="${{ github.event.head_commit.message }}"
+          else
+            CANDIDATE="workflow_dispatch: manual run"
+          fi
+
+          echo "Conventional candidate: $CANDIDATE"
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run_ci=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if printf '%s\n' "$CANDIDATE" | grep -Eiq "$REGEX"; then
+            echo "run_ci=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_ci=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  lint:
+    needs: conventional-filter
+    if: needs.conventional-filter.outputs.run_ci == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run lint
+        run: pnpm nx run-many -t lint --projects=apparatus,client,cli
+
+  test:
+    needs: conventional-filter
+    if: needs.conventional-filter.outputs.run_ci == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests
+        run: pnpm nx run-many -t test --projects=apparatus,client
+
+  filtered-out:
+    needs: conventional-filter
+    if: needs.conventional-filter.outputs.run_ci != 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Report filtered run
+        run: echo "Skipping lint/test because conventional commit filter did not match."
