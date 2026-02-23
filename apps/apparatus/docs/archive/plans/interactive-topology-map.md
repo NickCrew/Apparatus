@@ -1,7 +1,7 @@
 # Plan: Interactive Network Topology Map
 
 ## Objective
-Replace the static `ClusterMap` with a high-fidelity, interactive network topology visualizer that shows real-time traffic relationships between Apparatus, the attacker, and downstream targets (VulnLab).
+Replace the static `ClusterMap` with a high-fidelity, interactive network topology visualizer that shows real-time traffic relationships between Apparatus, the attacker, and downstream targets (Chimera).
 
 ## Key Features
 - **Dynamic Graph:** Auto-arranging force-directed graph of all connected nodes.

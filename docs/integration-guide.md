@@ -1,15 +1,15 @@
-# Integration Guide: Apparatus + VulnLab
+# Integration Guide: Apparatus + Chimera
 
-This guide explains how Apparatus and VulnLab work together as a complete security testing ecosystem.
+This guide explains how Apparatus and Chimera work together as a complete security testing ecosystem.
 
 ## Overview
 
-**Apparatus** and **VulnLab** are two separate monorepos designed to work together:
+**Apparatus** and **Chimera** are two separate monorepos designed to work together:
 
 | Component | Purpose | Location |
 |-----------|---------|----------|
 | **Apparatus** | Security testing platform (59+ features) | `/Users/nferguson/Developer/apparatus` |
-| **VulnLab** | Vulnerable web app + API targets | `/Users/nferguson/Developer/VulnLab` |
+| **Chimera** | Vulnerable web app + API targets | `/Users/nferguson/Developer/Chimera` |
 
 Together they form a **complete attack/defense simulation lab**.
 
@@ -97,7 +97,7 @@ curl http://localhost:8090/dashboard
 ### 4. Scenario-Based Testing
 
 ```bash
-# Create multi-step scenario targeting VulnLab
+# Create multi-step scenario targeting Chimera
 curl -X POST http://localhost:8090/scenarios \
   -H "Content-Type: application/json" \
   -d '{
@@ -171,17 +171,17 @@ pnpm build
 docker-compose up --build
 ```
 
-### Making Changes to VulnLab
+### Making Changes to Chimera
 
 ```bash
 # Stop docker-compose
 docker-compose down
 
-# Navigate to VulnLab and make changes
-cd ../VulnLab
+# Navigate to Chimera and make changes
+cd ../Chimera
 vi apps/vuln-web/src/index.ts
 
-# Build from VulnLab directory
+# Build from Chimera directory
 pnpm build
 
 # Back to Apparatus, restart
@@ -210,9 +210,9 @@ docker-compose exec vuln-web npm test
 
 ## Key Endpoints for Integration
 
-### Apparatus → VulnLab Testing
+### Apparatus → Chimera Testing
 
-From **Apparatus**, attack or test VulnLab targets:
+From **Apparatus**, attack or test Chimera targets:
 
 ```bash
 # Red team VulnWeb
@@ -239,12 +239,12 @@ curl -X POST http://localhost:8090/scenarios \
   }'
 ```
 
-### VulnLab → Apparatus Communication
+### Chimera → Apparatus Communication
 
-If VulnLab needs to report findings or trigger events in Apparatus:
+If Chimera needs to report findings or trigger events in Apparatus:
 
 ```javascript
-// From VulnLab backend
+// From Chimera backend
 const response = await fetch('http://apparatus:8090/webhooks/vuln-lab-events', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
@@ -269,7 +269,7 @@ curl http://localhost:8090/hooks/vuln-lab-events/inspect
 ### Real-Time Dashboard
 
 Open http://localhost:8090/dashboard to see:
-- All requests hitting both Apparatus and (reflected via echo) VulnLab
+- All requests hitting both Apparatus and (reflected via echo) Chimera
 - Real-time traffic heatmap
 - Autopilot findings and progress
 - Deception honeypot events
@@ -342,8 +342,8 @@ If you only need one component:
 # Just Apparatus
 docker-compose up apparatus
 
-# Just VulnLab (from VulnLab repo)
-cd ../VulnLab
+# Just Chimera (from Chimera repo)
+cd ../Chimera
 docker-compose up
 
 # Just run source (no Docker)
@@ -448,7 +448,7 @@ curl -X POST http://localhost:8090/api/redteam/autopilot/start \
   -d '{"target": "http://my-app:8000"}'
 ```
 
-### Custom Scenario for VulnLab
+### Custom Scenario for Chimera
 
 ```bash
 curl -X POST http://localhost:8090/scenarios \
@@ -471,7 +471,7 @@ curl -X POST http://localhost:8090/scenarios \
 # Run Terminal UI in Apparatus
 docker-compose exec apparatus pnpm tui
 
-# Watch real-time metrics while testing VulnLab
+# Watch real-time metrics while testing Chimera
 ```
 
 ---
@@ -481,7 +481,7 @@ docker-compose exec apparatus pnpm tui
 - **[Quick Reference](quick-reference.md)** - Common commands and scenarios
 - **[Features](features.md)** - All 58+ features explained
 - **[Architecture](architecture.md)** - System design and data flow
-- **[VulnLab Documentation](../../VulnLab)** - Vulnerable app details
+- **[Chimera Documentation](../../Chimera)** - Vulnerable app details
 
 ---
 

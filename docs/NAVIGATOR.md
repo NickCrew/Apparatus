@@ -8,7 +8,7 @@ Welcome! This guide helps you find the right documentation for your needs.
 
 ### Getting Started
 - **[Quick Reference](quick-reference.md)** — Common commands, services, and troubleshooting
-- **[Integration Guide](integration-guide.md)** — How Apparatus + VulnLab work together
+- **[Integration Guide](integration-guide.md)** — How Apparatus + Chimera work together
 
 ### Learning & Tutorials
 - **[Tutorial: CLI Reference](tutorial-cli.md)** — Command-line tool and scripting
@@ -105,7 +105,7 @@ Welcome! This guide helps you find the right documentation for your needs.
 docs/
 ├── NAVIGATOR.md (this file)
 ├── quick-reference.md ..................... Start here! Commands & scenarios
-├── integration-guide.md ................... Apparatus + VulnLab integration
+├── integration-guide.md ................... Apparatus + Chimera integration
 ├── architecture.md ........................ System design & technical details
 ├── diagrams.md ............................ Visual flowcharts & network topology
 ├── features.md ............................ Feature inventory (58+)
@@ -139,7 +139,7 @@ docs/
 2. **[Tutorial: Dashboard](tutorial-dashboard.md)** — Real-time monitoring UI
 3. **[Architecture Guide](architecture.md)** — How it works
 4. **[Visual Diagrams](diagrams.md)** — Flowcharts & network topology
-5. **[Integration Guide](integration-guide.md)** — Apparatus + VulnLab workflow
+5. **[Integration Guide](integration-guide.md)** — Apparatus + Chimera workflow
 
 ---
 

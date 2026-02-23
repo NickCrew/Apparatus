@@ -4,7 +4,7 @@
 
 ![Node.js](https://img.shields.io/badge/Node.js-v23-green)
 ![TypeScript](https://img.shields.io/badge/TypeScript-Strict-blue)
-![Multi-Protocol](https://img.shields.io/badge/Protocols-11%2B-orange)
+![Multi-Protocol](https://img.shields.io/badge/Protocols-13%2B-orange)
 ![Open Source](https://img.shields.io/badge/License-MIT-black)
 
 ---
@@ -103,13 +103,13 @@ Think of it as **OWASP WebGoat meets Chaos Monkey meets a full-featured security
 - pnpm (or npm/yarn)
 - Optional: tcpdump (for PCAP capture), Docker (for containerized deployment)
 
-### Option 1: Full Lab with VulnLab (Recommended for Testing)
+### Option 1: Full Lab with Chimera (Recommended for Testing)
 
 ```bash
 # Clone both repositories
 cd ~/Developer
-git clone https://github.com/yourusername/apparatus.git
-git clone https://github.com/yourusername/VulnLab.git
+git clone https://github.com/NickCrew/apparatus.git
+git clone https://github.com/NickCrew/Chimera.git
 
 # Start complete testing environment
 cd apparatus
@@ -127,7 +127,7 @@ This starts:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/apparatus.git
+git clone https://github.com/NickCrew/apparatus.git
 cd apparatus
 
 # Install dependencies
@@ -464,9 +464,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## Related Projects
 
-Apparatus is designed to work seamlessly with **VulnLab**:
+Apparatus is designed to work seamlessly with **Chimera**:
 
-- **[VulnLab](../VulnLab)** - Vulnerable web application and REST API with 450+ endpoints and 12 UIs
+- **[Chimera](../Chimera)** - Vulnerable web application and REST API with 450+ endpoints and 12 UIs
   - Provides realistic attack targets for security testing
   - Includes XSS, SQLi, CSRF, auth bypass, insecure deserialization vulnerabilities
   - Runs alongside Apparatus via `docker-compose`
@@ -488,15 +488,15 @@ MIT License - See [LICENSE](LICENSE) for details
 - **[Features](docs/features.md)** - Complete catalog of 58+ features
 - **[Architecture](docs/architecture.md)** - System design, data flow, and components
 - **[API Reference](docs/api.md)** - Detailed endpoint documentation
-- **[Related: VulnLab](../VulnLab)** - Vulnerable web app and API (450+ endpoints, 12 UIs)
+- **[Related: Chimera](../Chimera)** - Vulnerable web app and API (450+ endpoints, 12 UIs)
 
 ---
 
 ## Support
 
 - 📖 [Full Documentation](docs/)
-- 🐛 [Issue Tracker](https://github.com/yourusername/apparatus/issues)
-- 💬 [Discussions](https://github.com/yourusername/apparatus/discussions)
+- 🐛 [Issue Tracker](https://github.com/NickCrew/apparatus/issues)
+- 💬 [Discussions](https://github.com/NickCrew/apparatus/discussions)
 - 📧 Contact: nick@atlascrew.dev
 
 ---

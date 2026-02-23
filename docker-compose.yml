@@ -26,10 +26,10 @@ services:
       retries: 3
       start_period: 10s
 
-  # VulnLab: Vulnerable Web Application
+  # Chimera: Vulnerable Web Application
   vuln-web:
     build:
-      context: ../VulnLab/apps/vuln-web
+      context: ../Chimera/apps/vuln-web
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
@@ -48,10 +48,10 @@ services:
       retries: 3
       start_period: 15s
 
-  # VulnLab: Vulnerable REST API
+  # Chimera: Vulnerable REST API
   vuln-api:
     build:
-      context: ../VulnLab/apps/vuln-api
+      context: ../Chimera/apps/vuln-api
       dockerfile: Dockerfile
     ports:
       - "5000:5000"
