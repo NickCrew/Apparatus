@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       dist_tag:
-        description: NPM dist-tag to publish under (for example: latest, next)
+        description: "NPM dist-tag to publish under (for example: latest, next)"
         required: false
         default: latest
 

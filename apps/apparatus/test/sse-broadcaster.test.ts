@@ -213,12 +213,10 @@ describe('SSEBroadcaster', () => {
             broadcaster.broadcast('request', { id: 123 });
 
             expect(res.write).toHaveBeenNthCalledWith(1, 'event: request\n');
-            // Check data line format: data: <json>\n\n
-            // Also check that the JSON contains the timestamp and original data
+            // sendToClient injects timestamp directly into the data object
             const expectedJson = JSON.stringify({
-                type: 'request',
+                id: 123,
                 timestamp: timestamp.toISOString(),
-                data: { id: 123 }
             });
             expect(res.write).toHaveBeenNthCalledWith(2, `data: ${expectedJson}\n\n`);
         });

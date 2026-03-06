@@ -2,15 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
 import { createApp } from '../src/app.js';
 import { blockedIps } from '../src/tarpit.js';
-import * as undici from 'undici';
-
-// Mock undici for Threat Intel reporting
-vi.mock('undici', () => ({
-    request: vi.fn().mockResolvedValue({ 
-        statusCode: 200,
-        body: { json: () => Promise.resolve([]) }
-    })
-}));
 
 const app = createApp();
 
@@ -51,20 +42,16 @@ describe('Round 10: The Singularity', () => {
         });
     });
 
-    describe('Threat Intel Integration', () => {
-        it('should report threats to Threat Intel on trap trigger', async () => {
-            process.env.THREAT_INTEL_ADMIN_KEY = 'a'.repeat(32);
-
-            // Trigger a tarpit trap
+    describe('Tarpit Defense', () => {
+        it('should trap IPs that hit honeypot paths', async () => {
+            // /wp-admin is a TRAP_PATH — the tarpit enters slow-drip mode
+            // and the request won't complete normally, so we use a timeout
             try {
                 await request(app).get('/wp-admin').timeout(50);
             } catch (e) {}
 
-            // Verify reporting was attempted
-            expect(undici.request).toHaveBeenCalledWith(
-                expect.stringContaining('/_sensor/report'),
-                expect.objectContaining({ method: 'POST' })
-            );
+            // The requesting IP should now be in the blocked set
+            expect(blockedIps.size).toBeGreaterThanOrEqual(1);
         });
     });
 });

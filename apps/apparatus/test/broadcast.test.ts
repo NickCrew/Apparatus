@@ -25,16 +25,18 @@ describe('Traffic Broadcast Middleware', () => {
     it('should broadcast request details after response finishes', async () => {
         const broadcastSpy = vi.spyOn(sseBroadcaster, 'broadcast');
 
-        // Make a request
-        const res = await request(app).get('/healthz');
+        // Use a route that passes through the full middleware stack (not /healthz,
+        // which is registered before the broadcast middleware and bypasses it).
+        const res = await request(app).get('/echo');
         expect(res.status).toBe(200);
 
-        // Broadcast happens on 'finish', which might be slightly async relative to supertest return?
-        // Supertest waits for the response, so 'finish' should have fired.
-        
+        // Broadcast happens in the res 'finish' listener which may fire on a
+        // later tick than when supertest resolves.
+        await new Promise(r => setTimeout(r, 50));
+
         expect(broadcastSpy).toHaveBeenCalledWith('request', expect.objectContaining({
             method: 'GET',
-            path: '/healthz',
+            path: '/echo',
             status: 200,
         }));
     });
