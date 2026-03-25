@@ -65,7 +65,7 @@ The **Live Payload Fuzzer** is a **web-based HTTP request builder** that lives i
 
 The **Live Payload Fuzzer** form has these fields:
 
-<img src="/dashboard/assets/diagrams/diagram-42-live-fuzzer-interface.svg" alt="Live Payload Fuzzer interface flow from target and payload inputs through execution controls to captured response output." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-42-live-fuzzer-interface.svg" alt="Live Payload Fuzzer interface flow from target and payload inputs through execution controls to captured response output." width="940" style="max-width: 100%; height: auto;" />
 
 ### Checkpoint
 
@@ -323,7 +323,7 @@ Latency: 500ms (or close to it)
 
 After each request, you'll see classified telemetry:
 
-<img src="/dashboard/assets/diagrams/diagram-43-lab-ops-output-structure.svg" alt="Lab Operations output structure including status and blocked flags, headers, body preview, and latency/size metrics." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-43-lab-ops-output-structure.svg" alt="Lab Operations output structure including status and blocked flags, headers, body preview, and latency/size metrics." width="940" style="max-width: 100%; height: auto;" />
 
 ### What Each Field Means
 
@@ -338,7 +338,7 @@ After each request, you'll see classified telemetry:
 
 ### Interpreting Defense Classifications
 
-<img src="/dashboard/assets/diagrams/diagram-19-defense-classification.svg" alt="Defense classification decision flow for blocked, passed, and high-latency outcomes." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-19-defense-classification.svg" alt="Defense classification decision flow for blocked, passed, and high-latency outcomes." width="940" style="max-width: 100%; height: auto;" />
 
 **Scenario 1: Blocked = true, Status 403**
 ```
@@ -402,7 +402,7 @@ Conduct a 5-minute security test and document:
 
 **Objective:** Test if all major attack vectors are blocked.
 
-<img src="/dashboard/assets/diagrams/diagram-20-fuzzer-middleware-flow.svg" alt="Live payload fuzzer request flow through MTD, deception/tarpit, WAF, and handler classification." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-20-fuzzer-middleware-flow.svg" alt="Live payload fuzzer request flow through MTD, deception/tarpit, WAF, and handler classification." width="940" style="max-width: 100%; height: auto;" />
 
 **Steps:**
 

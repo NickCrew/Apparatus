@@ -1,0 +1,89 @@
+---
+layout: default
+---
+<div class="home">
+  <section class="hero">
+    <img src="{{ '/assets/apparatus-banner.png' | relative_url }}" alt="Apparatus — Open-source AI-augmented network security platform" class="hero-banner">
+  </section>
+
+  <section class="intro">
+    <p class="intro-text">An all-in-one cybersecurity testing and simulation lab. Test defenses, run red team operations, inject chaos, and monitor everything in real time.</p>
+    <div class="intro-actions">
+      <a href="{{ '/quick-reference' | relative_url }}" class="btn btn-primary">Get Started</a>
+      <a href="https://github.com/NickCrew/apparatus" class="btn btn-outline">View on GitHub</a>
+    </div>
+  </section>
+
+  <section class="features-grid">
+    <div class="feature-card">
+      <h3>Defense &amp; Deception</h3>
+      <p>WAF rules, honeypot traps, tarpit defenses, moving target defense, and AI-powered deception engines.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Red Team &amp; AI Autopilot</h3>
+      <p>Autonomous AI red team agent, payload fuzzing, multi-target campaigns, and attack scenario automation.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Chaos Engineering</h3>
+      <p>CPU and memory injection, network fault simulation, latency spikes, and resilience testing scenarios.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Multi-Protocol</h3>
+      <p>HTTP/1.1, HTTP/2, gRPC, WebSocket, Redis, MQTT, SMTP, Syslog, ICAP — all in one platform.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Real-Time Monitoring</h3>
+      <p>Web dashboard, terminal UI, SSE streaming, attacker fingerprinting, and incident tracking.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Security Testing</h3>
+      <p>Integrated k6 load testing, Nuclei vulnerability scanning, egress canaries, and testing lab workflows.</p>
+    </div>
+  </section>
+
+  <section class="quickstart">
+    <h2>Quick Start</h2>
+    <div class="quickstart-options">
+      <div class="quickstart-option">
+        <h4>Docker Compose</h4>
+        <pre><code>git clone https://github.com/NickCrew/apparatus.git
+cd apparatus
+docker compose --profile chimera up -d</code></pre>
+      </div>
+      <div class="quickstart-option">
+        <h4>From Source</h4>
+        <pre><code>git clone https://github.com/NickCrew/apparatus.git
+cd apparatus
+pnpm install &amp;&amp; pnpm build
+pnpm dev:server</code></pre>
+      </div>
+      <div class="quickstart-option">
+        <h4>CLI</h4>
+        <pre><code>npm install -g @apparatus/cli
+apparatus --url http://localhost:8090 status</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="explore">
+    <h2>Explore</h2>
+    <div class="explore-links">
+      <a href="{{ '/architecture' | relative_url }}" class="explore-card">
+        <h4>Architecture</h4>
+        <p>System design, middleware pipeline, and component details</p>
+      </a>
+      <a href="{{ '/features' | relative_url }}" class="explore-card">
+        <h4>58+ Features</h4>
+        <p>Complete feature catalog with descriptions and capabilities</p>
+      </a>
+      <a href="{{ '/diagrams' | relative_url }}" class="explore-card">
+        <h4>Visual Diagrams</h4>
+        <p>47 architectural and flow diagrams</p>
+      </a>
+      <a href="{{ '/tutorial-cli' | relative_url }}" class="explore-card">
+        <h4>Tutorials</h4>
+        <p>Hands-on guides from beginner to advanced</p>
+      </a>
+    </div>
+  </section>
+</div>

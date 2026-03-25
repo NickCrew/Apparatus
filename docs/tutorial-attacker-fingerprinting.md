@@ -65,7 +65,7 @@ Think of it as your **SOC (Security Operations Center) dashboard** — a central
 
 ### The Attacker Fingerprinting Layout
 
-<img src="/dashboard/assets/diagrams/diagram-12-fingerprint-layout.svg" alt="Attacker Fingerprinting console layout showing controls, attacker list, profile details, protocol heatmap, and response actions." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-12-fingerprint-layout.svg" alt="Attacker Fingerprinting console layout showing controls, attacker list, profile details, protocol heatmap, and response actions." width="940" style="max-width: 100%; height: auto;" />
 
 ### Checkpoint
 
@@ -103,7 +103,7 @@ A **risk score** (0–100) represents the **threat level** of an IP address. It'
 | **Tarpit effectiveness** | Longer time in tarpit = lower skill = lower score | Gave up quickly = lower score |
 | **Geographic factors** | Unexpected regions get higher score | Rare country = higher score |
 
-<img src="/dashboard/assets/diagrams/diagram-36-risk-score-calculation.svg" alt="Risk score calculation flow combining attack behavior, reputation, modifiers, and weighted scoring bands." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-36-risk-score-calculation.svg" alt="Risk score calculation flow combining attack behavior, reputation, modifiers, and weighted scoring bands." width="940" style="max-width: 100%; height: auto;" />
 
 ### Risk Score Color Coding
 
@@ -139,7 +139,7 @@ Each IP is classified into a category:
 | **Known Bot** | IP on a known botnet/spider list | Track (may be suspicious, may be legitimate bot) |
 | **Unknown External** | IP from outside your network, no reputation data | Investigate (could be attacker or legitimate user) |
 
-<img src="/dashboard/assets/diagrams/diagram-38-attacker-classification-taxonomy.svg" alt="Attacker classification taxonomy linking source category, typical risk bands, and behavior profiling signals." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-38-attacker-classification-taxonomy.svg" alt="Attacker classification taxonomy linking source category, typical risk bands, and behavior profiling signals." width="940" style="max-width: 100%; height: auto;" />
 
 ### Try It: Filter by Category
 
@@ -168,7 +168,7 @@ Each IP is classified into a category:
 
 When you click on an IP in the Attackers List, you see a detailed **profile** showing:
 
-<img src="/dashboard/assets/diagrams/diagram-13-attacker-profile-card.svg" alt="Attacker profile card flow showing identity, risk summary, protocol distribution, attack type breakdown, and response history." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-13-attacker-profile-card.svg" alt="Attacker profile card flow showing identity, risk summary, protocol distribution, attack type breakdown, and response history." width="940" style="max-width: 100%; height: auto;" />
 
 ### Interpreting the Heatmap
 
@@ -306,7 +306,7 @@ For each attacker, you can take immediate actions:
 
 **You notice a sudden spike of requests. What do you do?**
 
-<img src="/dashboard/assets/diagrams/diagram-37-attacker-response-decision-tree.svg" alt="Attacker response decision tree based on risk level, bypass evidence, and response actions." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-37-attacker-response-decision-tree.svg" alt="Attacker response decision tree based on risk level, bypass evidence, and response actions." width="940" style="max-width: 100%; height: auto;" />
 
 #### Step 1: Identify the Threat (1 min)
 

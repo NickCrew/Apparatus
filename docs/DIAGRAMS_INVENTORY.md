@@ -10,13 +10,13 @@ All ASCII instances previously tracked in this file have been replaced with Merm
 
 | Status | Tutorial File | Replaced Section | Mermaid Source | Embedded SVG |
 |---|---|---|---|---|
-| ✅ | `tutorial-attacker-fingerprinting.md` | Attacker Fingerprinting Layout | `docs/assets/diagrams/diagram-12-fingerprint-layout.mmd` | `/dashboard/assets/diagrams/diagram-12-fingerprint-layout.svg` |
-| ✅ | `tutorial-attacker-fingerprinting.md` | Attacker Profile Card | `docs/assets/diagrams/diagram-13-attacker-profile-card.mmd` | `/dashboard/assets/diagrams/diagram-13-attacker-profile-card.svg` |
-| ✅ | `tutorial-chaos-console.md` | Chaos Console Layout | `docs/assets/diagrams/diagram-14-chaos-console-layout.mmd` | `/dashboard/assets/diagrams/diagram-14-chaos-console-layout.svg` |
-| ✅ | `tutorial-overview-dashboard.md` | Overview Dashboard Sections | `docs/assets/diagrams/diagram-15-overview-sections.mmd` | `/dashboard/assets/diagrams/diagram-15-overview-sections.svg` |
-| ✅ | `tutorial-scenario-builder.md` | Scenario Structure | `docs/assets/diagrams/diagram-16-scenario-structure.mmd` | `/dashboard/assets/diagrams/diagram-16-scenario-structure.svg` |
-| ✅ | `tutorial-advanced-red-team.md` | Campaign Phases Structure | `docs/assets/diagrams/diagram-17-campaign-phases.mmd` | `/dashboard/assets/diagrams/diagram-17-campaign-phases.svg` |
-| ✅ | `tutorial-dashboard.md` | Console Panel Structure | `docs/assets/diagrams/diagram-18-console-panel-structure.mmd` | `/dashboard/assets/diagrams/diagram-18-console-panel-structure.svg` |
+| ✅ | `tutorial-attacker-fingerprinting.md` | Attacker Fingerprinting Layout | `docs/assets/diagrams/diagram-12-fingerprint-layout.mmd` | `assets/diagrams/diagram-12-fingerprint-layout.svg` |
+| ✅ | `tutorial-attacker-fingerprinting.md` | Attacker Profile Card | `docs/assets/diagrams/diagram-13-attacker-profile-card.mmd` | `assets/diagrams/diagram-13-attacker-profile-card.svg` |
+| ✅ | `tutorial-chaos-console.md` | Chaos Console Layout | `docs/assets/diagrams/diagram-14-chaos-console-layout.mmd` | `assets/diagrams/diagram-14-chaos-console-layout.svg` |
+| ✅ | `tutorial-overview-dashboard.md` | Overview Dashboard Sections | `docs/assets/diagrams/diagram-15-overview-sections.mmd` | `assets/diagrams/diagram-15-overview-sections.svg` |
+| ✅ | `tutorial-scenario-builder.md` | Scenario Structure | `docs/assets/diagrams/diagram-16-scenario-structure.mmd` | `assets/diagrams/diagram-16-scenario-structure.svg` |
+| ✅ | `tutorial-advanced-red-team.md` | Campaign Phases Structure | `docs/assets/diagrams/diagram-17-campaign-phases.mmd` | `assets/diagrams/diagram-17-campaign-phases.svg` |
+| ✅ | `tutorial-dashboard.md` | Console Panel Structure | `docs/assets/diagrams/diagram-18-console-panel-structure.mmd` | `assets/diagrams/diagram-18-console-panel-structure.svg` |
 
 ---
 

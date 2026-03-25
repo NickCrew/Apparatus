@@ -50,7 +50,7 @@ By the end, you'll have:
 
 ### Apparatus Monitoring Architecture
 
-<img src="/dashboard/assets/diagrams/diagram-7-monitoring.svg" alt="Monitoring architecture across SSE, Prometheus metrics, logs, dashboards, and analysis tools." width="680" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-7-monitoring.svg" alt="Monitoring architecture across SSE, Prometheus metrics, logs, dashboards, and analysis tools." width="680" style="max-width: 100%; height: auto;" />
 
 ### Metrics Apparatus Tracks
 
@@ -381,7 +381,7 @@ docker exec apparatus-server npm run tui
 
 **What you see:**
 
-<img src="/dashboard/assets/diagrams/diagram-44-terminal-dashboard-layout.svg" alt="Terminal monitoring dashboard layout showing status and request metrics, events and vulnerability panels, and traffic graph." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-44-terminal-dashboard-layout.svg" alt="Terminal monitoring dashboard layout showing status and request metrics, events and vulnerability panels, and traffic graph." width="940" style="max-width: 100%; height: auto;" />
 
 ### Terminal UI Features
 

@@ -59,7 +59,7 @@ A **campaign** is a **coordinated series of attacks** designed to:
 
 ### Campaign Structure
 
-<img src="/dashboard/assets/diagrams/diagram-17-campaign-phases.svg" alt="Five-phase attack campaign sequence from reconnaissance through analysis with time estimates." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-17-campaign-phases.svg" alt="Five-phase attack campaign sequence from reconnaissance through analysis with time estimates." width="940" style="max-width: 100%; height: auto;" />
 
 ---
 
@@ -86,7 +86,7 @@ MEDIUM vectors (test after):
   3. Deserialization attacks
 ```
 
-<img src="/dashboard/assets/diagrams/diagram-24-multivector-campaign-flow.svg" alt="Multi-vector campaign flow from reconnaissance through exploitation, persistence, escalation, and analysis." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-24-multivector-campaign-flow.svg" alt="Multi-vector campaign flow from reconnaissance through exploitation, persistence, escalation, and analysis." width="940" style="max-width: 100%; height: auto;" />
 
 ### Try It: Design a Multi-Vector Campaign
 
@@ -369,7 +369,7 @@ curl http://localhost:8090/api/redteam/autopilot/reports | jq .
 | **Recovery Time** | Time to restore after bypass | 30s |
 | **Correlation Score** | Likelihood attacks are coordinated | 0.8 (likely coordinated) |
 
-<img src="/dashboard/assets/diagrams/diagram-25-attack-success-rate.svg" alt="Attack success rate calculation flow based on blocked versus bypassed payload outcomes and escalation thresholds." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-25-attack-success-rate.svg" alt="Attack success rate calculation flow based on blocked versus bypassed payload outcomes and escalation thresholds." width="940" style="max-width: 100%; height: auto;" />
 
 ### Campaign Report Template
 

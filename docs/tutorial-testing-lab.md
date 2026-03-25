@@ -48,17 +48,17 @@ The **Testing Lab** is a **unified security testing dashboard** that combines th
 | **Nuclei Templates** | Automated vulnerability scanning | Security audits, compliance checks, CVE detection |
 | **Escape Artist** | Egress channel validation | Testing data exfiltration, command & control validation |
 
-<img src="/dashboard/assets/diagrams/diagram-39-security-testing-methodology-map.svg" alt="Security testing methodology map connecting objective-driven tools to recommended test sequence and unified reporting." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-39-security-testing-methodology-map.svg" alt="Security testing methodology map connecting objective-driven tools to recommended test sequence and unified reporting." width="940" style="max-width: 100%; height: auto;" />
 
 Think of it as your **security testing command center** — everything happens here in one place.
 
 ### The Testing Lab Layout
 
-<img src="/dashboard/assets/diagrams/diagram-41-testing-lab-layout.svg" alt="Testing Lab layout showing payload fuzzer, k6 scenarios, Nuclei templates, and unified operations output." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-41-testing-lab-layout.svg" alt="Testing Lab layout showing payload fuzzer, k6 scenarios, Nuclei templates, and unified operations output." width="940" style="max-width: 100%; height: auto;" />
 
 ### Try It: Navigate to Testing Lab
 
-<img src="/dashboard/assets/diagrams/diagram-40-tool-selection-decision-tree.svg" alt="Tool selection decision tree for choosing k6, Nuclei, payload fuzzing, or egress validation based on test goals." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-40-tool-selection-decision-tree.svg" alt="Tool selection decision tree for choosing k6, Nuclei, payload fuzzing, or egress validation based on test goals." width="940" style="max-width: 100%; height: auto;" />
 
 1. Open the dashboard: `http://localhost:8090/dashboard`
 2. Click **Testing Lab** in the left sidebar (or press Cmd+K and type "Lab")
@@ -116,7 +116,7 @@ The dashboard comes with **pre-configured k6 scenarios**. Each represents a diff
 
 **VU** = Virtual User (simulated user making requests)
 
-<img src="/dashboard/assets/diagrams/diagram-21-k6-lifecycle.svg" alt="k6 test lifecycle from setup and ramp-up through peak load, ramp-down, and results." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-21-k6-lifecycle.svg" alt="k6 test lifecycle from setup and ramp-up through peak load, ramp-down, and results." width="940" style="max-width: 100%; height: auto;" />
 
 ### Try It: Run a Smoke Test (Light Load)
 
@@ -270,7 +270,7 @@ Each **Nuclei template** is a vulnerability check. Templates available include:
 | **Information Disclosure** | Version banners, debug endpoints | Medium |
 | **CMS-specific** | WordPress, Joomla vulnerabilities | Varies |
 
-<img src="/dashboard/assets/diagrams/diagram-23-nuclei-scan-process.svg" alt="Nuclei scan workflow from template selection to severity-based remediation decisions." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-23-nuclei-scan-process.svg" alt="Nuclei scan workflow from template selection to severity-based remediation decisions." width="940" style="max-width: 100%; height: auto;" />
 
 ### Try It: Run a Security Header Scan
 
@@ -491,7 +491,7 @@ Classification: DNS egress allowed
 
 **Workflow:**
 
-<img src="/dashboard/assets/diagrams/diagram-22-testing-lab-multitool-workflow.svg" alt="Comprehensive testing lab workflow chaining k6, Nuclei, payload fuzzing, and egress validation into a single report." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-22-testing-lab-multitool-workflow.svg" alt="Comprehensive testing lab workflow chaining k6, Nuclei, payload fuzzing, and egress validation into a single report." width="940" style="max-width: 100%; height: auto;" />
 
 #### Step 1: Load Test (k6)
 ```

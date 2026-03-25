@@ -59,7 +59,7 @@ Think of it as a **test script** or **attack playbook** — recipes for testing 
 
 Every scenario has:
 
-<img src="/dashboard/assets/diagrams/diagram-16-scenario-structure.svg" alt="Scenario structure showing metadata, ordered steps with action and parameters, and final execution result." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-16-scenario-structure.svg" alt="Scenario structure showing metadata, ordered steps with action and parameters, and final execution result." width="940" style="max-width: 100%; height: auto;" />
 
 ### Scenario Limits
 
@@ -308,7 +308,7 @@ curl -X POST "http://localhost:8090/scenarios/$SCENARIO_ID/run"
 
 ### Monitoring Execution
 
-<img src="/dashboard/assets/diagrams/diagram-34-scenario-execution-timeline.svg" alt="Scenario execution timeline from run trigger through queued execution, step updates, and terminal state." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-34-scenario-execution-timeline.svg" alt="Scenario execution timeline from run trigger through queued execution, step updates, and terminal state." width="940" style="max-width: 100%; height: auto;" />
 
 #### Via Dashboard (Real-Time)
 
@@ -467,7 +467,7 @@ Step 3: chaos.memory
 
 ### Pattern 1: Gradual Load Increase
 
-<img src="/dashboard/assets/diagrams/diagram-35-scenario-step-dependency-graph.svg" alt="Scenario step dependency graph showing prerequisite and converging validation steps before final reporting." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-35-scenario-step-dependency-graph.svg" alt="Scenario step dependency graph showing prerequisite and converging validation steps before final reporting." width="940" style="max-width: 100%; height: auto;" />
 
 ```
 Goal: Test system under gradually increasing load

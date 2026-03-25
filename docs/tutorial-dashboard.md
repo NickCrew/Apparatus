@@ -55,7 +55,7 @@ Think of it as **your war room dashboard** — everything happens here in real-t
 
 ### The Layout
 
-<img src="/dashboard/assets/diagrams/diagram-8-dashboard-layout.svg" alt="Dashboard layout showing header, sidebar navigation, and main console workspace." width="680" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-8-dashboard-layout.svg" alt="Dashboard layout showing header, sidebar navigation, and main console workspace." width="680" style="max-width: 100%; height: auto;" />
 
 ### Try It: Open the Dashboard
 
@@ -207,7 +207,7 @@ Notice how **console state is preserved** — when you return to Autopilot, your
 
 Every console has these elements:
 
-<img src="/dashboard/assets/diagrams/diagram-18-console-panel-structure.svg" alt="Standard console panel structure showing header, controls, filters, data area, and export section." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-18-console-panel-structure.svg" alt="Standard console panel structure showing header, controls, filters, data area, and export section." width="940" style="max-width: 100%; height: auto;" />
 
 ### Checkpoint
 
@@ -230,7 +230,7 @@ AI red team agent that autonomously attacks your target application.
 
 **What you see:**
 
-<img src="/dashboard/assets/diagrams/diagram-45-autopilot-console-layout.svg" alt="Autopilot console layout with campaign status, controls, attack history, findings, and export/report actions." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-45-autopilot-console-layout.svg" alt="Autopilot console layout with campaign status, controls, attack history, findings, and export/report actions." width="940" style="max-width: 100%; height: auto;" />
 
 ### Key Controls
 
@@ -290,7 +290,7 @@ Configure WAF rules, rate limiting, tarpit, and other defenses.
 
 **What you see:**
 
-<img src="/dashboard/assets/diagrams/diagram-46-defense-console-layout.svg" alt="Defense console layout showing rule controls, active rule list, defense statistics, and supporting panels." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-46-defense-console-layout.svg" alt="Defense console layout showing rule controls, active rule list, defense statistics, and supporting panels." width="940" style="max-width: 100%; height: auto;" />
 
 Also visible in this console:
 - **Tarpit Status** — IPs currently trapped
@@ -351,7 +351,7 @@ Real-time HTTP requests and responses flowing through Apparatus.
 
 **What you see:**
 
-<img src="/dashboard/assets/diagrams/diagram-47-traffic-console-layout.svg" alt="Traffic console layout showing controls, traffic stats, filters, request feed, and row actions." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-47-traffic-console-layout.svg" alt="Traffic console layout showing controls, traffic stats, filters, request feed, and row actions." width="940" style="max-width: 100%; height: auto;" />
 
 Each row shows:
 - **Timestamp** — When request arrived

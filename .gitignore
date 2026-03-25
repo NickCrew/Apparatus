@@ -42,4 +42,7 @@ pino-*.log
 .agents/reviews
 **/reviews
 .gemini-design/
+
+# jekyll
+docs/_site/
 backlog/

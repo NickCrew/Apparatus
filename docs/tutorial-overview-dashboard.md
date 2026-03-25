@@ -45,7 +45,7 @@ Think of it as your **24/7 monitoring console** — a single pane of glass to un
 
 ### Main Sections
 
-<img src="/dashboard/assets/diagrams/diagram-15-overview-sections.svg" alt="Overview dashboard section map showing pressure gauge, key metrics, protocol activity, and incident feed." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-15-overview-sections.svg" alt="Overview dashboard section map showing pressure gauge, key metrics, protocol activity, and incident feed." width="940" style="max-width: 100%; height: auto;" />
 
 ### Try It: Open the Overview
 
@@ -184,7 +184,7 @@ All routes OK  Heavy routes   Request shedding
                  shedding
 ```
 
-<img src="/dashboard/assets/diagrams/diagram-33-pressure-state-transitions.svg" alt="Pressure gauge state transitions between Stable, Elevated, and Critical based on event loop lag thresholds." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-33-pressure-state-transitions.svg" alt="Pressure gauge state transitions between Stable, Elevated, and Critical based on event loop lag thresholds." width="940" style="max-width: 100%; height: auto;" />
 
 ### Pressure Calculation
 
@@ -424,7 +424,7 @@ Latency spiked to 450ms (P99)
 
 **What do you do?**
 
-<img src="/dashboard/assets/diagrams/diagram-32-incident-response-workflow.svg" alt="Incident response workflow from severity assessment through source investigation, response choice, and verification." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-32-incident-response-workflow.svg" alt="Incident response workflow from severity assessment through source investigation, response choice, and verification." width="940" style="max-width: 100%; height: auto;" />
 
 ### Step-by-Step Response
 

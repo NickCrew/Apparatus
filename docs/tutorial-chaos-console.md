@@ -95,7 +95,7 @@ By the end, you'll be able to:
 
 ### The Chaos Console Layout
 
-<img src="/dashboard/assets/diagrams/diagram-14-chaos-console-layout.svg" alt="Chaos console layout showing safety warning, CPU controls, memory controls, crash controls, and recent action history." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-14-chaos-console-layout.svg" alt="Chaos console layout showing safety warning, CPU controls, memory controls, crash controls, and recent action history." width="940" style="max-width: 100%; height: auto;" />
 
 ### Checkpoint
 
@@ -124,7 +124,7 @@ When CPU spikes:
 - ⬆️ Error rate may increase (queue overflow)
 - ⬆️ Pressure gauge moves toward CRITICAL
 
-<img src="/dashboard/assets/diagrams/diagram-26-cpu-impact-timeline.svg" alt="CPU spike impact timeline from baseline to spike window to recovery validation." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-26-cpu-impact-timeline.svg" alt="CPU spike impact timeline from baseline to spike window to recovery validation." width="940" style="max-width: 100%; height: auto;" />
 
 ### Try It: Measure CPU Impact
 
@@ -229,7 +229,7 @@ When memory spikes:
 - ⬆️ Latency may increase
 - ⬆️ Error rate may increase if OOM killer triggers
 
-<img src="/dashboard/assets/diagrams/diagram-27-memory-allocation-impact.svg" alt="Memory allocation impact stages from low allocation through high-pressure ranges and cleanup." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-27-memory-allocation-impact.svg" alt="Memory allocation impact stages from low allocation through high-pressure ranges and cleanup." width="940" style="max-width: 100%; height: auto;" />
 
 ### Memory Controls
 
@@ -606,7 +606,7 @@ After chaos ends, metrics still degraded
 3. Wait longer (recovery can take 30+ seconds)
 4. If still stuck after 5 min, restart Apparatus
 
-<img src="/dashboard/assets/diagrams/diagram-28-chaos-recovery-decision-tree.svg" alt="Recovery decision tree for post-chaos degraded metrics and escalation paths." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-28-chaos-recovery-decision-tree.svg" alt="Recovery decision tree for post-chaos degraded metrics and escalation paths." width="940" style="max-width: 100%; height: auto;" />
 
 ### Issue: Dashboard Disconnects During Crash
 

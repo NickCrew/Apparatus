@@ -52,12 +52,12 @@ Apparatus is designed to work alongside Chimera as a complete security testing e
 ## System Architecture
 
 ### High-Level Data Flow
-<img src="/dashboard/assets/diagrams/diagram-1-data-flow.svg" alt="High-level data flow through Apparatus from tester to protocol servers, middleware, handlers, dashboards, and targets." width="860" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-1-data-flow.svg" alt="High-level data flow through Apparatus from tester to protocol servers, middleware, handlers, dashboards, and targets." width="860" style="max-width: 100%; height: auto;" />
 
 Security testers send requests through multiple protocol servers into the Apparatus platform, which processes them through a middleware stack before executing feature handlers and returning results via dashboards. The platform can target VulnWeb, VulnAPI, or external systems.
 
 ### Request Flow Through Middleware
-<img src="/dashboard/assets/diagrams/diagram-2-middleware-flow.svg" alt="Request processing through the ordered middleware stack from MTD to SSE broadcast." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-2-middleware-flow.svg" alt="Request processing through the ordered middleware stack from MTD to SSE broadcast." width="940" style="max-width: 100%; height: auto;" />
 
 Each request flows through **11 middleware stages in order:**
 
@@ -90,9 +90,9 @@ Executes in critical order:
 - **Metrics** (`src/metrics.ts`) - Prometheus counters and histograms
 - **Active Shield** (`src/sentinel.ts`) - Pattern-based request blocking
 
-<img src="/dashboard/assets/diagrams/diagram-9-middleware-deps.svg" alt="Middleware dependency and ordering graph showing MTD, self-healing, deception, tarpit, metrics, parser, WAF, handler, and SSE." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-9-middleware-deps.svg" alt="Middleware dependency and ordering graph showing MTD, self-healing, deception, tarpit, metrics, parser, WAF, handler, and SSE." width="940" style="max-width: 100%; height: auto;" />
 
-<img src="/dashboard/assets/diagrams/diagram-5-health-states.svg" alt="Self-healing state model with Healthy, Degraded, and Critical transitions based on event loop lag thresholds." width="900" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-5-health-states.svg" alt="Self-healing state model with Healthy, Degraded, and Critical transitions based on event loop lag thresholds." width="900" style="max-width: 100%; height: auto;" />
 
 #### 2. Protocol Servers
 Multiple independent servers bound to different ports:
@@ -112,7 +112,7 @@ Multiple independent servers bound to different ports:
 | UDP Echo | 9001 | `server-l4.ts` | UDP |
 | WebSocket | /ws | `server-ws.ts` | WebSocket over HTTP/1.1 |
 
-<img src="/dashboard/assets/diagrams/diagram-6-protocol-servers.svg" alt="Protocol server architecture showing Apparatus and its HTTP, gRPC, WebSocket, Redis, MQTT, SMTP, TCP, UDP, and Syslog interfaces." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-6-protocol-servers.svg" alt="Protocol server architecture showing Apparatus and its HTTP, gRPC, WebSocket, Redis, MQTT, SMTP, TCP, UDP, and Syslog interfaces." width="940" style="max-width: 100%; height: auto;" />
 
 #### 3. Feature Modules
 
@@ -255,7 +255,7 @@ const members = new Map<string, number>();
 ---
 
 ## Network Topology in Docker Compose
-<img src="/dashboard/assets/diagrams/diagram-3-network.svg" alt="Docker compose network topology for Apparatus, VulnWeb, and VulnAPI on the security-lab network." width="760" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-3-network.svg" alt="Docker compose network topology for Apparatus, VulnWeb, and VulnAPI on the security-lab network." width="760" style="max-width: 100%; height: auto;" />
 
 All containers run on isolated network `security-lab` (172.25.0.0/16):
 
@@ -463,7 +463,7 @@ No dedicated timeline diagram is maintained right now; use the step flow below w
 3. **Tn:** Client polls `GET /scenarios/{id}/status?executionId=X` to get current status, step ID, errors, and finish time
 
 ### Red Team Autopilot Loop
-<img src="/dashboard/assets/diagrams/diagram-4-autopilot-loop.svg" alt="Autopilot decision loop from target evaluation and tool selection through execution, recording, and stop checks." width="940" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-4-autopilot-loop.svg" alt="Autopilot decision loop from target evaluation and tool selection through execution, recording, and stop checks." width="940" style="max-width: 100%; height: auto;" />
 
 **Autonomous agent loop:**
 1. **Evaluate Target State** — Send probes, analyze responses, assess health, identify weak points

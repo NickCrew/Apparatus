@@ -1,0 +1,45 @@
+main:
+  - title: Getting Started
+    url: /quick-reference
+  - title: Architecture
+    url: /architecture
+  - title: Features
+    url: /features
+  - title: Diagrams
+    url: /diagrams
+  - title: Integration
+    url: /integration-guide
+
+tutorials:
+  - title: CLI Reference
+    url: /tutorial-cli
+  - title: Web Dashboard
+    url: /tutorial-dashboard
+  - title: Overview Dashboard
+    url: /tutorial-overview-dashboard
+  - title: AI Autopilot
+    url: /tutorial-autopilot
+  - title: Advanced Red Team
+    url: /tutorial-advanced-red-team
+  - title: Chaos Engineering
+    url: /tutorial-chaos-engineering
+  - title: Chaos Console
+    url: /tutorial-chaos-console
+  - title: Defense Rules
+    url: /tutorial-defense-rules
+  - title: Attacker Fingerprinting
+    url: /tutorial-attacker-fingerprinting
+  - title: Scenario Builder
+    url: /tutorial-scenario-builder
+  - title: Scenarios
+    url: /tutorial-scenarios
+  - title: Live Payload Fuzzer
+    url: /tutorial-live-payload-fuzzer
+  - title: Testing Lab
+    url: /tutorial-testing-lab
+  - title: Webhooks
+    url: /tutorial-webhooks
+  - title: Monitoring
+    url: /tutorial-monitoring
+  - title: Performance Tuning
+    url: /tutorial-performance-tuning

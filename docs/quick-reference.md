@@ -40,7 +40,7 @@ pnpm start
 
 ## Learning Path At A Glance
 
-<img src="/dashboard/assets/diagrams/diagram-10-feature-adoption.svg" alt="Four-level feature adoption timeline from onboarding basics to advanced automation." width="760" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-10-feature-adoption.svg" alt="Four-level feature adoption timeline from onboarding basics to advanced automation." width="760" style="max-width: 100%; height: auto;" />
 
 ---
 

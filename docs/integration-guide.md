@@ -36,7 +36,7 @@ Services will be available at:
 
 ### Docker Compose Network
 
-<img src="/dashboard/assets/diagrams/diagram-3-network.svg" alt="Docker compose network graph showing Apparatus, VulnWeb, and VulnAPI communication paths." width="760" style="max-width: 100%; height: auto;" />
+<img src="assets/diagrams/diagram-3-network.svg" alt="Docker compose network graph showing Apparatus, VulnWeb, and VulnAPI communication paths." width="760" style="max-width: 100%; height: auto;" />
 
 All containers run on isolated network `security-lab`:
 - **Apparatus** can reach VulnWeb at `http://vuln-web:3000`
