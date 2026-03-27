@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Button } from '../ui/Button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { useClient } from '../../hooks/useClient';
-import { isApiError, type JwtVerifyResponse } from '@apparatus/client';
+import { isApiError, type JwtVerifyResponse } from '@atlascrew/apparatus-client';
 
 type JsonRecord = Record<string, unknown>;
 type AttackMode = 'none' | 'none_alg' | 'weak_key' | 'key_confusion';

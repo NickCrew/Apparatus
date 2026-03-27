@@ -165,7 +165,7 @@ importers:
 
   apps/apparatus/src/dashboard:
     dependencies:
-      '@apparatus/client':
+      '@atlascrew/apparatus-client':
         specifier: workspace:*
         version: link:../../../../libs/client
       '@radix-ui/react-dialog':
@@ -253,7 +253,7 @@ importers:
 
   apps/cli:
     dependencies:
-      '@apparatus/client':
+      '@atlascrew/apparatus-client':
         specifier: workspace:*
         version: link:../../libs/client
       chalk:

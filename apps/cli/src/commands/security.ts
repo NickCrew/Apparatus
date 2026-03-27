@@ -4,7 +4,7 @@
  */
 
 import type { Command } from 'commander';
-import type { ApparatusClient } from '@apparatus/client';
+import type { ApparatusClient } from '@atlascrew/apparatus-client';
 import chalk from 'chalk';
 import * as output from '../output.js';
 

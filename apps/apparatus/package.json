@@ -1,11 +1,39 @@
 {
-  "name": "@apparatus/server",
+  "name": "@atlascrew/apparatus",
   "version": "0.9.0",
-  "private": true,
+  "author": "Nicholas Crew Ferguson <nick@atlascrew.dev> (https://atlascrew.dev)",
+  "keywords": [
+    "security-research",
+    "network-simulation",
+    "security-testing",
+    "synapse",
+    "horizon"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NickCrew/Apparatus",
+    "directory": "apps/apparatus"
+  },
+  "homepage": "https://apparatus.atlascrew.dev",
+  "bugs": "https://github.com/NickCrew/Apparatus/issues",
   "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "apparatus": "./bin/apparatus.mjs"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "certs",
+    "proto",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "node --loader ts-node/esm --experimental-specifier-resolution=node src/index.ts",
-    "build": "pnpm --filter @apparatus/dashboard build && tsc && cp -r src/dist-dashboard dist/",
+    "build": "pnpm --filter @atlascrew/apparatus-dashboard build && tsc && cp -r src/dist-dashboard dist/",
     "start": "node dist/index.js",
     "tui": "node --loader ts-node/esm --experimental-specifier-resolution=node src/tui/index.ts",
     "escape": "node --loader ts-node/esm --experimental-specifier-resolution=node src/escape/index.ts",

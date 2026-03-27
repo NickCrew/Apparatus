@@ -15,7 +15,7 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@apparatus/client": ["libs/client/src/index.ts"]
+      "@atlascrew/apparatus-client": ["libs/client/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "dist"]

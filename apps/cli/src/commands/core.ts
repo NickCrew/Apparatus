@@ -4,7 +4,7 @@
  */
 
 import type { Command } from 'commander';
-import type { ApparatusClient } from '@apparatus/client';
+import type { ApparatusClient } from '@atlascrew/apparatus-client';
 import * as output from '../output.js';
 
 export function registerCoreCommands(program: Command, getClient: () => ApparatusClient): void {

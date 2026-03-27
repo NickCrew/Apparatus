@@ -1,6 +1,17 @@
 {
-  "name": "@apparatus/monorepo",
+  "name": "@atlascrew/apparatus-monorepo",
   "private": true,
+  "author": "Nicholas Crew Ferguson <nick@atlascrew.dev> (https://atlascrew.dev)",
+  "keywords": ["security-research", "network-simulation", "security-testing", "synapse", "horizon"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NickCrew/Apparatus",
+    "directory": "apps/apparatus"
+  },
+  "homepage": "https://apparatus.atlascrew.dev",
+  "bugs": "https://github.com/NickCrew/Apparatus/issues",
+  "license": "MIT",
+
   "type": "module",
   "engines": {
     "node": ">=22.0.0"

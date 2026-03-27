@@ -7,7 +7,7 @@ import {
   useCallback,
   type ReactNode,
 } from 'react';
-import { ApparatusClient } from '@apparatus/client';
+import { ApparatusClient } from '@atlascrew/apparatus-client';
 
 interface HealthState {
   status: 'healthy' | 'unhealthy' | 'degraded' | 'critical' | 'checking' | 'unknown';

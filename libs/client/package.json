@@ -1,7 +1,22 @@
 {
-  "name": "@apparatus/client",
-  "version": "0.9.0",
+  "name": "@atlascrew/apparatus-client",
+  "version": "0.9.1",
   "description": "TypeScript API client for Apparatus",
+  "author": "Nicholas Crew Ferguson <nick@atlascrew.dev> (https://atlascrew.dev)",
+  "keywords": [
+    "security-research",
+    "network-simulation",
+    "security-testing",
+    "synapse",
+    "horizon"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NickCrew/Apparatus",
+    "directory": "libs/client"
+  },
+  "homepage": "https://apparatus.atlascrew.dev",
+  "bugs": "https://github.com/NickCrew/Apparatus/issues",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -26,7 +41,7 @@
   },
   "license": "MIT",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "access": "public"
   },
   "devDependencies": {
     "@types/node": "^22.12.0"
