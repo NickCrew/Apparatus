@@ -1,4 +1,4 @@
-# apparatus-client
+# @atlascrew/apparatus-sdk
 
 TypeScript API client for [Apparatus](../../apps/demo-targets/apparatus/) - a comprehensive HTTP testing and chaos engineering server with 50+ endpoints.
 
@@ -6,19 +6,19 @@ TypeScript API client for [Apparatus](../../apps/demo-targets/apparatus/) - a co
 
 ```bash
 # npm
-npm install apparatus-client
+npm install @atlascrew/apparatus-sdk
 
 # pnpm
-pnpm add apparatus-client
+pnpm add @atlascrew/apparatus-sdk
 
 # yarn
-yarn add apparatus-client
+yarn add @atlascrew/apparatus-sdk
 ```
 
 ## Quick Start
 
 ```typescript
-import { ApparatusClient } from 'apparatus-client';
+import { ApparatusClient } from '@atlascrew/apparatus-sdk';
 
 // Create client
 const client = new ApparatusClient({
@@ -676,7 +676,7 @@ import {
   isApiError,        // Type guards
   isNetworkError,
   isTimeoutError,
-} from 'apparatus-client';
+} from '@atlascrew/apparatus-sdk';
 
 try {
   await client.core.health();
@@ -738,7 +738,7 @@ import type {
   MemorySpikeResponse,
 
   // And many more...
-} from 'apparatus-client';
+} from '@atlascrew/apparatus-sdk';
 ```
 
 ---
@@ -748,7 +748,7 @@ import type {
 ### Health Monitoring
 
 ```typescript
-import { ApparatusClient } from 'apparatus-client';
+import { ApparatusClient } from '@atlascrew/apparatus-sdk';
 
 const client = new ApparatusClient({ baseUrl: 'http://localhost:8080' });
 
@@ -766,7 +766,7 @@ setInterval(async () => {
 ### Chaos Testing
 
 ```typescript
-import { ApparatusClient } from 'apparatus-client';
+import { ApparatusClient } from '@atlascrew/apparatus-sdk';
 
 const client = new ApparatusClient({ baseUrl: 'http://localhost:8080' });
 
@@ -786,7 +786,7 @@ async function stressTest() {
 ### Real-time Event Monitoring
 
 ```typescript
-import { ApparatusClient } from 'apparatus-client';
+import { ApparatusClient } from '@atlascrew/apparatus-sdk';
 
 const client = new ApparatusClient({ baseUrl: 'http://localhost:8080' });
 
@@ -815,7 +815,7 @@ process.on('SIGINT', () => {
 ### Security Scanning
 
 ```typescript
-import { ApparatusClient, isApiError } from 'apparatus-client';
+import { ApparatusClient, isApiError } from '@atlascrew/apparatus-sdk';
 
 const client = new ApparatusClient({ baseUrl: 'http://localhost:8080' });
 

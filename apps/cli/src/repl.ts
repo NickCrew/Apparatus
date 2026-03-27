@@ -5,7 +5,7 @@
 
 import * as readline from 'readline';
 import chalk from 'chalk';
-import { ApparatusClient } from '@atlascrew/apparatus-client';
+import { ApparatusClient } from '@atlascrew/apparatus-sdk';
 import { loadConfig, loadHistory, appendHistory, getHistoryPath } from './config.js';
 import { createCompleter } from './repl/completer.js';
 import { expandCommand, BUILTIN_COMMANDS, isBuiltinCommand, type ReplContext } from './repl/context.js';

@@ -160,19 +160,19 @@ graph:
 # ── Release ────────────────────────────────────────────────
 #
 # Per-package versioning. Each package has its own version and tag.
-#   Tag format: <pkg>-v<semver>  (e.g. apparatus-v1.0.0, apparatus-client-v0.9.1)
+#   Tag format: <pkg>-v<semver>  (e.g. apparatus-v1.0.0, apparatus-sdk-v0.9.1)
 #   Pushing a tag triggers the matching CI publish job.
 #
 # Package map (short name → package.json path):
 _pkg_apparatus         := "apps/apparatus/package.json"
-_pkg_apparatus_client  := "libs/client/package.json"
+_pkg_apparatus_sdk     := "libs/client/package.json"
 _pkg_apparatus_cli     := "apps/cli/package.json"
 _pkg_apparatus_dash    := "apps/apparatus/src/dashboard/package.json"
 
 # Show current versions for all packages
 versions:
 	@echo "apparatus        $(jq -r .version {{_pkg_apparatus}})"
-	@echo "apparatus-client $(jq -r .version {{_pkg_apparatus_client}})"
+	@echo "apparatus-sdk    $(jq -r .version {{_pkg_apparatus_sdk}})"
 	@echo "apparatus-cli    $(jq -r .version {{_pkg_apparatus_cli}})"
 	@echo "apparatus-dash   $(jq -r .version {{_pkg_apparatus_dash}})"
 
@@ -182,10 +182,10 @@ version pkg="apparatus":
 	set -euo pipefail
 	case "{{pkg}}" in
 	  apparatus)        jq -r .version {{_pkg_apparatus}} ;;
-	  apparatus-client) jq -r .version {{_pkg_apparatus_client}} ;;
+	  apparatus-sdk|apparatus-client) jq -r .version {{_pkg_apparatus_sdk}} ;;
 	  apparatus-cli)    jq -r .version {{_pkg_apparatus_cli}} ;;
 	  apparatus-dash)   jq -r .version {{_pkg_apparatus_dash}} ;;
-	  *) echo "Unknown package: {{pkg}}. Use: apparatus, apparatus-client, apparatus-cli, apparatus-dash"; exit 1 ;;
+	  *) echo "Unknown package: {{pkg}}. Use: apparatus, apparatus-sdk, apparatus-cli, apparatus-dash"; exit 1 ;;
 	esac
 
 # Bump a package version (just bump <pkg> [patch|minor|major])
@@ -194,10 +194,10 @@ bump pkg="apparatus" level="patch":
 	set -euo pipefail
 	case "{{pkg}}" in
 	  apparatus)        files="{{_pkg_apparatus}}" ;;
-	  apparatus-client) files="{{_pkg_apparatus_client}}" ;;
+	  apparatus-sdk|apparatus-client) files="{{_pkg_apparatus_sdk}}" ;;
 	  apparatus-cli)    files="{{_pkg_apparatus_cli}}" ;;
 	  apparatus-dash)   files="{{_pkg_apparatus_dash}}" ;;
-	  *) echo "Unknown package: {{pkg}}. Use: apparatus, apparatus-client, apparatus-cli, apparatus-dash"; exit 1 ;;
+	  *) echo "Unknown package: {{pkg}}. Use: apparatus, apparatus-sdk, apparatus-cli, apparatus-dash"; exit 1 ;;
 	esac
 	current=$(jq -r .version $files)
 	IFS='.' read -r major minor patch <<< "$current"
@@ -216,13 +216,25 @@ release pkg="apparatus":
 	#!/usr/bin/env bash
 	set -euo pipefail
 	case "{{pkg}}" in
-	  apparatus)        file="{{_pkg_apparatus}}" ;;
-	  apparatus-client) file="{{_pkg_apparatus_client}}" ;;
-	  apparatus-cli)    file="{{_pkg_apparatus_cli}}" ;;
-	  *) echo "Unknown publishable package: {{pkg}}. Use: apparatus, apparatus-client, apparatus-cli"; exit 1 ;;
+	  apparatus)
+	    file="{{_pkg_apparatus}}"
+	    tag_prefix="apparatus"
+	    ;;
+	  apparatus-sdk|apparatus-client)
+	    file="{{_pkg_apparatus_sdk}}"
+	    tag_prefix="apparatus-sdk"
+	    ;;
+	  apparatus-cli)
+	    file="{{_pkg_apparatus_cli}}"
+	    tag_prefix="apparatus-cli"
+	    ;;
+	  *)
+	    echo "Unknown publishable package: {{pkg}}. Use: apparatus, apparatus-sdk, apparatus-cli"
+	    exit 1
+	    ;;
 	esac
 	version=$(jq -r .version "$file")
-	tag="{{pkg}}-v${version}"
+	tag="${tag_prefix}-v${version}"
 	if git rev-parse "$tag" >/dev/null 2>&1; then
 	  echo "Error: tag $tag already exists. Bump first: just bump {{pkg}} [patch|minor|major]"
 	  exit 1
@@ -235,7 +247,7 @@ release pkg="apparatus":
 # Release all publishable packages at their current versions
 release-all:
 	just release apparatus
-	just release apparatus-client
+	just release apparatus-sdk
 	just release apparatus-cli
 
 # ── Docs ───────────────────────────────────────

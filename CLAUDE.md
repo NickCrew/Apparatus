@@ -40,12 +40,12 @@ pnpm lint                     # eslint all packages
 ```
 apps/apparatus/   → @atlascrew/apparatus  (Express server, 50+ endpoints, multi-protocol)
 apps/cli/         → @atlascrew/apparatus-cli     (Commander.js CLI with REPL)
-libs/client/      → @atlascrew/apparatus-client  (HTTP client library, 16 API categories)
+libs/client/      → @atlascrew/apparatus-sdk  (HTTP client library, 16 API categories)
 ```
 
 **Dependency graph:** CLI depends on client (`workspace:*`). Server is standalone. Client is the shared library consumed by CLI and dashboard.
 
-**Module system:** All ESM (`"type": "module"`). Server imports use `.js` extensions. Cross-package imports use `@atlascrew/apparatus-client` path alias (configured in `tsconfig.base.json`).
+**Module system:** All ESM (`"type": "module"`). Server imports use `.js` extensions. Cross-package imports use `@atlascrew/apparatus-sdk` path alias (configured in `tsconfig.base.json`).
 
 **Build tools:** Server uses plain `tsc`. CLI and client use `tsup` (ESM output, node22 target). CLI bundles the client via `noExternal` and prepends a shebang.
 
@@ -64,7 +64,7 @@ libs/client/      → @atlascrew/apparatus-client  (HTTP client library, 16 API 
 
 **TUI:** Terminal dashboard at `src/tui/` using blessed + blessed-contrib. Run with `pnpm tui`. Architecture: `dashboard.ts` (main), `api-client.ts` (polling), `sse-client.ts` (real-time), `core/store.ts` (state), `widgets/` (18 widget types).
 
-**Web Dashboard:** React SPA at `src/dashboard/` (Vite + Tailwind + React Router). Built to `dist-dashboard/`, served at `/dashboard`. Uses `@atlascrew/apparatus-client`.
+**Web Dashboard:** React SPA at `src/dashboard/` (Vite + Tailwind + React Router). Built to `dist-dashboard/`, served at `/dashboard`. Uses `@atlascrew/apparatus-sdk`.
 
 ## Client Library (libs/client)
 
@@ -88,7 +88,7 @@ libs/client/      → @atlascrew/apparatus-client  (HTTP client library, 16 API 
 - Vitest for tests (`*.test.ts`), globals enabled, v8 coverage
 - Nx caching enabled for build/test/lint/type-check targets
 - `dependsOn: ["^build"]` ensures client builds before CLI
-- All three packages (`@atlascrew/apparatus`, `@atlascrew/apparatus-client`, `@atlascrew/apparatus-cli`) publish to npm under the `@atlascrew` org
+- All three packages (`@atlascrew/apparatus`, `@atlascrew/apparatus-sdk`, `@atlascrew/apparatus-cli`) publish to npm under the `@atlascrew` org
 
 <!-- BACKLOG.MD MCP GUIDELINES START -->
 

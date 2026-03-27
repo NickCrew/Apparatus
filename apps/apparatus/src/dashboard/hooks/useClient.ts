@@ -1,4 +1,4 @@
-import { ApparatusClient } from '@atlascrew/apparatus-client';
+import { ApparatusClient } from '@atlascrew/apparatus-sdk';
 import { useApparatus } from '../providers/ApparatusProvider';
 
 /**

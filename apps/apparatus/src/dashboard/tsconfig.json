@@ -17,7 +17,8 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@atlascrew/apparatus-sdk": ["../../../../libs/client/src/index.ts"]
     }
   },
   "include": ["./**/*.ts", "./**/*.tsx"],

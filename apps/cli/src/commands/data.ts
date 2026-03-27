@@ -4,7 +4,7 @@
  */
 
 import type { Command } from 'commander';
-import type { ApparatusClient } from '@atlascrew/apparatus-client';
+import type { ApparatusClient } from '@atlascrew/apparatus-sdk';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as output from '../output.js';

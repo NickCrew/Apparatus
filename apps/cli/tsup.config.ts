@@ -11,5 +11,5 @@ export default defineConfig({
   banner: {
     js: '#!/usr/bin/env node',
   },
-  noExternal: ['@atlascrew/apparatus-client'],
+  noExternal: ['@atlascrew/apparatus-sdk'],
 });

@@ -9,6 +9,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname),
+      '@atlascrew/apparatus-sdk': path.resolve(__dirname, '../../../../libs/client/src/index.ts'),
     },
   },
   server: {

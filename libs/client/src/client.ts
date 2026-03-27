@@ -6,7 +6,7 @@
  *
  * @example
  * ```typescript
- * import { ApparatusClient } from 'apparatus-client';
+ * import { ApparatusClient } from '@atlascrew/apparatus-sdk';
  *
  * const client = new ApparatusClient({ baseUrl: 'http://localhost:8080' });
  *
