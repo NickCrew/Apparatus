@@ -1,4 +1,4 @@
-# @atlascrew/apparatus-sdk
+# @atlascrew/apparatus-lib
 
 TypeScript API client for [Apparatus](../../apps/demo-targets/apparatus/) - a comprehensive HTTP testing and chaos engineering server with 50+ endpoints.
 
@@ -6,19 +6,19 @@ TypeScript API client for [Apparatus](../../apps/demo-targets/apparatus/) - a co
 
 ```bash
 # npm
-npm install @atlascrew/apparatus-sdk
+npm install @atlascrew/apparatus-lib
 
 # pnpm
-pnpm add @atlascrew/apparatus-sdk
+pnpm add @atlascrew/apparatus-lib
 
 # yarn
-yarn add @atlascrew/apparatus-sdk
+yarn add @atlascrew/apparatus-lib
 ```
 
 ## Quick Start
 
 ```typescript
-import { ApparatusClient } from '@atlascrew/apparatus-sdk';
+import { ApparatusClient } from '@atlascrew/apparatus-lib';
 
 // Create client
 const client = new ApparatusClient({
@@ -676,7 +676,7 @@ import {
   isApiError,        // Type guards
   isNetworkError,
   isTimeoutError,
-} from '@atlascrew/apparatus-sdk';
+} from '@atlascrew/apparatus-lib';
 
 try {
   await client.core.health();
@@ -738,7 +738,7 @@ import type {
   MemorySpikeResponse,
 
   // And many more...
-} from '@atlascrew/apparatus-sdk';
+} from '@atlascrew/apparatus-lib';
 ```
 
 ---
@@ -748,7 +748,7 @@ import type {
 ### Health Monitoring
 
 ```typescript
-import { ApparatusClient } from '@atlascrew/apparatus-sdk';
+import { ApparatusClient } from '@atlascrew/apparatus-lib';
 
 const client = new ApparatusClient({ baseUrl: 'http://localhost:8080' });
 
@@ -766,7 +766,7 @@ setInterval(async () => {
 ### Chaos Testing
 
 ```typescript
-import { ApparatusClient } from '@atlascrew/apparatus-sdk';
+import { ApparatusClient } from '@atlascrew/apparatus-lib';
 
 const client = new ApparatusClient({ baseUrl: 'http://localhost:8080' });
 
@@ -786,7 +786,7 @@ async function stressTest() {
 ### Real-time Event Monitoring
 
 ```typescript
-import { ApparatusClient } from '@atlascrew/apparatus-sdk';
+import { ApparatusClient } from '@atlascrew/apparatus-lib';
 
 const client = new ApparatusClient({ baseUrl: 'http://localhost:8080' });
 
@@ -815,7 +815,7 @@ process.on('SIGINT', () => {
 ### Security Scanning
 
 ```typescript
-import { ApparatusClient, isApiError } from '@atlascrew/apparatus-sdk';
+import { ApparatusClient, isApiError } from '@atlascrew/apparatus-lib';
 
 const client = new ApparatusClient({ baseUrl: 'http://localhost:8080' });
 

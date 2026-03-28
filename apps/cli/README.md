@@ -778,7 +778,7 @@ apparatus --config ./my-config.json health
 
 ## See Also
 
-- [apparatus-sdk](../../../libs/client/) - TypeScript API client
+- [apparatus-lib](../../../libs/client/) - TypeScript API client
 - [Apparatus](../apparatus/) - The API server
 
 ## License

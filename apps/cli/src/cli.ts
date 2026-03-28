@@ -5,7 +5,7 @@
 
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { ApparatusClient } from '@atlascrew/apparatus-sdk';
+import { ApparatusClient } from '@atlascrew/apparatus-lib';
 import { loadConfig, type ApparatusConfig } from './config.js';
 import * as output from './output.js';
 

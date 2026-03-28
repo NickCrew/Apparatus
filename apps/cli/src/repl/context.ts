@@ -3,7 +3,7 @@
  * Handles command parsing and execution in REPL mode
  */
 
-import { ApparatusClient } from '@atlascrew/apparatus-sdk';
+import { ApparatusClient } from '@atlascrew/apparatus-lib';
 import * as output from '../output.js';
 
 export interface ReplContext {

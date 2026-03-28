@@ -7,7 +7,7 @@
  */
 
 import type { Command } from 'commander';
-import type { ApparatusClient } from '@atlascrew/apparatus-sdk';
+import type { ApparatusClient } from '@atlascrew/apparatus-lib';
 import chalk from 'chalk';
 import * as output from '../output.js';
 

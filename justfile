@@ -160,7 +160,7 @@ graph:
 # ── Release ────────────────────────────────────────────────
 #
 # Per-package versioning. Each package has its own version and tag.
-#   Tag format: <pkg>-v<semver>  (e.g. apparatus-v1.0.0, apparatus-sdk-v0.9.1)
+#   Tag format: <pkg>-v<semver>  (e.g. apparatus-v1.0.0, apparatus-lib-v0.9.1)
 #   Pushing a tag triggers the matching CI publish job.
 #
 # Package map (short name → package.json path):
@@ -172,7 +172,7 @@ _pkg_apparatus_dash    := "apps/apparatus/src/dashboard/package.json"
 # Show current versions for all packages
 versions:
 	@echo "apparatus        $(jq -r .version {{_pkg_apparatus}})"
-	@echo "apparatus-sdk    $(jq -r .version {{_pkg_apparatus_sdk}})"
+	@echo "apparatus-lib    $(jq -r .version {{_pkg_apparatus_sdk}})"
 	@echo "apparatus-cli    $(jq -r .version {{_pkg_apparatus_cli}})"
 	@echo "apparatus-dash   $(jq -r .version {{_pkg_apparatus_dash}})"
 
@@ -182,10 +182,10 @@ version pkg="apparatus":
 	set -euo pipefail
 	case "{{pkg}}" in
 	  apparatus)        jq -r .version {{_pkg_apparatus}} ;;
-	  apparatus-sdk|apparatus-client) jq -r .version {{_pkg_apparatus_sdk}} ;;
+	  apparatus-lib|apparatus-sdk|apparatus-client) jq -r .version {{_pkg_apparatus_sdk}} ;;
 	  apparatus-cli)    jq -r .version {{_pkg_apparatus_cli}} ;;
 	  apparatus-dash)   jq -r .version {{_pkg_apparatus_dash}} ;;
-	  *) echo "Unknown package: {{pkg}}. Use: apparatus, apparatus-sdk, apparatus-cli, apparatus-dash"; exit 1 ;;
+	  *) echo "Unknown package: {{pkg}}. Use: apparatus, apparatus-lib, apparatus-cli, apparatus-dash"; exit 1 ;;
 	esac
 
 # Bump a package version (just bump <pkg> [patch|minor|major])
@@ -194,10 +194,10 @@ bump pkg="apparatus" level="patch":
 	set -euo pipefail
 	case "{{pkg}}" in
 	  apparatus)        files="{{_pkg_apparatus}}" ;;
-	  apparatus-sdk|apparatus-client) files="{{_pkg_apparatus_sdk}}" ;;
+	  apparatus-lib|apparatus-sdk|apparatus-client) files="{{_pkg_apparatus_sdk}}" ;;
 	  apparatus-cli)    files="{{_pkg_apparatus_cli}}" ;;
 	  apparatus-dash)   files="{{_pkg_apparatus_dash}}" ;;
-	  *) echo "Unknown package: {{pkg}}. Use: apparatus, apparatus-sdk, apparatus-cli, apparatus-dash"; exit 1 ;;
+	  *) echo "Unknown package: {{pkg}}. Use: apparatus, apparatus-lib, apparatus-cli, apparatus-dash"; exit 1 ;;
 	esac
 	current=$(jq -r .version $files)
 	IFS='.' read -r major minor patch <<< "$current"
@@ -220,16 +220,16 @@ release pkg="apparatus":
 	    file="{{_pkg_apparatus}}"
 	    tag_prefix="apparatus"
 	    ;;
-	  apparatus-sdk|apparatus-client)
+	  apparatus-lib|apparatus-sdk|apparatus-client)
 	    file="{{_pkg_apparatus_sdk}}"
-	    tag_prefix="apparatus-sdk"
+	    tag_prefix="apparatus-lib"
 	    ;;
 	  apparatus-cli)
 	    file="{{_pkg_apparatus_cli}}"
 	    tag_prefix="apparatus-cli"
 	    ;;
 	  *)
-	    echo "Unknown publishable package: {{pkg}}. Use: apparatus, apparatus-sdk, apparatus-cli"
+	    echo "Unknown publishable package: {{pkg}}. Use: apparatus, apparatus-lib, apparatus-cli"
 	    exit 1
 	    ;;
 	esac
@@ -247,7 +247,7 @@ release pkg="apparatus":
 # Release all publishable packages at their current versions
 release-all:
 	just release apparatus
-	just release apparatus-sdk
+	just release apparatus-lib
 	just release apparatus-cli
 
 # ── Docs ───────────────────────────────────────

@@ -165,7 +165,7 @@ importers:
 
   apps/apparatus/src/dashboard:
     dependencies:
-      '@atlascrew/apparatus-sdk':
+      '@atlascrew/apparatus-lib':
         specifier: workspace:*
         version: link:../../../../libs/client
       '@radix-ui/react-dialog':

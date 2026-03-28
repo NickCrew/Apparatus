@@ -4,7 +4,7 @@
  */
 
 import type { Command } from 'commander';
-import type { ApparatusClient } from '@atlascrew/apparatus-sdk';
+import type { ApparatusClient } from '@atlascrew/apparatus-lib';
 import * as output from '../output.js';
 
 export function registerChaosCommands(program: Command, getClient: () => ApparatusClient): void {
